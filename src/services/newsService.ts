@@ -16,6 +16,15 @@ import pLimit from 'p-limit';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const xmlParser = new XMLParser();
 
+let _israeliNamesCache: Record<string, string> | null = null;
+
+function getIsraeliNames(): Record<string, string> {
+    if (_israeliNamesCache !== null) return _israeliNamesCache;
+    const namesPath = path.join(__dirname, '..', 'config', 'israeliNames.json');
+    _israeliNamesCache = JSON.parse(fs.readFileSync(namesPath, 'utf-8')) as Record<string, string>;
+    return _israeliNamesCache;
+}
+
 /**
  * Format date for Finnhub API (YYYY-MM-DD)
  */
@@ -44,7 +53,7 @@ export async function fetchNewsForStock(ticker: string): Promise<NewsItem[]> {
     const now = new Date();
     const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-    const url = `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=${formatDate(yesterday)}&to=${formatDate(now)}&token=${finnhubApiKey}`;
+    const url = `https://finnhub.io/api/v1/company-news?symbol=${encodeURIComponent(ticker)}&from=${formatDate(yesterday)}&to=${formatDate(now)}&token=${finnhubApiKey}`;
 
     try {
         const response = await fetch(url);
@@ -78,10 +87,8 @@ export async function fetchNewsForStock(ticker: string): Promise<NewsItem[]> {
  * Fetch news from Google News RSS for Israeli stocks
  */
 export async function fetchHebrewNews(ticker: string): Promise<NewsItem[]> {
-    const namesPath = path.join(__dirname, '..', 'config', 'israeliNames.json');
-    const israeliNames = JSON.parse(fs.readFileSync(namesPath, 'utf-8'));
-
-    const name = (israeliNames as Record<string, string>)[ticker] || ticker.replace('.TA', '');
+    const israeliNames = getIsraeliNames();
+    const name = israeliNames[ticker] || ticker.replace('.TA', '');
     const query = encodeURIComponent(`${name} מניה`);
     const url = `https://news.google.com/rss/search?q=${query}&hl=iw&gl=IL&ceid=IL:iw`;
 
@@ -98,12 +105,15 @@ export async function fetchHebrewNews(ticker: string): Promise<NewsItem[]> {
         // Normalize to array
         const newsItems = Array.isArray(items) ? items : [items];
 
-        return newsItems.slice(0, 3).map((item: any) => ({
-            headline: item.title,
-            url: item.link,
-            source: item.source?.['#text'] || 'Google News',
-            publishedAt: new Date(item.pubDate),
-        }));
+        interface RssItem { title?: string; link?: string; source?: { '#text'?: string }; pubDate?: string }
+        return newsItems.slice(0, 3)
+            .filter((item: RssItem) => item.title && item.pubDate)
+            .map((item: RssItem) => ({
+                headline: item.title!,
+                url: item.link ?? '',
+                source: item.source?.['#text'] ?? 'Google News',
+                publishedAt: new Date(item.pubDate!),
+            }));
     } catch (error) {
         logger.error(`Failed to fetch Hebrew news for ${ticker}`, error);
         return [];
