@@ -125,7 +125,7 @@ export async function sendTelegramMessage(message: string): Promise<void> {
 
 function formatFailedSection(failedTickers: string[]): string {
     if (failedTickers.length === 0) return '';
-    return `\n\n━━━━━━━━━━━━━━━━━━━━━━\n⚠️ <b>Could not check (fetch error)</b>\n<code>${failedTickers.map((t) => escapeHtml(t)).join(', ')}</code>`;
+    return `\n\n━━━━━━━━━━━━━━━━━━━━━━\n⚠️ <b>Could not check (fetch error)</b>\n<code>${failedTickers.map((t) => escapeHtml(t)).join(', ')}</code>\n<i>(Check for typos or if the symbol is delisted)</i>`;
 }
 
 function formatReportHeader(date: string, bullish: number, bearish: number): string {
@@ -404,7 +404,9 @@ function formatRunIssuesSection(invalidTickers: string[], failedTickers: string[
         parts.push(`⚠️ <b>פורמט לא נתמך (דולגו):</b> <code>${invalidTickers.map((t) => escapeHtml(t)).join(', ')}</code>`);
     }
     if (failedTickers.length > 0) {
-        parts.push(`⚠️ <b>לא הצלחנו לשלוף נתונים:</b> <code>${failedTickers.map((t) => escapeHtml(t)).join(', ')}</code>`);
+        parts.push(
+            `⚠️ <b>לא הצלחנו לשלוף נתונים:</b> <code>${failedTickers.map((t) => escapeHtml(t)).join(', ')}</code>\n<i>(בדקו שגיאות כתיב או אם הסימול נמחק מהבורסה)</i>`
+        );
     }
     if (parts.length === 0) return '';
     return `━━━━━━━━━━━━━━━━━━━━━━\n${parts.join('\n')}\n━━━━━━━━━━━━━━━━━━━━━━\n\n`;
