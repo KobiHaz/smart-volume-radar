@@ -74,9 +74,9 @@ describe('parseWatchlistCsv', () => {
     });
 
     it('supports international and longer tickers (extended regex)', () => {
-        const csv = 'Symbol,Sector\n000660.KS,Tech\n8035.T,Tech\nBA.L,Ind\nBRK-B,Fin\n^TNX,Yield\nTABANKS5.TA,Fin\nVERY-LONG-TICKER-NAME.SUFFIX,Other\nCOBE,Other';
+        const csv = 'Symbol,Sector\n000660.KS,Tech\n8035.T,Tech\nBA.L,Ind\nBRK-B,Fin\n^TNX,Yield\nTABANKS5.TA,Fin\nVERY-LONG-TICKER-NAME.SUFFIX,Other\nCOBE,Other\nBT.A.L,Ind';
         const result = parseWatchlistCsv(csv);
-        expect(result.tickers).toHaveLength(8);
+        expect(result.tickers).toHaveLength(9);
         expect(result.tickers[0].symbol).toBe('000660.KS');
         expect(result.tickers[1].symbol).toBe('8035.T');
         expect(result.tickers[2].symbol).toBe('BA.L');
@@ -85,6 +85,7 @@ describe('parseWatchlistCsv', () => {
         expect(result.tickers[5].symbol).toBe('TABANKS5.TA');
         expect(result.tickers[6].symbol).toBe('VERY-LONG-TICKER-NAME.SUFFIX');
         expect(result.tickers[7].symbol).toBe('COBE');
+        expect(result.tickers[8].symbol).toBe('BT.A.L');
         expect(result.invalidSkipped).toHaveLength(0);
     });
 });

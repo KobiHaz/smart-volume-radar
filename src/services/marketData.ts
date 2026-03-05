@@ -38,9 +38,14 @@ async function fetchFromYahooChart(ticker: string): Promise<StockData | null> {
 
         const data = await response.json() as any;
         const result = data?.chart?.result?.[0];
+        const error = data?.chart?.error;
 
         if (!result) {
-            logger.warn(`No chart data for ${ticker}`);
+            if (error) {
+                logger.warn(`❌ Yahoo Chart error for ${ticker}: ${error.description || error.code || 'Unknown error'}`);
+            } else {
+                logger.warn(`No chart data for ${ticker}`);
+            }
             return null;
         }
 
@@ -215,6 +220,8 @@ async function fetchFromTwelveData(ticker: string): Promise<StockData | null> {
         if (data.status === 'error' || !data.close) {
             if (data.status === 'error') {
                 logger.warn(`❌ Twelve Data error for ${ticker}: ${data.message || 'Unknown error'}`);
+            } else if (!data.close) {
+                logger.warn(`⚠️ Twelve Data: No price data in quote for ${ticker}`);
             }
             return null;
         }
