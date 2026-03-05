@@ -2,6 +2,12 @@
  * RVOL Calculator Tests
  */
 
+jest.mock('../src/config/index.js', () => ({
+    config: {
+        formatPrecision: { price: 2, pct: 2, base: 2, rvol: 2, rsi: 0 },
+    },
+}));
+
 import { calculateRVOL, formatRVOL, formatPriceChange, isBullish } from '../src/services/rvolCalculator';
 import { StockData } from '../src/types';
 
