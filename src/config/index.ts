@@ -84,8 +84,8 @@ export const config = {
     } as const,
 } as const;
 
-/** Valid ticker: optional ^, 1-25 alphanumeric chars/dashes, optional .XXXXXX exchange suffix */
-const TICKER_REGEX = /^\^?[A-Za-z0-9-]{1,25}(\.[A-Za-z0-9]{1,10})?$/;
+/** Valid ticker: optional ^, 1-25 alphanumeric chars/dashes, optional exchange suffixes (e.g. .A.L) */
+const TICKER_REGEX = /^\^?[A-Za-z0-9-]{1,25}(\.[A-Za-z0-9]{1,10})*$/;
 
 /**
  * Validate ticker symbol format (prevents URL injection)

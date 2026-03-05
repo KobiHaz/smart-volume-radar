@@ -4,6 +4,43 @@
  */
 
 import { StockData } from '../types/index.js';
+
+interface YahooChartResponse {
+    chart: {
+        result: Array<{
+            meta: {
+                regularMarketPrice?: number;
+            };
+            indicators: {
+                quote: Array<{
+                    volume: Array<number | null>;
+                    close: Array<number | null>;
+                }>;
+            };
+        }>;
+    };
+}
+
+interface TwelveDataIndicatorResponse {
+    status: string;
+    values?: Array<{
+        rsi?: string;
+        sma?: string;
+    }>;
+}
+
+interface TwelveDataQuoteResponse {
+    status?: string;
+    code?: number;
+    message?: string;
+    close?: string;
+    volume?: string;
+    average_volume?: string;
+    percent_change?: string;
+    fifty_two_week?: {
+        high?: string;
+    };
+}
 import { config } from '../config/index.js';
 import logger from '../utils/logger.js';
 import { formatRVOL } from '../utils/formatters.js';
@@ -34,8 +71,8 @@ async function fetchFromYahooChart(ticker: string): Promise<StockData | null> {
             return null;
         }
 
-        const data = await response.json() as any;
-        const result = data?.chart?.result?.[0];
+        const data = (await response.json()) as YahooChartResponse;
+        const result = data.chart?.result?.[0];
 
         if (!result) {
             logger.warn(`No chart data for ${ticker}`);
@@ -46,8 +83,8 @@ async function fetchFromYahooChart(ticker: string): Promise<StockData | null> {
         const indicators = result.indicators?.quote?.[0];
 
         // Get volumes and closes (filter out nulls)
-        const volumes = indicators?.volume?.filter((v: number | null) => v !== null && v > 0) || [];
-        const closes = indicators?.close?.filter((c: number | null) => c !== null && c > 0) || [];
+        const volumes = indicators?.volume?.filter((v: number | null): v is number => v !== null && v > 0) || [];
+        const closes = indicators?.close?.filter((c: number | null): c is number => c !== null && c > 0) || [];
 
         const isIndex = ticker.startsWith('^');
 
@@ -168,13 +205,13 @@ async function fetchIndicatorsFromTwelveData(
             fetch(`${TWELVE_DATA_BASE}/sma?symbol=${encodedTicker}&interval=1day&time_period=21&series_type=close&apikey=${apiKey}`),
         ]);
 
-        const rsiData = (await rsiRes.json()) as any;
-        if (rsiData?.status === 'ok' && rsiData?.values?.[0]?.rsi != null) {
+        const rsiData = (await rsiRes.json()) as TwelveDataIndicatorResponse;
+        if (rsiData.status === 'ok' && rsiData.values?.[0]?.rsi != null) {
             result.rsi = parseFloat(rsiData.values[0].rsi);
         }
 
-        const smaData = (await smaRes.json()) as any;
-        if (smaData?.status === 'ok' && smaData?.values?.[0]?.sma != null) {
+        const smaData = (await smaRes.json()) as TwelveDataIndicatorResponse;
+        if (smaData.status === 'ok' && smaData.values?.[0]?.sma != null) {
             result.sma21 = parseFloat(smaData.values[0].sma);
         }
     } catch {
@@ -193,23 +230,44 @@ async function fetchFromTwelveData(ticker: string): Promise<StockData | null> {
     try {
         const url = `${TWELVE_DATA_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`;
         const response = await fetch(url);
-        const data = await response.json() as any;
 
-        if (data.status === 'error' || !data.close) {
+        if (!response.ok) {
+            if (response.status === 429) {
+                logger.warn(`⚠️ Twelve Data API rate limited for ${ticker}`);
+            } else if (response.status === 404) {
+                logger.warn(`❌ Ticker not found on Twelve Data: ${ticker}`);
+            }
             return null;
         }
 
-        const volume = parseFloat(data.volume) || 0;
-        const avgVolume = parseFloat(data.average_volume) || parseFloat(data.volume) || 1;
-        const lastPrice = parseFloat(data.close) || 0;
+        const data = (await response.json()) as TwelveDataQuoteResponse;
+
+        if (data.status === 'error') {
+            if (data.code === 429) {
+                logger.warn(`⚠️ Twelve Data API rate limited for ${ticker}: ${data.message}`);
+            } else if (data.code === 404) {
+                logger.warn(`❌ Ticker not found on Twelve Data: ${ticker}: ${data.message}`);
+            } else {
+                logger.warn(`❌ Twelve Data error for ${ticker}: ${data.message}`);
+            }
+            return null;
+        }
+
+        if (!data.close) {
+            return null;
+        }
+
+        const volume = parseFloat(data.volume || '0') || 0;
+        const avgVolume = parseFloat(data.average_volume || data.volume || '1') || 1;
+        const lastPrice = parseFloat(data.close || '0') || 0;
         const fiftyTwoWeek = data.fifty_two_week;
         const high52w = fiftyTwoWeek?.high != null ? parseFloat(fiftyTwoWeek.high) : undefined;
 
         let rsi: number | undefined;
         let sma21: number | undefined;
-        const indicators = await fetchIndicatorsFromTwelveData(ticker, apiKey);
-        rsi = indicators.rsi;
-        sma21 = indicators.sma21;
+        const fetchedIndicators = await fetchIndicatorsFromTwelveData(ticker, apiKey);
+        rsi = fetchedIndicators.rsi;
+        sma21 = fetchedIndicators.sma21;
 
         const ath = high52w;
         const pctFromAth = ath != null && ath > 0 ? ((lastPrice - ath) / ath) * 100 : undefined;
@@ -225,7 +283,7 @@ async function fetchFromTwelveData(ticker: string): Promise<StockData | null> {
             currentVolume: volume,
             avgVolume,
             rvol: volume / avgVolume,
-            priceChange: parseFloat(data.percent_change) || 0,
+            priceChange: parseFloat(data.percent_change || '0') || 0,
             lastPrice,
             sma21,
             rsi,

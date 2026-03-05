@@ -86,6 +86,13 @@ describe('parseWatchlistCsv', () => {
         expect(result.tickers[6].symbol).toBe('VERY-LONG-TICKER-NAME.SUFFIX');
         expect(result.invalidSkipped).toHaveLength(0);
     });
+
+    it('supports tickers with multiple dots (complex suffixes)', () => {
+        const csv = 'Symbol,Sector\nBT.A.L,Telecom';
+        const result = parseWatchlistCsv(csv);
+        expect(result.tickers).toHaveLength(1);
+        expect(result.tickers[0].symbol).toBe('BT.A.L');
+    });
 });
 
 // Valid-length fake Sheet ID (real IDs are ~44 chars; regex requires 20-60)

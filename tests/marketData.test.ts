@@ -26,6 +26,7 @@ jest.mock('../src/config/index.js', () => ({
 const mockFetch = jest.fn();
 global.fetch = mockFetch as typeof fetch;
 
+import { config } from '../src/config/index.js';
 import { fetchAllStocks } from '../src/services/marketData.js';
 
 function createYahooChartResponse(ticker: string): object {
@@ -143,5 +144,35 @@ describe('fetchAllStocks', () => {
         expect(stocks[0].ticker).toBe('NEW');
         expect(stocks[0].priceChange).toBe(0);
         expect(failedTickers).toHaveLength(0);
+    });
+
+    it('returns failedTickers when Twelve Data returns 404 or 429', async () => {
+        // Mock config to use Twelve Data fallback
+        const originalUseFetchedIndicators = config.useFetchedIndicators;
+        (config as any).useFetchedIndicators = true;
+        process.env.TWELVE_DATA_API_KEY = 'test-key';
+
+        const emptyYahoo = { chart: { result: [] } };
+        mockFetch
+            .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(emptyYahoo) }) // Yahoo fails
+            .mockResolvedValueOnce({ ok: false, status: 404 }); // Twelve Data 404
+
+        const { stocks, failedTickers } = await fetchAllStocks(['NOTFOUND']);
+        expect(stocks).toHaveLength(0);
+        expect(failedTickers).toContain('NOTFOUND');
+
+        mockFetch
+            .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(emptyYahoo) }) // Yahoo fails
+            .mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve({ status: 'error', code: 429, message: 'Rate limit' })
+            }); // Twelve Data 429 in JSON
+
+        const { stocks: stocks2, failedTickers: failedTickers2 } = await fetchAllStocks(['RATELIMITED']);
+        expect(stocks2).toHaveLength(0);
+        expect(failedTickers2).toContain('RATELIMITED');
+
+        delete process.env.TWELVE_DATA_API_KEY;
+        (config as any).useFetchedIndicators = originalUseFetchedIndicators;
     });
 });
