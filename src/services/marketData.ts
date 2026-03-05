@@ -16,7 +16,7 @@ import { calculateSMA, calculateRSI, calculate52wHighAndConsolidation, isNearSMA
  */
 async function fetchFromYahooChart(ticker: string): Promise<StockData | null> {
     try {
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=5y`;
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=5y`;
 
         const response = await fetch(url, {
             headers: {
@@ -160,9 +160,10 @@ async function fetchIndicatorsFromTwelveData(
 ): Promise<{ rsi?: number; sma21?: number }> {
     const result: { rsi?: number; sma21?: number } = {};
     try {
+        const encodedTicker = encodeURIComponent(ticker);
         const [rsiRes, smaRes] = await Promise.all([
-            fetch(`${TWELVE_DATA_BASE}/rsi?symbol=${ticker}&interval=1day&time_period=14&apikey=${apiKey}`),
-            fetch(`${TWELVE_DATA_BASE}/sma?symbol=${ticker}&interval=1day&time_period=21&series_type=close&apikey=${apiKey}`),
+            fetch(`${TWELVE_DATA_BASE}/rsi?symbol=${encodedTicker}&interval=1day&time_period=14&apikey=${apiKey}`),
+            fetch(`${TWELVE_DATA_BASE}/sma?symbol=${encodedTicker}&interval=1day&time_period=21&series_type=close&apikey=${apiKey}`),
         ]);
 
         const rsiData = (await rsiRes.json()) as any;
@@ -188,7 +189,7 @@ async function fetchFromTwelveData(ticker: string): Promise<StockData | null> {
     if (!apiKey) return null;
 
     try {
-        const url = `${TWELVE_DATA_BASE}/quote?symbol=${ticker}&apikey=${apiKey}`;
+        const url = `${TWELVE_DATA_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`;
         const response = await fetch(url);
         const data = await response.json() as any;
 

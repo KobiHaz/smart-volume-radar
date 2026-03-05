@@ -84,15 +84,15 @@ export const config = {
     } as const,
 } as const;
 
-/** Valid ticker: 1-10 alphanumeric chars/dashes, optional .XXX exchange suffix */
-const TICKER_REGEX = /^[A-Za-z0-9-]{1,10}(\.[A-Za-z]{1,3})?$/;
+/** Valid ticker: optional ^, 1-10 alphanumeric chars/dashes, optional .XXX exchange suffix */
+const TICKER_REGEX = /^\^?[A-Za-z0-9-]{1,10}(\.[A-Za-z]{1,3})?$/;
 
 /**
  * Validate ticker symbol format (prevents URL injection)
  */
 export function validateTicker(ticker: string): boolean {
     const t = ticker.trim();
-    return t.length > 0 && t.length <= 14 && TICKER_REGEX.test(t);
+    return t.length > 0 && t.length <= 15 && TICKER_REGEX.test(t);
 }
 
 /** Google Sheet ID format: alphanumeric, dashes, underscores, 40-50 chars */
