@@ -6,6 +6,7 @@
 import { StockData } from '../types/index.js';
 import { config } from '../config/index.js';
 import logger from '../utils/logger.js';
+import { formatRVOL } from '../utils/formatters.js';
 import pLimit from 'p-limit';
 import { calculateSMA, calculateRSI, calculate52wHighAndConsolidation, isNearSMA } from '../utils/technicalAnalysis.js';
 
@@ -269,7 +270,7 @@ export async function fetchAllStocks(tickers: string[]): Promise<FetchAllStocksR
         }
 
         if (result) {
-            logger.info(`✅ ${ticker}: RVOL=${result.rvol.toFixed(2)}x (${successSource})`);
+            logger.info(`✅ ${ticker}: RVOL=${formatRVOL(result.rvol)} (${successSource})`);
             return { ticker, data: result };
         } else {
             logger.warn(`❌ ${ticker}: No data from any source`);
