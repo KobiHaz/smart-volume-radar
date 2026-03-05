@@ -18,17 +18,20 @@ jobs:
 
     steps:
       - name: Notify Telegram (Jules invoked)
+        continue-on-error: true
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            MSG="🔧 Jules invoked to fix daily scan failure. Track: ${{ github.event.workflow_run.html_url }}"
             curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-              -d "chat_id=${TELEGRAM_CHAT_ID}&text=🔧 Jules invoked to fix daily scan failure. Track progress: ${{ github.event.workflow_run.html_url }}"
+              --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+              --data-urlencode "text=${MSG}"
           fi
 
       - name: Invoke Jules to fix failure
-        uses: google-labs-code/jules-invoke@v1
+        uses: google-labs-code/jules-action@v1.0.0
         with:
           prompt: |
             The Smart Volume Radar daily scan has failed in GitHub Actions.
