@@ -2,6 +2,12 @@
  * Formatters Utilities Tests
  */
 
+jest.mock('../src/config/index.js', () => ({
+    config: {
+        formatPrecision: { price: 2, pct: 2, base: 2, rvol: 2, rsi: 0 },
+    },
+}));
+
 import { formatRVOL, formatPriceChange } from '../src/utils/formatters';
 
 describe('formatters', () => {
