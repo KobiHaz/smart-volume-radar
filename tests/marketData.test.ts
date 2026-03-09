@@ -171,4 +171,66 @@ describe('fetchAllStocks', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(1, expect.stringContaining('BRK.B'), expect.any(Object));
         expect(mockFetch).toHaveBeenNthCalledWith(2, expect.stringContaining('BRK-B'), expect.any(Object));
     });
+
+    it('falls back to CBOE when COBE fails (typo fallback)', async () => {
+        process.env.TWELVE_DATA_API_KEY = 'test-key';
+        // 1. Yahoo Chart COBE -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 2. Twelve Data COBE -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 3. Yahoo Chart CBOE (typo fallback) -> success
+        mockFetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve(createYahooChartResponse('CBOE')),
+        });
+
+        const { stocks, failedTickers } = await fetchAllStocks(['COBE']);
+        expect(stocks).toHaveLength(1);
+        expect(stocks[0].ticker).toBe('CBOE');
+        expect(failedTickers).toHaveLength(0);
+        expect(mockFetch).toHaveBeenCalledTimes(3);
+        expect(mockFetch).toHaveBeenNthCalledWith(3, expect.stringContaining('CBOE'), expect.any(Object));
+
+        delete process.env.TWELVE_DATA_API_KEY;
+    });
+
+    it('falls back from dot to dash for Twelve Data (e.g. BRK.B -> BRK-B)', async () => {
+        process.env.TWELVE_DATA_API_KEY = 'test-key';
+
+        // 1. Yahoo Chart BRK.B -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 2. Yahoo Chart BRK-B (dot-to-dash fallback) -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 3. Twelve Data BRK.B -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 4. Twelve Data BRK-B (dot-to-dash fallback) -> success
+        mockFetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+                status: 'ok',
+                close: '100',
+                volume: '1000',
+                percent_change: '1',
+            }),
+        });
+        // 5 & 6. Indicators (RSI, SMA)
+        mockFetch.mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({ status: 'ok', values: [] }),
+        });
+
+        const { stocks, failedTickers } = await fetchAllStocks(['BRK.B']);
+        expect(stocks).toHaveLength(1);
+        expect(stocks[0].ticker).toBe('BRK-B');
+        expect(failedTickers).toHaveLength(0);
+        // At least 4 calls for the main logic, plus indicators
+        expect(mockFetch.mock.calls.length).toBeGreaterThanOrEqual(4);
+        expect(mockFetch).toHaveBeenNthCalledWith(1, expect.stringContaining('BRK.B'), expect.any(Object));
+        // Twelve Data call for BRK.B is the 3rd fetch call in this sequence
+        expect(mockFetch.mock.calls[2][0]).toContain('BRK.B');
+        // Twelve Data fallback call for BRK-B is the 4th fetch call
+        expect(mockFetch.mock.calls[3][0]).toContain('BRK-B');
+
+        delete process.env.TWELVE_DATA_API_KEY;
+    });
 });

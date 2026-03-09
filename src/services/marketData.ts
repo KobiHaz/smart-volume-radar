@@ -10,6 +10,11 @@ import { formatRVOL } from '../utils/formatters.js';
 import pLimit from 'p-limit';
 import { calculateSMA, calculateRSI, calculate52wHighAndConsolidation, isNearSMA } from '../utils/technicalAnalysis.js';
 
+/** Common ticker typos and their correct symbols */
+const COMMON_TYPO_FALLBACKS: Record<string, string> = {
+    'COBE': 'CBOE',
+};
+
 /**
  * Direct fetch from Yahoo Finance chart API
  * Uses 5y range for price history; 52w high and consolidation use last 252 days
@@ -211,7 +216,7 @@ async function fetchIndicatorsFromTwelveData(
 /**
  * Fetch from Twelve Data API – fetches RSI, SMA21, 52w high when available
  */
-async function fetchFromTwelveData(ticker: string, attempt = 1): Promise<StockData | null> {
+async function fetchFromTwelveData(ticker: string, isFallback = false, attempt = 1): Promise<StockData | null> {
     const apiKey = process.env.TWELVE_DATA_API_KEY;
     if (!apiKey) return null;
 
@@ -223,12 +228,17 @@ async function fetchFromTwelveData(ticker: string, attempt = 1): Promise<StockDa
             if (response.status === 429) {
                 logger.warn(`⚠️ Twelve Data API rate limited for ${ticker}`);
             } else if (response.status === 404) {
+                if (!isFallback && ticker.includes('.')) {
+                    const fallbackTicker = ticker.replace(/\./g, '-');
+                    logger.info(`🔍 Ticker ${ticker} not found on Twelve Data, trying fallback: ${fallbackTicker}`);
+                    return fetchFromTwelveData(fallbackTicker, true);
+                }
                 logger.warn(`❌ Ticker not found on Twelve Data: ${ticker}`);
             } else {
                 if (attempt === 1) {
                     logger.warn(`⚠️ Twelve Data API error ${response.status} for ${ticker}, retrying...`);
                     await new Promise(resolve => setTimeout(resolve, 500));
-                    return fetchFromTwelveData(ticker, attempt + 1);
+                    return fetchFromTwelveData(ticker, isFallback, attempt + 1);
                 }
                 logger.warn(`❌ Twelve Data API error ${response.status} for ${ticker}`);
             }
@@ -239,6 +249,11 @@ async function fetchFromTwelveData(ticker: string, attempt = 1): Promise<StockDa
 
         if (data.status === 'error' || !data.close) {
             if (data.status === 'error') {
+                if (data.code === 404 && !isFallback && ticker.includes('.')) {
+                    const fallbackTicker = ticker.replace(/\./g, '-');
+                    logger.info(`🔍 Twelve Data error 404 for ${ticker}, trying fallback: ${fallbackTicker}`);
+                    return fetchFromTwelveData(fallbackTicker, true);
+                }
                 logger.warn(`❌ Twelve Data error for ${ticker}: ${data.message || 'Unknown error'}`);
             } else if (!data.close) {
                 logger.warn(`⚠️ Twelve Data: No price data in quote for ${ticker}`);
@@ -288,7 +303,7 @@ async function fetchFromTwelveData(ticker: string, attempt = 1): Promise<StockDa
         if (attempt === 1) {
             logger.warn(`⚠️ Twelve Data fetch failed for ${ticker} (${(error as Error).message}), retrying...`);
             await new Promise(resolve => setTimeout(resolve, 500));
-            return fetchFromTwelveData(ticker, attempt + 1);
+            return fetchFromTwelveData(ticker, isFallback, attempt + 1);
         }
         logger.error(`❌ Twelve Data fetch failed for ${ticker}:`, (error as Error).message);
         return null;
@@ -322,6 +337,26 @@ export async function fetchAllStocks(tickers: string[]): Promise<FetchAllStocksR
             // Try Twelve Data as fallback
             result = await fetchFromTwelveData(ticker);
             successSource = 'Twelve Data';
+        }
+
+        // Try common typo fallback if still no result
+        if (!result && COMMON_TYPO_FALLBACKS[ticker.toUpperCase()]) {
+            const fallbackTicker = COMMON_TYPO_FALLBACKS[ticker.toUpperCase()];
+            logger.info(`🔍 Ticker ${ticker} failed, trying common typo fallback: ${fallbackTicker}`);
+
+            result = await fetchFromYahooChart(fallbackTicker);
+            successSource = 'Yahoo Chart (Typo Fallback)';
+
+            if (!result) {
+                result = await fetchFromTwelveData(fallbackTicker);
+                successSource = 'Twelve Data (Typo Fallback)';
+            }
+
+            if (result) {
+                // Return result but keep original ticker for tracking if preferred,
+                // but here we update it to the correct one so future logic uses the valid symbol.
+                result.ticker = fallbackTicker;
+            }
         }
 
         if (result) {
