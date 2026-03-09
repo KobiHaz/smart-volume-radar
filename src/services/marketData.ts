@@ -303,7 +303,7 @@ export async function fetchAllStocks(tickers: string[]): Promise<FetchAllStocksR
             logger.info(`✅ ${ticker}: RVOL=${formatRVOL(result.rvol)} (${successSource})`);
             return { ticker, data: result };
         } else {
-            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data). Check for typos, if the symbol is delisted, or if it requires a specific exchange suffix (e.g. .L, .TA).`);
+            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data). Check for typos (e.g. COBE vs CBOE), if the symbol is delisted, or if it requires a specific exchange suffix (e.g. .L, .TA).`);
             return { ticker, data: null };
         }
     }));
