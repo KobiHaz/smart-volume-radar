@@ -150,4 +150,25 @@ describe('fetchAllStocks', () => {
         expect(stocks[0].priceChange).toBe(0);
         expect(failedTickers).toHaveLength(0);
     });
+
+    it('falls back from dot to dash for Yahoo tickers (e.g. BRK.B -> BRK-B)', async () => {
+        // First call for BRK.B returns 404
+        mockFetch.mockResolvedValueOnce({
+            ok: false,
+            status: 404,
+        });
+        // Second call for BRK-B (fallback) returns success
+        mockFetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve(createYahooChartResponse('BRK-B')),
+        });
+
+        const { stocks, failedTickers } = await fetchAllStocks(['BRK.B']);
+        expect(stocks).toHaveLength(1);
+        expect(stocks[0].ticker).toBe('BRK-B'); // The data returned is for the fallback ticker
+        expect(failedTickers).toHaveLength(0);
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(mockFetch).toHaveBeenNthCalledWith(1, expect.stringContaining('BRK.B'), expect.any(Object));
+        expect(mockFetch).toHaveBeenNthCalledWith(2, expect.stringContaining('BRK-B'), expect.any(Object));
+    });
 });

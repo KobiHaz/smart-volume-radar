@@ -14,7 +14,7 @@ import { calculateSMA, calculateRSI, calculate52wHighAndConsolidation, isNearSMA
  * Direct fetch from Yahoo Finance chart API
  * Uses 5y range for price history; 52w high and consolidation use last 252 days
  */
-async function fetchFromYahooChart(ticker: string): Promise<StockData | null> {
+async function fetchFromYahooChart(ticker: string, isFallback = false, attempt = 1): Promise<StockData | null> {
     try {
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=5y`;
 
@@ -29,8 +29,18 @@ async function fetchFromYahooChart(ticker: string): Promise<StockData | null> {
             if (response.status === 429) {
                 logger.warn(`⚠️ Yahoo Chart API rate limited for ${ticker}`);
             } else if (response.status === 404) {
+                if (!isFallback && ticker.includes('.')) {
+                    const fallbackTicker = ticker.replace(/\./g, '-');
+                    logger.info(`🔍 Ticker ${ticker} not found on Yahoo Chart, trying fallback: ${fallbackTicker}`);
+                    return fetchFromYahooChart(fallbackTicker, true);
+                }
                 logger.warn(`❌ Ticker not found on Yahoo Chart: ${ticker}`);
             } else {
+                if (attempt === 1) {
+                    logger.warn(`⚠️ Yahoo Chart API error ${response.status} for ${ticker}, retrying...`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    return fetchFromYahooChart(ticker, isFallback, attempt + 1);
+                }
                 logger.warn(`❌ Yahoo Chart API error ${response.status} for ${ticker}`);
             }
             return null;
@@ -155,6 +165,11 @@ async function fetchFromYahooChart(ticker: string): Promise<StockData | null> {
             inConsolidationClose,
         };
     } catch (error) {
+        if (attempt === 1) {
+            logger.warn(`⚠️ Chart fetch failed for ${ticker} (${(error as Error).message}), retrying...`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            return fetchFromYahooChart(ticker, isFallback, attempt + 1);
+        }
         logger.error(`❌ Chart fetch failed for ${ticker}:`, (error as Error).message);
         return null;
     }
@@ -196,7 +211,7 @@ async function fetchIndicatorsFromTwelveData(
 /**
  * Fetch from Twelve Data API – fetches RSI, SMA21, 52w high when available
  */
-async function fetchFromTwelveData(ticker: string): Promise<StockData | null> {
+async function fetchFromTwelveData(ticker: string, attempt = 1): Promise<StockData | null> {
     const apiKey = process.env.TWELVE_DATA_API_KEY;
     if (!apiKey) return null;
 
@@ -210,6 +225,11 @@ async function fetchFromTwelveData(ticker: string): Promise<StockData | null> {
             } else if (response.status === 404) {
                 logger.warn(`❌ Ticker not found on Twelve Data: ${ticker}`);
             } else {
+                if (attempt === 1) {
+                    logger.warn(`⚠️ Twelve Data API error ${response.status} for ${ticker}, retrying...`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    return fetchFromTwelveData(ticker, attempt + 1);
+                }
                 logger.warn(`❌ Twelve Data API error ${response.status} for ${ticker}`);
             }
             return null;
@@ -265,6 +285,11 @@ async function fetchFromTwelveData(ticker: string): Promise<StockData | null> {
             nearSMA21Close,
         };
     } catch (error) {
+        if (attempt === 1) {
+            logger.warn(`⚠️ Twelve Data fetch failed for ${ticker} (${(error as Error).message}), retrying...`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            return fetchFromTwelveData(ticker, attempt + 1);
+        }
         logger.error(`❌ Twelve Data fetch failed for ${ticker}:`, (error as Error).message);
         return null;
     }
