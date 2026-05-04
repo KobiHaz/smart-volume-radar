@@ -29,7 +29,7 @@
 
 מרץ 2026: נוספו לוגים וקבצי debug:
 
-- **`results/scan-debug-{date}.json`** — בכל סריקה: `failedTickers`, `greenSortedFull` (דירוג מלא לפני חיתוך ל־TOP_N), `greenCount`, `blueOnlyCount`
+- **`results/scan-debug-{date}.json`** — בכל סריקה: `failedTickers`, `greenSortedFull` (דירוג מלא לפני חיתוך ל־TOP_N), `greenCount`, `pullbackOnlyCount`, `sma21OnlyCount`
 - **שימוש:** אם מניה "נעלמת" — לבדוק: האם ב־`failedTickers`? מה המקום ב־`greenSortedFull`?
 
 ## סקריפטים לחקירה
