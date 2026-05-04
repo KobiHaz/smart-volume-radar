@@ -68,7 +68,7 @@ async function main(): Promise<void> {
     if (fs.existsSync(scanPath)) {
         const scan = JSON.parse(fs.readFileSync(scanPath, 'utf-8')) as StoredScanResult;
         for (const s of scan.signals) {
-            if (s.source === 'topSignals') actualTopTickers.add(s.ticker);
+            if (s.source === 'topSignals-green' || s.source === 'topSignals-pullback' || s.source === 'topSignals-sma21') actualTopTickers.add(s.ticker);
         }
     }
 

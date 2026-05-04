@@ -1,9 +1,11 @@
 #!/usr/bin/env npx tsx
 /**
  * Evaluate full setup (🎯) signals from last 7 days.
- * Downloads artifacts via gh CLI, fetches current prices, outputs for Telegram.
+ * Downloads artifacts via gh CLI (or uses local results/ when USE_LOCAL_RESULTS=1),
+ * fetches current prices, outputs for Telegram.
  * Run: npm run evaluate-setups
- * Env: GITHUB_TOKEN (or GH_TOKEN), plus FINNHUB/TELEGRAM etc for fetch
+ * Env: GITHUB_TOKEN (or GH_TOKEN), FINNHUB_API_KEY for prices.
+ *      USE_LOCAL_RESULTS=1 — skip gh, use existing results/*.json
  */
 import 'dotenv/config';
 import fs from 'node:fs';
@@ -82,32 +84,133 @@ function formatTelegramMessage(data: {
     return lines.join('\n');
 }
 
+function ensureResultsDir(resultsDir: string): void {
+    if (!fs.existsSync(resultsDir)) fs.mkdirSync(resultsDir, { recursive: true });
+}
+
+function getRepoSlug(): { owner: string; repo: string } | null {
+    try {
+        const url = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
+        const m = url.match(/(?:[:/])([^/]+)\/([^/.]+)(?:\.git)?$/);
+        return m ? { owner: m[1], repo: m[2] } : null;
+    } catch {
+        return null;
+    }
+}
+
+async function fetchArtifactsViaApi(resultsDir: string): Promise<boolean> {
+    const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+    const slug =
+        process.env.GITHUB_REPOSITORY?.split('/').length === 2
+            ? { owner: process.env.GITHUB_REPOSITORY.split('/')[0], repo: process.env.GITHUB_REPOSITORY.split('/')[1] }
+            : getRepoSlug();
+    if (!token || !slug) return false;
+
+    const headers: Record<string, string> = {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+    };
+
+    try {
+        const runsRes = await fetch(
+            `https://api.github.com/repos/${slug.owner}/${slug.repo}/actions/workflows/daily-scan.yml/runs?per_page=15&status=completed`,
+            { headers }
+        );
+        if (!runsRes.ok) return false;
+        const runsData = (await runsRes.json()) as {
+            workflow_runs: Array<{ id: number; conclusion: string }>;
+        };
+        const successful = runsData.workflow_runs
+            .filter((r) => r.conclusion === 'success')
+            .slice(0, LOOKBACK_DAYS);
+
+        for (const run of successful) {
+            const artifactsRes = await fetch(
+                `https://api.github.com/repos/${slug.owner}/${slug.repo}/actions/runs/${run.id}/artifacts`,
+                { headers }
+            );
+            if (!artifactsRes.ok) continue;
+            const artifactsData = (await artifactsRes.json()) as {
+                artifacts: Array<{ id: number; name: string }>;
+            };
+            const scanArtifact = artifactsData.artifacts.find((a) => /^scan-\d{4}-\d{2}-\d{2}$/.test(a.name));
+            if (!scanArtifact) continue;
+
+            const zipRes = await fetch(
+                `https://api.github.com/repos/${slug.owner}/${slug.repo}/actions/artifacts/${scanArtifact.id}/zip`,
+                { headers, redirect: 'follow' }
+            );
+            if (!zipRes.ok) continue;
+            const buf = Buffer.from(await zipRes.arrayBuffer());
+            const zipPath = path.join(resultsDir, `artifact-${run.id}.zip`);
+            fs.writeFileSync(zipPath, buf);
+            try {
+                execSync(`unzip -o -q "${zipPath}" -d "${resultsDir}"`, { stdio: 'pipe' });
+            } finally {
+                fs.unlinkSync(zipPath);
+            }
+        }
+        return findScanJsonFiles(resultsDir).length > 0;
+    } catch {
+        return false;
+    }
+}
+
+function fetchArtifactsViaGh(resultsDir: string): boolean {
+    try {
+        const runsJson = execSync(
+            `gh run list --workflow daily-scan.yml --limit 15 --json databaseId,conclusion,createdAt`,
+            { encoding: 'utf-8' }
+        );
+        const runs = JSON.parse(runsJson) as Array<{
+            databaseId: number;
+            conclusion: string;
+            createdAt: string;
+        }>;
+        const successful = runs.filter((r) => r.conclusion === 'success').slice(0, LOOKBACK_DAYS);
+        for (const run of successful) {
+            try {
+                execSync(`gh run download ${run.databaseId} -D ${resultsDir}`, { stdio: 'pipe' });
+            } catch {
+                /* skip missing artifact */
+            }
+        }
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 async function main(): Promise<void> {
     const resultsDir = path.join(process.cwd(), 'results');
+    const useLocal = process.env.USE_LOCAL_RESULTS === '1' || process.env.USE_LOCAL_RESULTS === 'true';
 
-    // Clean and recreate results dir for fresh downloads
-    if (fs.existsSync(resultsDir)) {
-        fs.rmSync(resultsDir, { recursive: true });
-    }
-    fs.mkdirSync(resultsDir, { recursive: true });
+    ensureResultsDir(resultsDir);
 
-    // 1. Get last 7 successful daily-scan runs
-    const runsJson = execSync(
-        `gh run list --workflow daily-scan.yml --limit 15 --json databaseId,conclusion,createdAt`,
-        { encoding: 'utf-8' }
-    );
-    const runs = JSON.parse(runsJson) as Array<{
-        databaseId: number;
-        conclusion: string;
-        createdAt: string;
-    }>;
-    const successful = runs.filter((r) => r.conclusion === 'success').slice(0, LOOKBACK_DAYS);
-
-    for (const run of successful) {
-        try {
-            execSync(`gh run download ${run.databaseId} -D ${resultsDir}`, { stdio: 'pipe' });
-        } catch {
-            // Skip if artifact missing for this run
+    if (!useLocal) {
+        let ok = fetchArtifactsViaGh(resultsDir);
+        if (!ok) {
+            ok = await fetchArtifactsViaApi(resultsDir);
+        }
+        if (!ok) {
+            const existing = findScanJsonFiles(resultsDir);
+            if (existing.length > 0) {
+                process.stderr.write(
+                    'gh unavailable and API fallback failed — using existing results/*.json (USE_LOCAL_RESULTS=1 to suppress)\n'
+                );
+            } else {
+                // Create minimal demo file so local runs always produce output
+                const today = new Date().toISOString().slice(0, 10);
+                const demoPath = path.join(resultsDir, `scan-${today}.json`);
+                fs.writeFileSync(
+                    demoPath,
+                    JSON.stringify({ date: today, signals: [] } satisfies StoredScanResult, null, 2)
+                );
+                process.stderr.write(
+                    'gh and API unavailable, no local artifacts — using empty demo. Set GITHUB_TOKEN or USE_LOCAL_RESULTS=1 with real results/ for full data.\n'
+                );
+            }
         }
     }
 
@@ -117,11 +220,16 @@ async function main(): Promise<void> {
 
     const fullSignals: FullSignal[] = [];
     const jsonFiles = findScanJsonFiles(resultsDir);
+    const seen = new Set<string>(); // "ticker|date" to dedupe (ticker can appear in topSignals + volumeWithoutPrice)
 
     for (const { path: filePath, date } of jsonFiles) {
         if (new Date(date) < cutoff) continue;
         const data = JSON.parse(fs.readFileSync(filePath, 'utf-8')) as StoredScanResult;
         for (const s of data.signals) {
+            if (s.source === 'volumeWithoutPrice') continue; // exclude silent activities
+            const key = `${s.ticker}|${date}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
             fullSignals.push({ ticker: s.ticker, date, priceThen: s.lastPrice });
         }
     }
