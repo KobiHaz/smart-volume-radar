@@ -123,6 +123,19 @@ function buildStockUrls(stock: RVOLResult): { tvUrl: string; yahooUrl: string; n
     };
 }
 
+/**
+ * Per-stock monitor metadata used to surface persistence markers (🆕 / 🔁N) in the
+ * daily report. Built in index.ts from the monitor state, keyed by uppercase ticker.
+ */
+export interface MonitorMeta {
+    /** True when firstAlertDate === scanDate (this is the very first alert for this ticker). */
+    isFirstAlertToday: boolean;
+    /** Number of re-alert events on this entry (0 = single alert so far). */
+    reAlertCount: number;
+    /** Calendar days between firstAlertDate and scanDate. */
+    daysSinceFirst: number;
+}
+
 /** Hebrew labels for momentum criteria — used in the (חסר: ...) failures hint. */
 const CRITERIA_LABEL_HE: Record<string, string> = {
     rvolPass: 'נפח (RVOL)',
@@ -162,32 +175,71 @@ function formatSma21Distance(stock: RVOLResult): string | null {
     return `${sign}${distPct.toFixed(1)}%`;
 }
 
-function formatSingleStockBlock(stock: RVOLResult): string {
+/**
+ * Render a persistence marker for a stock based on monitor history.
+ *  🆕 = first alert today
+ *  🔁N = N-th re-alert (N=1+); upgraded to 🔁🔥N at 5+ (per 2026-05-05 finding:
+ *  5+ re-alerts had 88% win rate, the highest in the dataset).
+ */
+function formatPersistenceMarker(meta: MonitorMeta | undefined): string {
+    if (!meta) return '';
+    if (meta.isFirstAlertToday) return ' 🆕';
+    if (meta.reAlertCount === 0) return '';
+    const heat = meta.reAlertCount >= 5 ? '🔁🔥' : '🔁';
+    return ` ${heat}${meta.reAlertCount}`;
+}
+
+/**
+ * Format up to 2 most recent news headlines, dimmed and compact.
+ * Empty string when news is missing or empty.
+ */
+function formatNewsLines(stock: RVOLResult): string {
+    if (!stock.news || stock.news.length === 0) return '';
+    const recent = [...stock.news]
+        .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
+        .slice(0, 2);
+    const now = Date.now();
+    const lines = recent.map((n) => {
+        const ageHours = (now - n.publishedAt.getTime()) / 3_600_000;
+        const ageStr = ageHours < 24 ? `${ageHours.toFixed(0)}h` : `${(ageHours / 24).toFixed(0)}d`;
+        const headline = n.headline.length > 80 ? n.headline.slice(0, 77) + '…' : n.headline;
+        return `├ 📰 <a href="${escapeHtml(n.url)}">${escapeHtml(headline)}</a> · <i>${ageStr} · ${escapeHtml(n.source)}</i>`;
+    });
+    return lines.join('\n') + '\n';
+}
+
+function formatSingleStockBlock(stock: RVOLResult, monitorMeta?: MonitorMeta): string {
     let statusEmoji = stock.priceChange >= 0 ? '↗️' : '↘️';
     if (stock.rvol > 4) statusEmoji = '⚡️';
     else if (stock.rvol > 2) statusEmoji = '🔥';
 
     const trendColor = stock.priceChange >= 0 ? '🟢' : '🔴';
     const { tvUrl, yahooUrl } = buildStockUrls(stock);
+    const persistenceMarker = formatPersistenceMarker(monitorMeta);
 
-    let block = `${statusEmoji} <b><a href="${tvUrl}">${escapeHtml(stock.ticker)}</a></b>`;
+    let block = `${statusEmoji} <b><a href="${tvUrl}">${escapeHtml(stock.ticker)}</a></b>${persistenceMarker}`;
     if (stock.sector) {
         block += ` <i>(${escapeHtml(stock.sector)})</i>`;
     }
     block += '\n';
 
-    // Momentum badge — primary signal (Telegram is momentum-only).
-    if (stock.momentum?.level === 'full') {
-        block += `├ 🎯 <b>FULL MOMENTUM</b>\n`;
-    } else if (stock.momentum?.level === 'recovery') {
-        block += `├ 🦅 <b>RECOVERY RALLY</b> <i>(SMA200 עוד למטה — סיכון/סיכוי גבוה)</i>\n`;
+    // Momentum tier line — only for Watchlist/Recovery where it adds info beyond the
+    // section header (failure reasons, regime context). For Full, the section header
+    // already says "🎯 FULL MOMENTUM" and Mandatory is all-green by definition; we
+    // skip both lines to reduce noise.
+    if (stock.momentum?.level === 'recovery') {
+        block += `├ 🦅 <i>SMA200 עוד למטה — סיכון/סיכוי גבוה</i>\n`;
     } else if (stock.momentum?.level === 'close') {
         const reasons = criteriaListHe(stock.momentum.failures.slice(0, 3));
-        block += `├ 👀 <b>MOMENTUM WATCHLIST</b>${reasons ? ` <i>(חסר: ${escapeHtml(reasons)})</i>` : ''}\n`;
+        if (reasons) {
+            block += `├ 👀 <i>חסר: ${escapeHtml(reasons)}</i>\n`;
+        }
     }
 
-    // 8-criteria breakdown (4 mandatory + 4 quality) — the "ניתוח מומנטום".
-    block += formatMomentumCriteriaRows(stock);
+    // Criteria checklist — only for non-Full tiers (Full passes all 4 mandatory by def).
+    if (stock.momentum?.level !== 'full') {
+        block += formatMomentumCriteriaRows(stock);
+    }
 
     // Core metrics
     block += `├ 📊 <b>RVOL</b> ${formatRVOL(stock.rvol)}`;
@@ -244,6 +296,9 @@ function formatSingleStockBlock(stock: RVOLResult): string {
         block += `├ 🏷 ${escapeHtml(tagStr)}\n`;
     }
 
+    // News — render the 2 most recent Finnhub headlines if enriched
+    block += formatNewsLines(stock);
+
     block += `└ ⛓ <a href="${tvUrl}">TV</a>  <a href="${yahooUrl}">YF</a>\n\n`;
     return block;
 }
@@ -286,7 +341,8 @@ export function formatDailyReport(
     topSignals: RVOLResult[],
     volumeWithoutPrice: StockData[],
     _failedTickers: string[] = [],
-    graduations?: GraduationInfo[]
+    graduations?: GraduationInfo[],
+    monitorMetaByTicker?: Map<string, MonitorMeta>
 ): string {
     const gradSection = formatGraduationSection(graduations);
     if (topSignals.length === 0) {
@@ -326,7 +382,8 @@ export function formatDailyReport(
         if (bucket.length === 0) continue;
         message += `${tierHeaders[tier]} <i>(${bucket.length})</i>\n━━━━━━━━━━━━━━━━━━━━━━\n`;
         for (const stock of bucket) {
-            message += formatSingleStockBlock(stock);
+            const meta = monitorMetaByTicker?.get(stock.ticker.toUpperCase());
+            message += formatSingleStockBlock(stock, meta);
         }
     }
 
@@ -464,6 +521,8 @@ export interface ReportScope {
     };
     /** Stocks that graduated today (Watchlist→Full). Surfaced at top of report. */
     graduations?: GraduationInfo[];
+    /** Per-ticker monitor metadata (🆕/🔁N markers) — keyed by uppercase ticker. */
+    monitorMetaByTicker?: Map<string, MonitorMeta>;
 }
 
 /**
@@ -617,7 +676,14 @@ export async function sendDailyReport(
     failedTickers: string[] = [],
     scope?: ReportScope
 ): Promise<void> {
-    const report = formatDailyReport(date, topSignals, volumeWithoutPrice, failedTickers, scope?.graduations);
+    const report = formatDailyReport(
+        date,
+        topSignals,
+        volumeWithoutPrice,
+        failedTickers,
+        scope?.graduations,
+        scope?.monitorMetaByTicker
+    );
     const chunks = chunkMessage(report);
 
     const issuesSection = formatRunIssuesSection(

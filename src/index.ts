@@ -9,7 +9,7 @@ import { fetchAllStocksAsOfDate, fetchMarketRegime } from './services/marketData
 import { evaluateMomentumSetup } from './utils/setup.js';
 import { calculateRVOL } from './services/rvolCalculator.js';
 import { enrichWithNews } from './services/newsService.js';
-import { sendDailyReport, sendTelegramMessage, formatMonitorTelegramMessage, GraduationInfo } from './services/telegramBot.js';
+import { sendDailyReport, sendTelegramMessage, formatMonitorTelegramMessage, GraduationInfo, MonitorMeta } from './services/telegramBot.js';
 import { loadMonitorState, saveMonitorState } from './utils/monitorStore.js';
 import { updateMonitorState } from './services/monitorTracker.js';
 import { RVOLResult, MarketStatus, StockData } from './types/index.js';
@@ -246,6 +246,26 @@ async function main(): Promise<void> {
             logger.error('⚠️ Monitor update failed (non-fatal):', (monitorErr as Error).message);
         }
 
+        // Build per-ticker monitor metadata for persistence markers (🆕 / 🔁N).
+        // Re-alert count comes from the entry's events; first-alert-today comes from the
+        // entry's firstAlertDate matching scanDate.
+        const monitorMetaByTicker = new Map<string, MonitorMeta>();
+        for (const entry of monitorState.entries) {
+            const reAlertCount = entry.events.filter((e) => e.type.startsWith('re-alert')).length;
+            const isFirstAlertToday = entry.firstAlertDate === scanDate;
+            const daysSinceFirst = Math.max(
+                0,
+                Math.round(
+                    (Date.parse(scanDate) - Date.parse(entry.firstAlertDate)) / 86400_000
+                )
+            );
+            monitorMetaByTicker.set(entry.ticker.toUpperCase(), {
+                isFirstAlertToday,
+                reAlertCount,
+                daysSinceFirst,
+            });
+        }
+
         // 8. Telegram: momentum-only (finalSignals already filtered). Pass [] for silent activity.
         await sendDailyReport(scanDate, finalSignals, [], fixableFailed, {
             watchlistCount: tickers.length,
@@ -261,6 +281,7 @@ async function main(): Promise<void> {
                 reasonFetchFailed: fixableFailed.length,
             },
             graduations,
+            monitorMetaByTicker,
         });
 
         // JSON history keeps the legacy 3-path + silent set so backtest scripts still see them.

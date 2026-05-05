@@ -118,8 +118,8 @@ describe('Telegram Formatter (momentum-only)', () => {
             expect(report).toContain('AMD');
         });
 
-        it('renders the 8-criteria checklist (mandatory + quality)', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock], []);
+        it('renders the 8-criteria checklist for Watchlist stocks (where it varies)', () => {
+            const report = formatDailyReport('2026-02-01', [watchlistStock], []);
 
             expect(report).toContain('Mandatory:');
             expect(report).toContain('Quality:');
@@ -127,8 +127,13 @@ describe('Telegram Formatter (momentum-only)', () => {
             expect(report).toContain('Stage2 ✓');
             expect(report).toContain('Pivot ✓');
             expect(report).toContain('AVWAP ✓');
-            expect(report).toContain('LowRisk ✓');
-            expect(report).toContain('Tight ✓');
+        });
+
+        it('omits the Mandatory checklist for Full stocks (always all-green by definition)', () => {
+            const report = formatDailyReport('2026-02-01', [fullStock], []);
+            // Full passes 4/4 mandatory by tier definition; rendering them is just noise.
+            expect(report).not.toContain('Mandatory:');
+            expect(report).not.toContain('Quality:');
         });
 
         it('marks failing criteria with ✗ for watchlist stock and labels them in Hebrew', () => {
