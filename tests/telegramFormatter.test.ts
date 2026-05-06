@@ -1,9 +1,10 @@
 /**
- * Telegram Formatter Tests — momentum-only output (2026-05-05)
+ * Telegram Formatter Tests — action-based output (2026-05-06).
  *
- * The daily report is now driven exclusively by momentum tiers
- * (Full / Recovery / Watchlist). Legacy entry-path labels and the
- * Silent Activity section are no longer in the Telegram output.
+ * The daily report is now driven by Champion-Score actions
+ * (BUY / WATCH / CAUTION_EXTENDED / CAUTION_NO_VOL). PASS and
+ * PASS_TOO_LATE are filtered out before reaching the formatter.
+ * Stocks must have `action` set; otherwise they're invisible.
  */
 
 // Mock config and llmSummary before importing telegramBot (avoids p-limit ESM in Jest)
@@ -29,42 +30,57 @@ jest.mock('../src/services/llmSummary.js', () => ({
 }));
 
 import { formatDailyReport } from '../src/services/telegramBot';
-import { RVOLResult, MomentumResult } from '../src/types';
+import { RVOLResult, MomentumResult, TradePlan } from '../src/types';
 
-const fullCriteria: MomentumResult['criteria'] = {
+const buyCriteria: MomentumResult['criteria'] = {
     rvolPass: true,
     stage2: true,
-    lowRiskEntry: true,
+    lowRiskEntry: false,
     pivotBreakout: true,
     tightness: true,
     aboveGapAvwap: true,
     antsAccumulation: false,
     bigMoveToday: true,
 };
-const watchlistCriteria: MomentumResult['criteria'] = {
-    rvolPass: true,
+const watchCriteria: MomentumResult['criteria'] = {
+    rvolPass: false,
     stage2: true,
-    lowRiskEntry: false,
-    pivotBreakout: true,
+    lowRiskEntry: true,
+    pivotBreakout: false,
     tightness: false,
     aboveGapAvwap: true,
     antsAccumulation: false,
     bigMoveToday: false,
 };
 
-const fullMomentum: MomentumResult = {
-    level: 'full',
-    criteria: fullCriteria,
-    failures: [],
-};
+const fullMomentum: MomentumResult = { level: 'full', criteria: buyCriteria, failures: [] };
 const watchlistMomentum: MomentumResult = {
     level: 'close',
-    criteria: watchlistCriteria,
-    failures: ['lowRiskEntry', 'tightness'],
+    criteria: watchCriteria,
+    failures: ['rvolPass', 'pivotBreakout'],
 };
 
-describe('Telegram Formatter (momentum-only)', () => {
-    const fullStock: RVOLResult = {
+const buyTradePlan: TradePlan = {
+    pivot: 855,
+    buyZoneLow: 837.9,
+    buyZoneHigh: 872.1,
+    stopLoss: 779,
+    riskPct: -8.4,
+    distanceToEntryPct: 0.6,
+    extensionPct: 0,
+};
+const watchTradePlan: TradePlan = {
+    pivot: 150,
+    buyZoneLow: 147,
+    buyZoneHigh: 153,
+    stopLoss: 123.5,
+    riskPct: -14.8,
+    distanceToEntryPct: 3.3,
+    extensionPct: 0,
+};
+
+describe('Telegram Formatter (action-based)', () => {
+    const buyStock: RVOLResult = {
         ticker: 'NVDA',
         sector: 'Semiconductor',
         lastPrice: 850.0,
@@ -79,19 +95,23 @@ describe('Telegram Formatter (momentum-only)', () => {
         sma21: 820,
         ath: 855,
         pctFromAth: -0.6,
-        daysSinceAth: 25,
+        daysSinceAth: 0,
         news: [],
         isVolumeWithoutPrice: false,
         momentum: fullMomentum,
+        championScore: 87,
+        action: 'BUY',
+        breakoutStage: 'Breaking Out',
+        tradePlan: buyTradePlan,
     };
-    const watchlistStock: RVOLResult = {
+    const watchStock: RVOLResult = {
         ticker: 'AMD',
         sector: 'Semiconductor',
         lastPrice: 145.0,
         priceChange: 2.1,
         currentVolume: 60_000_000,
         avgVolume: 20_000_000,
-        rvol: 3.0,
+        rvol: 1.4,
         rsi: 60,
         sma50: 140,
         sma200: 130,
@@ -103,111 +123,108 @@ describe('Telegram Formatter (momentum-only)', () => {
         news: [],
         isVolumeWithoutPrice: false,
         momentum: watchlistMomentum,
+        championScore: 62,
+        action: 'WATCH',
+        breakoutStage: 'Pre-Pivot',
+        tradePlan: watchTradePlan,
     };
 
     describe('formatDailyReport', () => {
-        it('renders header, sentiment, and tier sections', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock, watchlistStock], []);
+        it('renders header with sentiment + action counts', () => {
+            const report = formatDailyReport('2026-02-01', [buyStock, watchStock], []);
 
             expect(report).toContain('SMART VOLUME RADAR');
             expect(report).toContain('2026-02-01');
             expect(report).toContain('Sentiment:');
-            expect(report).toContain('FULL MOMENTUM');
-            expect(report).toContain('MOMENTUM WATCHLIST');
+            expect(report).toContain('BUY');
+            expect(report).toContain('WATCH');
             expect(report).toContain('NVDA');
             expect(report).toContain('AMD');
         });
 
-        it('renders the 8-criteria checklist for Watchlist stocks (where it varies)', () => {
-            const report = formatDailyReport('2026-02-01', [watchlistStock], []);
+        it('groups by action — BUY before WATCH regardless of input order', () => {
+            const report = formatDailyReport('2026-02-01', [watchStock, buyStock], []);
+            const buyIdx = report.indexOf('🟢 <b>BUY</b>');
+            const watchIdx = report.indexOf('👀 <b>WATCH</b>');
+            expect(buyIdx).toBeGreaterThan(0);
+            expect(watchIdx).toBeGreaterThan(buyIdx);
+        });
 
+        it('shows the Champion Score next to ticker', () => {
+            const report = formatDailyReport('2026-02-01', [buyStock], []);
+            expect(report).toContain('NVDA');
+            expect(report).toContain('87'); // championScore
+            expect(report).toContain('/100');
+        });
+
+        it('renders the trade plan (buy zone + pivot + stop + risk)', () => {
+            const report = formatDailyReport('2026-02-01', [buyStock], []);
+            expect(report).toContain('Buy zone');
+            expect(report).toContain('837.90'); // buyZoneLow
+            expect(report).toContain('872.10'); // buyZoneHigh
+            expect(report).toContain('pivot $855');
+            expect(report).toContain('Stop');
+            expect(report).toContain('779');
+            expect(report).toContain('Risk');
+            expect(report).toContain('-8.4%');
+        });
+
+        it('shows breakout stage with Hebrew descriptor', () => {
+            const buyReport = formatDailyReport('2026-02-01', [buyStock], []);
+            expect(buyReport).toContain('Stage:');
+            expect(buyReport).toContain('Breaking Out');
+
+            const watchReport = formatDailyReport('2026-02-01', [watchStock], []);
+            expect(watchReport).toContain('Pre-Pivot');
+        });
+
+        it('omits criteria checklist for BUY actions (already confirmed)', () => {
+            const report = formatDailyReport('2026-02-01', [buyStock], []);
+            expect(report).not.toContain('Mandatory:');
+        });
+
+        it('renders the criteria checklist for WATCH (where it varies)', () => {
+            const report = formatDailyReport('2026-02-01', [watchStock], []);
             expect(report).toContain('Mandatory:');
             expect(report).toContain('Quality:');
-            expect(report).toContain('RVOL ✓');
-            expect(report).toContain('Stage2 ✓');
-            expect(report).toContain('Pivot ✓');
-            expect(report).toContain('AVWAP ✓');
         });
 
-        it('omits the Mandatory checklist for Full stocks (always all-green by definition)', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock], []);
-            // Full passes 4/4 mandatory by tier definition; rendering them is just noise.
-            expect(report).not.toContain('Mandatory:');
-            expect(report).not.toContain('Quality:');
+        it('shows the WATCH narrative line about distance to pivot', () => {
+            const report = formatDailyReport('2026-02-01', [watchStock], []);
+            expect(report).toContain('עד ה-pivot');
         });
 
-        it('marks failing criteria with ✗ for watchlist stock and labels them in Hebrew', () => {
-            const report = formatDailyReport('2026-02-01', [watchlistStock], []);
-
-            expect(report).toContain('LowRisk ✗');
-            expect(report).toContain('Tight ✗');
-            // Hebrew labels in the (חסר: ...) hint instead of camelCase code names
-            expect(report).toContain('מרחק SMA21');
-            expect(report).toContain('תקופת בסיס');
-        });
-
-        it('shows distance metrics (SMA21 / ATH / days since ATH)', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock], []);
-
-            expect(report).toContain('SMA21'); // distance row
-            expect(report).toContain('ATH -0.6%');
-            expect(report).toContain('25d since ATH');
-        });
-
-        it('shows trend stack (Price vs SMA50, SMA50 vs SMA200, SMA200 slope)', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock], []);
-
-            expect(report).toContain('Price ↑ SMA50');
-            expect(report).toContain('SMA50 ↑ SMA200');
-            expect(report).toContain('SMA200 ↗up');
-        });
-
-        it('handles the empty case with a momentum-specific message', () => {
+        it('handles the empty case with action-vocabulary message', () => {
             const report = formatDailyReport('2026-02-01', [], []);
-
-            expect(report).toContain('אין מניות במומנטום היום');
+            expect(report).toContain('אין מניות אקטיביות');
             expect(report).not.toContain('Sentiment:');
         });
 
-        it('does not render Silent Activity Watchlist (momentum-only Telegram)', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock], []);
-
+        it('does not render Silent Activity Watchlist (action-only Telegram)', () => {
+            const report = formatDailyReport('2026-02-01', [buyStock], []);
             expect(report).not.toContain('SILENT ACTIVITY WATCHLIST');
         });
 
         it('does not include legacy entry-path labels (RVOL+מחיר / Pullback / SMA21 Touch)', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock, watchlistStock], []);
-
+            const report = formatDailyReport('2026-02-01', [buyStock, watchStock], []);
             expect(report).not.toContain('כניסה: RVOL+מחיר');
             expect(report).not.toContain('כניסה: Pullback 15%');
             expect(report).not.toContain('כניסה: SMA21 Touch');
         });
 
-        it('groups by tier — Full appears before Watchlist regardless of input order', () => {
-            const report = formatDailyReport('2026-02-01', [watchlistStock, fullStock], []);
-            const fullIdx = report.indexOf('FULL MOMENTUM');
-            const watchIdx = report.indexOf('MOMENTUM WATCHLIST');
-
-            expect(fullIdx).toBeGreaterThan(0);
-            expect(watchIdx).toBeGreaterThan(fullIdx);
-        });
-
         it('uses correct price-direction emoji per stock', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock, watchlistStock], []);
-
+            const report = formatDailyReport('2026-02-01', [buyStock, watchStock], []);
             expect(report).toContain('🟢 +6.25%');
             expect(report).toContain('🟢 +2.10%');
         });
 
         it('includes sector hint next to the ticker', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock], []);
-
+            const report = formatDailyReport('2026-02-01', [buyStock], []);
             expect(report).toContain('Semiconductor');
         });
 
         it('does not leak failed tickers into the report body (issues section is separate)', () => {
-            const report = formatDailyReport('2026-02-01', [fullStock], [], ['BAD.TA', 'MISSING']);
-
+            const report = formatDailyReport('2026-02-01', [buyStock], [], ['BAD.TA', 'MISSING']);
             expect(report).not.toContain('Could not check');
             expect(report).not.toContain('BAD.TA');
         });
@@ -226,7 +243,7 @@ describe('Telegram Formatter (momentum-only)', () => {
             ];
 
             it('renders the graduation block when graduations are passed', () => {
-                const report = formatDailyReport('2026-04-27', [fullStock], [], [], graduations);
+                const report = formatDailyReport('2026-04-27', [buyStock], [], [], graduations);
 
                 expect(report).toContain('GRADUATION ALERT (1)');
                 expect(report).toContain('Watchlist → Full Momentum');
@@ -236,32 +253,26 @@ describe('Telegram Formatter (momentum-only)', () => {
                 expect(report).toContain('12 ימים');
             });
 
-            it('places graduation block before the FULL MOMENTUM section', () => {
-                const report = formatDailyReport('2026-04-27', [fullStock], [], [], graduations);
+            it('places graduation block before the BUY section', () => {
+                const report = formatDailyReport('2026-04-27', [buyStock], [], [], graduations);
                 const gradIdx = report.indexOf('GRADUATION ALERT');
-                // Tier section header is "🎯 <b>FULL MOMENTUM</b> <i>(1)</i>" — find the FIRST
-                // FULL MOMENTUM occurrence after the graduation block, which is the tier header
-                // (not the per-stock badge inside the graduation block).
                 const reportRadarHeaderIdx = report.indexOf('SMART VOLUME RADAR');
-                const fullIdx = report.indexOf('FULL MOMENTUM', reportRadarHeaderIdx);
+                const buyIdx = report.indexOf('🟢 <b>BUY</b>', reportRadarHeaderIdx);
 
                 expect(gradIdx).toBeGreaterThanOrEqual(0);
-                expect(fullIdx).toBeGreaterThan(gradIdx);
+                expect(buyIdx).toBeGreaterThan(gradIdx);
             });
 
             it('omits the section entirely when no graduations', () => {
-                const report = formatDailyReport('2026-04-27', [fullStock], [], [], []);
-
+                const report = formatDailyReport('2026-04-27', [buyStock], [], [], []);
                 expect(report).not.toContain('GRADUATION ALERT');
             });
 
-            it('still shows graduation block when there are no momentum signals', () => {
+            it('still shows graduation block when there are no actionable signals', () => {
                 const report = formatDailyReport('2026-04-27', [], [], [], graduations);
-
                 expect(report).toContain('GRADUATION ALERT');
                 expect(report).toContain('NXPI');
-                // Empty-state for momentum is still appended
-                expect(report).toContain('אין מניות במומנטום היום');
+                expect(report).toContain('אין מניות אקטיביות');
             });
         });
     });

@@ -89,21 +89,21 @@ function formatReportHeader(
     bullish: number,
     bearish: number,
     regime: 'bull' | 'bear' | undefined,
-    tierCounts: { full: number; recovery: number; close: number }
+    actionCounts: { buy: number; watch: number; caution: number }
 ): string {
     const regimeBadge =
         regime === 'bear' ? ' | 🐻 Bear (SPY<SMA200)' : regime === 'bull' ? ' | 🐂 Bull' : '';
-    const tierBits: string[] = [];
-    if (tierCounts.full > 0) tierBits.push(`🎯 ${tierCounts.full} Full`);
-    if (tierCounts.recovery > 0) tierBits.push(`🦅 ${tierCounts.recovery} Recovery`);
-    if (tierCounts.close > 0) tierBits.push(`👀 ${tierCounts.close} Watchlist`);
-    const tierLine = tierBits.length > 0 ? `${tierBits.join(' | ')}\n` : '';
+    const actionBits: string[] = [];
+    if (actionCounts.buy > 0) actionBits.push(`🟢 ${actionCounts.buy} BUY`);
+    if (actionCounts.caution > 0) actionBits.push(`⚠️ ${actionCounts.caution} CAUTION`);
+    if (actionCounts.watch > 0) actionBits.push(`👀 ${actionCounts.watch} WATCH`);
+    const actionLine = actionBits.length > 0 ? `${actionBits.join(' | ')}\n` : '';
     return (
         `🛰 <b>SMART VOLUME RADAR</b>\n` +
         `📅 <code>${date}</code>${regimeBadge}\n` +
-        tierLine +
+        actionLine +
         `🎭 Sentiment: ${bullish} 🟢 | ${bearish} 🔴\n` +
-        `<i>🎯 Full = 4 mandatory + ≥1 quality | 🦅 Recovery = bull bounce w/o SMA200 | 👀 Watchlist = קרוב</i>\n` +
+        `<i>🟢 BUY = at pivot + volume confirmed | ⚠️ CAUTION = extended or no volume | 👀 WATCH = setup forming</i>\n` +
         `━━━━━━━━━━━━━━━━━━━━━━\n\n`
     );
 }
@@ -208,6 +208,24 @@ function formatNewsLines(stock: RVOLResult): string {
     return lines.join('\n') + '\n';
 }
 
+/** Hebrew descriptor for breakout stage. */
+function breakoutStageLabel(stage: NonNullable<RVOLResult['breakoutStage']>): string {
+    switch (stage) {
+        case 'Breaking Out':
+            return 'Breaking Out (פריצה היום)';
+        case 'Fresh':
+            return 'Fresh (פריצה טרייה)';
+        case 'Aging':
+            return 'Aging (פריצה ישנה — נמצא במגמה)';
+        case 'Pre-Pivot':
+            return 'Pre-Pivot (קרוב לפיבוט, מתבסס)';
+        case 'Setup':
+            return 'Setup (בתוך בסיס)';
+        case 'Failed':
+            return 'Failed (פריצה כשלה)';
+    }
+}
+
 function formatSingleStockBlock(stock: RVOLResult, monitorMeta?: MonitorMeta): string {
     let statusEmoji = stock.priceChange >= 0 ? '↗️' : '↘️';
     if (stock.rvol > 4) statusEmoji = '⚡️';
@@ -217,27 +235,53 @@ function formatSingleStockBlock(stock: RVOLResult, monitorMeta?: MonitorMeta): s
     const { tvUrl, yahooUrl } = buildStockUrls(stock);
     const persistenceMarker = formatPersistenceMarker(monitorMeta);
 
+    // Header: ticker + persistence + Champion Score + sector
     let block = `${statusEmoji} <b><a href="${tvUrl}">${escapeHtml(stock.ticker)}</a></b>${persistenceMarker}`;
+    if (stock.championScore != null) {
+        block += `  <b>${stock.championScore.toFixed(0)}</b><i>/100</i>`;
+    }
     if (stock.sector) {
         block += ` <i>(${escapeHtml(stock.sector)})</i>`;
     }
     block += '\n';
 
-    // Momentum tier line — only for Watchlist/Recovery where it adds info beyond the
-    // section header (failure reasons, regime context). For Full, the section header
-    // already says "🎯 FULL MOMENTUM" and Mandatory is all-green by definition; we
-    // skip both lines to reduce noise.
+    // Action-specific narrative line: tells the user WHY this action.
+    if (stock.action === 'CAUTION_EXTENDED' && stock.tradePlan) {
+        block += `├ ⚠️ <i>extended ${stock.tradePlan.extensionPct.toFixed(1)}% מעבר ל-pivot — סטופ הדוק</i>\n`;
+    } else if (stock.action === 'CAUTION_NO_VOL') {
+        block += `├ ⚠️ <i>על ה-pivot אבל RVOL ${formatRVOL(stock.rvol)} — נפח לא מאשר</i>\n`;
+    } else if (stock.action === 'WATCH' && stock.tradePlan) {
+        block += `├ 👀 <i>צריך עוד ${stock.tradePlan.distanceToEntryPct.toFixed(1)}% עד ה-pivot</i>\n`;
+    }
+
+    // Trade plan: pivot, buy zone, stop loss, risk %
+    if (stock.tradePlan) {
+        const tp = stock.tradePlan;
+        block +=
+            `├ 🎯 <b>Buy zone</b>: $${tp.buyZoneLow.toFixed(2)}–$${tp.buyZoneHigh.toFixed(2)}` +
+            ` <i>(pivot $${tp.pivot.toFixed(2)})</i>\n`;
+        if (tp.stopLoss != null && tp.riskPct != null) {
+            block += `├ 🛑 <b>Stop</b> $${tp.stopLoss.toFixed(2)}  ·  <b>Risk</b> ${tp.riskPct.toFixed(1)}%\n`;
+        }
+    }
+
+    // Breakout stage
+    if (stock.breakoutStage) {
+        block += `├ 📊 <b>Stage:</b> ${escapeHtml(breakoutStageLabel(stock.breakoutStage))}\n`;
+    }
+
+    // Recovery / Watchlist context (preserved from prior format — additive)
     if (stock.momentum?.level === 'recovery') {
-        block += `├ 🦅 <i>SMA200 עוד למטה — סיכון/סיכוי גבוה</i>\n`;
-    } else if (stock.momentum?.level === 'close') {
+        block += `├ 🦅 <i>Recovery: SMA200 עוד למטה — סיכון/סיכוי גבוה</i>\n`;
+    } else if (stock.momentum?.level === 'close' && stock.action !== 'BUY') {
         const reasons = criteriaListHe(stock.momentum.failures.slice(0, 3));
         if (reasons) {
             block += `├ 👀 <i>חסר: ${escapeHtml(reasons)}</i>\n`;
         }
     }
 
-    // Criteria checklist — only for non-Full tiers (Full passes all 4 mandatory by def).
-    if (stock.momentum?.level !== 'full') {
+    // Criteria checklist — only for non-BUY actions (BUY already action-confirmed).
+    if (stock.action !== 'BUY' && stock.momentum?.level !== 'full') {
         block += formatMomentumCriteriaRows(stock);
     }
 
@@ -346,48 +390,54 @@ export function formatDailyReport(
 ): string {
     const gradSection = formatGraduationSection(graduations);
     if (topSignals.length === 0) {
-        const empty = `📊 <b>Smart Volume Radar</b>\n📅 ${date}\n\n📭 אין מניות במומנטום היום (Full / Recovery / Watchlist).\n\n<i>הסורק רץ תקין — פשוט אין כיום מניה שעוברת את הקריטריונים.</i>`;
+        const empty = `📊 <b>Smart Volume Radar</b>\n📅 ${date}\n\n📭 אין מניות אקטיביות היום (BUY / WATCH / CAUTION).\n\n<i>הסורק רץ תקין — פשוט אין כיום מניה שעוברת את הקריטריונים.</i>`;
         return gradSection ? gradSection + empty : empty;
     }
 
-    // Caller already sorted by tier (full→recovery→close) then RVOL — preserve that.
+    // Caller already sorted by action rank then score — preserve that.
     const bullish = topSignals.filter((s) => s.priceChange > 0).length;
     const bearish = topSignals.filter((s) => s.priceChange < 0).length;
     const regime = topSignals.find((s) => s.marketRegime)?.marketRegime;
 
-    // Group by tier so Full Momentum stocks always appear first as a coherent block.
-    const tierBuckets: Record<'full' | 'recovery' | 'close', RVOLResult[]> = { full: [], recovery: [], close: [] };
+    // Group by action label (BUY → CAUTION → WATCH).
+    const actionBuckets: Record<'BUY' | 'CAUTION' | 'WATCH', RVOLResult[]> = {
+        BUY: [],
+        CAUTION: [],
+        WATCH: [],
+    };
     for (const stock of topSignals) {
-        const lvl = (stock.momentum?.level ?? 'close') as 'full' | 'recovery' | 'close' | 'none';
-        if (lvl !== 'none') tierBuckets[lvl].push(stock);
+        if (stock.action === 'BUY') actionBuckets.BUY.push(stock);
+        else if (stock.action === 'CAUTION_EXTENDED' || stock.action === 'CAUTION_NO_VOL')
+            actionBuckets.CAUTION.push(stock);
+        else if (stock.action === 'WATCH') actionBuckets.WATCH.push(stock);
     }
-    const tierCounts = {
-        full: tierBuckets.full.length,
-        recovery: tierBuckets.recovery.length,
-        close: tierBuckets.close.length,
+    const actionCounts = {
+        buy: actionBuckets.BUY.length,
+        watch: actionBuckets.WATCH.length,
+        caution: actionBuckets.CAUTION.length,
     };
 
-    let message = formatReportHeader(date, bullish, bearish, regime, tierCounts);
+    let message = formatReportHeader(date, bullish, bearish, regime, actionCounts);
     if (gradSection) {
         message = gradSection + message;
     }
 
-    const tierHeaders = {
-        full: '🎯 <b>FULL MOMENTUM</b>',
-        recovery: '🦅 <b>RECOVERY RALLY</b>',
-        close: '👀 <b>MOMENTUM WATCHLIST</b>',
+    const actionHeaders = {
+        BUY: '🟢 <b>BUY</b> <i>(at pivot + volume confirmed)</i>',
+        CAUTION: '⚠️ <b>CAUTION</b> <i>(extended or no volume — risky entry)</i>',
+        WATCH: '👀 <b>WATCH</b> <i>(setup forming — pre-pivot)</i>',
     } as const;
-    for (const tier of ['full', 'recovery', 'close'] as const) {
-        const bucket = tierBuckets[tier];
+    for (const action of ['BUY', 'CAUTION', 'WATCH'] as const) {
+        const bucket = actionBuckets[action];
         if (bucket.length === 0) continue;
-        message += `${tierHeaders[tier]} <i>(${bucket.length})</i>\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+        message += `${actionHeaders[action]}  ·  ${bucket.length}\n━━━━━━━━━━━━━━━━━━━━━━\n`;
         for (const stock of bucket) {
             const meta = monitorMetaByTicker?.get(stock.ticker.toUpperCase());
             message += formatSingleStockBlock(stock, meta);
         }
     }
 
-    // Silent activity intentionally omitted — Telegram is momentum-only.
+    // Silent activity / PASS / TOO LATE intentionally omitted — Telegram is action-only.
     return message;
 }
 

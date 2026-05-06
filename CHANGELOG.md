@@ -3,6 +3,18 @@
 ## Unreleased
 
 ### Added
+- **Champion Score Layer (2026-05-06):** Continuous quality score 0-100 plus
+  6-state action label (BUY / WATCH / CAUTION_EXTENDED / CAUTION_NO_VOL /
+  PASS / PASS_TOO_LATE) and a per-stock trade plan (pivot, buy zone, stop loss,
+  risk %, distance to entry, extension %). Inspired by championscan.com after
+  research session 2026-05-06; weights derived from our own 2026-05-06
+  criteria-importance analysis (86 days, train+test stable). New file
+  `src/utils/championScore.ts` (pure & synchronous).
+- **Telegram report (2026-05-06):** Now driven by action labels instead of
+  momentum tiers. Sections: 🟢 BUY → ⚠️ CAUTION → 👀 WATCH. PASS / PASS_TOO_LATE
+  filtered out (not actionable). Each block shows Champion Score, breakout
+  stage (Breaking Out / Fresh / Aging / Pre-Pivot / Setup / Failed), and full
+  trade plan (Buy zone $X-$Y, Pivot $Z, Stop $W, Risk -N%).
 - **Momentum Edition:** Stage 2 Momentum Breakout scoring layer (Intel/AMKR/MXL pattern). 8 criteria — 4 mandatory (RVOL · Stage2 · Pivot · AVWAP) + 4 quality (LowRisk · Tightness · Ants · BigMove). Tiers: 🎯 Full / 🦅 Recovery (bull bounce, no SMA200 yet) / 👀 Watchlist. Regime-aware RVOL threshold (bull=2.0, bear=3.0). New helpers: `projectedRvol`, `calculateAVWAP`, `detectEarningsGap`, `calculateSMA200Slope`, `countConsecutiveGreenDays`. New file `src/utils/setup.ts` (the momentum brain).
 - **Monitor follow-up tracking:** New scan-to-scan state machine in `src/services/monitorTracker.ts` + `src/utils/monitorStore.ts`. Surfaces graduations, manual-entry candidates, SMA21 pullbacks, expirations as a separate Telegram message. Persists to `results/monitor-list.json` (now committed daily so CI runs share state).
 - **Newlogic tags:** Replaced legacy Setup (🎯/👀) with independent tags: SMA21 Touch, Pullback 15%, 1M Breakout. Tags travel with each stock; Silent Activity and Top Signals both receive tags.

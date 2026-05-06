@@ -7,6 +7,7 @@ import { loadWatchlist, validateConfig, config, getSectorForTicker, fetchAndCach
 import { classifyTickersWithGroq } from './services/llmSummary.js';
 import { fetchAllStocksAsOfDate, fetchMarketRegime } from './services/marketData.js';
 import { evaluateMomentumSetup } from './utils/setup.js';
+import { applyChampionScore } from './utils/championScore.js';
 import { calculateRVOL } from './services/rvolCalculator.js';
 import { enrichWithNews } from './services/newsService.js';
 import { sendDailyReport, sendTelegramMessage, formatMonitorTelegramMessage, GraduationInfo, MonitorMeta } from './services/telegramBot.js';
@@ -122,9 +123,11 @@ async function main(): Promise<void> {
         logger.info(`🧭 Market regime: ${marketRegime.toUpperCase()} (SPY vs SMA200)`);
         const { stocks, failedTickers } = await fetchAllStocksAsOfDate(tickers, scanDate);
         // Tag every stock with the regime + run momentum evaluator (additive — does not affect existing pipeline).
+        // Then apply the Champion Score layer (continuous score + action label + trade plan).
         for (const s of stocks) {
             s.marketRegime = marketRegime;
             s.momentum = evaluateMomentumSetup(s, { regime: marketRegime });
+            applyChampionScore(s);
         }
         logger.info(`✅ Fetched data for ${stocks.length}/${tickers.length} stocks`);
 
@@ -143,27 +146,41 @@ async function main(): Promise<void> {
         });
         logger.info(`🎯 Legacy 3-path: ${topSignals.length} signals + ${volumeWithoutPrice.length} silent (history only)`);
 
-        // 6.5. Momentum-only signal list — THIS is what Telegram sends.
-        //      Built directly from `stocks` so a Full/Close/Recovery stock can never be
-        //      filtered out by the legacy 3-path rule.
-        const momentumStocks = stocks.filter(
-            (s) => s.momentum?.level === 'full' || s.momentum?.level === 'close' || s.momentum?.level === 'recovery'
+        // 6.5. Action-based signal list — THIS is what Telegram sends.
+        //      Built directly from `stocks`, filtered by Champion-Score action label.
+        //      PASS and PASS_TOO_LATE are excluded (not actionable).
+        const actionableStocks = stocks.filter(
+            (s) =>
+                s.action === 'BUY' ||
+                s.action === 'WATCH' ||
+                s.action === 'CAUTION_EXTENDED' ||
+                s.action === 'CAUTION_NO_VOL'
         );
-        const tierRank = (lvl: 'full' | 'close' | 'recovery' | 'none' | undefined): number =>
-            lvl === 'full' ? 0 : lvl === 'recovery' ? 1 : lvl === 'close' ? 2 : 3;
-        momentumStocks.sort((a, b) => {
-            const tDiff = tierRank(a.momentum?.level) - tierRank(b.momentum?.level);
-            if (tDiff !== 0) return tDiff;
+        const actionRank: Record<string, number> = {
+            BUY: 0,
+            CAUTION_EXTENDED: 1,
+            CAUTION_NO_VOL: 1,
+            WATCH: 2,
+        };
+        actionableStocks.sort((a, b) => {
+            const aR = actionRank[a.action ?? ''] ?? 99;
+            const bR = actionRank[b.action ?? ''] ?? 99;
+            if (aR !== bR) return aR - bR;
+            // within same action bucket, higher score first, then higher RVOL
+            const sDiff = (b.championScore ?? 0) - (a.championScore ?? 0);
+            if (Math.abs(sDiff) > 0.5) return sDiff;
             return (b.rvol ?? 0) - (a.rvol ?? 0);
         });
-        const fullCount = momentumStocks.filter((s) => s.momentum?.level === 'full').length;
-        const recoveryCount = momentumStocks.filter((s) => s.momentum?.level === 'recovery').length;
-        const closeCount = momentumStocks.filter((s) => s.momentum?.level === 'close').length;
-        logger.info(`🎯 Momentum signals (Telegram): ${fullCount} Full + ${recoveryCount} Recovery + ${closeCount} Watchlist`);
+        const buyCount = actionableStocks.filter((s) => s.action === 'BUY').length;
+        const watchCount = actionableStocks.filter((s) => s.action === 'WATCH').length;
+        const cautionCount = actionableStocks.filter(
+            (s) => s.action === 'CAUTION_EXTENDED' || s.action === 'CAUTION_NO_VOL'
+        ).length;
+        logger.info(`🎯 Telegram signals: ${buyCount} BUY + ${watchCount} WATCH + ${cautionCount} CAUTION`);
 
-        // 7. Enrich with news — only momentum stocks (what Telegram sends)
+        // 7. Enrich with news — only actionable stocks (what Telegram sends)
         logger.info('📰 Enriching with news...');
-        const enrichedMomentum = await enrichWithNews(momentumStocks);
+        const enrichedMomentum = await enrichWithNews(actionableStocks);
 
         // Build RVOLResult shape (with sector). isVolumeWithoutPrice always false for momentum.
         const finalSignals: RVOLResult[] = enrichedMomentum.map((s) => ({
@@ -372,7 +389,7 @@ async function main(): Promise<void> {
         // 10. Log completion
         const duration = ((Date.now() - startTime) / 1000).toFixed(1);
         logger.info(`\n✅ Report sent successfully in ${duration}s`);
-        logger.info(`   Scanned: ${stocks.length} | Telegram(momentum): ${finalSignals.length} | History(3-path+silent): ${topSignals.length}+${volumeWithoutPrice.length}`);
+        logger.info(`   Scanned: ${stocks.length} | Telegram(actionable): ${finalSignals.length} | History(3-path+silent): ${topSignals.length}+${volumeWithoutPrice.length}`);
 
     } catch (error) {
         const errorMessage = formatErrorForTelegram(error);

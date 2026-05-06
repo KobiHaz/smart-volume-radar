@@ -99,6 +99,65 @@ export interface StockData {
     marketRegime?: 'bull' | 'bear';
     /** Computed momentum signal (set by evaluateMomentumSetup downstream of fetch) */
     momentum?: MomentumResult;
+
+    // ─── Champion-Score Layer (additive, post-momentum) ─────────────────────
+    /** Continuous quality score 0-100 (composite of stable predictors per
+     *  2026-05-06 criteria-importance analysis). See `evaluateChampionScore`. */
+    championScore?: number;
+    /** Actionable label combining score + breakout stage + volume confirmation.
+     *  Inspired by ChampionScan's 6-state vocabulary. */
+    action?: ActionLabel;
+    /** Trade-execution helpers — pivot, buy zone, stop, risk %. */
+    tradePlan?: TradePlan;
+    /** Where the stock sits in its breakout cycle (Setup → Fresh → Aging → ...) */
+    breakoutStage?: BreakoutStage;
+}
+
+/**
+ * Six-state action label that pairs with the continuous Champion Score.
+ * The action is what to DO; the score is HOW GOOD the setup is.
+ *  - BUY              — actionable now: at pivot + score ≥ 70 + volume confirmed
+ *  - WATCH            — qualifying setup, waiting for the breakout
+ *  - CAUTION_EXTENDED — past pivot ≤10%, risky entry without strong volume
+ *  - CAUTION_NO_VOL   — at pivot but RVOL doesn't confirm institutional interest
+ *  - PASS_TOO_LATE    — extended >10% past pivot, missed it
+ *  - PASS             — score below threshold or trend broken
+ */
+export type ActionLabel =
+    | 'BUY'
+    | 'WATCH'
+    | 'CAUTION_EXTENDED'
+    | 'CAUTION_NO_VOL'
+    | 'PASS_TOO_LATE'
+    | 'PASS';
+
+/** Where the stock is in its breakout cycle. */
+export type BreakoutStage =
+    | 'Breaking Out'  // Today set a new ATH AND price ≥ pivot
+    | 'Fresh'         // 1-3 trading days since first piercing the pivot
+    | 'Aging'         // 4-10 trading days since pivot break, still above
+    | 'Setup'         // In a base / consolidation, not yet at pivot
+    | 'Failed'        // Was at pivot but pulled back significantly
+    | 'Pre-Pivot';    // Approaching pivot but not there yet
+
+/**
+ * Trade execution plan derived from technical levels — pivot, buy zone,
+ * stop loss, and risk %. Parallel to ChampionScan's "Buy Near / Stop / Risk".
+ */
+export interface TradePlan {
+    /** Reference pivot — typically 52w high / ATH. */
+    pivot: number;
+    /** Suggested entry zone: pivot ± 2%. */
+    buyZoneLow: number;
+    buyZoneHigh: number;
+    /** Stop loss — currently SMA21 × 0.95 (5% below SMA21), null when SMA21 missing. */
+    stopLoss: number | null;
+    /** Risk % from current price to stop. Negative number (e.g. -5.2%). */
+    riskPct: number | null;
+    /** Distance from current price to pivot, as % (positive = below, negative = above). */
+    distanceToEntryPct: number;
+    /** Extension % past pivot, 0 if not past. */
+    extensionPct: number;
 }
 
 /**
