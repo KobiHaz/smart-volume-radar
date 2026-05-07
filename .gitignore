@@ -45,3 +45,5 @@ retro-*.txt
 results/*
 # Exception: monitor-list.json IS committed daily so follow-up state survives CI runs.
 !results/monitor-list.json
+# Finnhub fundamentals cache (TTL 7d) — never committed, never shared across machines.
+results/finnhub-cache/

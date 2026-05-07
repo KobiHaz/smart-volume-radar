@@ -58,6 +58,13 @@ const WEIGHTS = {
     /** Bollinger Band squeeze (BB-width / price < 5%) = volatility contraction
      *  preceding many breakouts. */
     bbSqueeze: 3,
+    // ─── Phase 3 weights (fundamentals, 2026-05-07) ────────────────────
+    /** EPS YoY growth-rate accelerating Q-over-Q — institutional buying fuel. */
+    epsAccelerating: 5,
+    /** EPS YoY growth-rate decelerating — material slowdown, reduce score. */
+    epsDeceleratingPenalty: -5,
+    /** Revenue YoY growth-rate accelerating — confirms top-line expansion. */
+    revAccelerating: 3,
 } as const;
 
 /** Threshold for the BB squeeze flag: (upper - lower) / price as a fraction. */
@@ -111,6 +118,11 @@ export function computeChampionScore(stock: StockData): number {
     if ((stock.distributionDays ?? 0) >= 3) score += WEIGHTS.distributionPenalty;
     if ((stock.rsPercentile ?? 0) >= 80) score += WEIGHTS.topRS;
     if (isBBSqueeze(stock)) score += WEIGHTS.bbSqueeze;
+
+    // ─── Phase 3 contributors (fundamentals) ──────────────────────────
+    if (stock.epsAcceleration === 'accelerating') score += WEIGHTS.epsAccelerating;
+    else if (stock.epsAcceleration === 'decelerating') score += WEIGHTS.epsDeceleratingPenalty;
+    if (stock.revAcceleration === 'accelerating') score += WEIGHTS.revAccelerating;
 
     return Math.max(0, Math.min(100, Math.round(score * 10) / 10));
 }

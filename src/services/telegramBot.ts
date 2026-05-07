@@ -343,6 +343,23 @@ function formatSingleStockBlock(stock: RVOLResult, monitorMeta?: MonitorMeta): s
         block += `├ 📊 <b>A/D:</b> ${acc}↑ / ${dist}↓ <i>(${verdict})</i>\n`;
     }
 
+    // Phase 3: Earnings warning (≤7 days = elevated risk)
+    if (stock.daysToEarnings != null && stock.daysToEarnings >= 0 && stock.daysToEarnings <= 7) {
+        const dateStr = stock.nextEarningsDate ? ` (${stock.nextEarningsDate})` : '';
+        const urgency = stock.daysToEarnings <= 2 ? '⚠️ ⚠️' : '⚠️';
+        block += `├ 📅 <b>Earnings in ${stock.daysToEarnings}d</b>${dateStr} ${urgency} <i>elevated risk</i>\n`;
+    }
+
+    // Phase 3: EPS / Revenue acceleration (institutional money rule of thumb)
+    if (stock.epsAcceleration || stock.revAcceleration) {
+        const sym = (t: typeof stock.epsAcceleration): string =>
+            t === 'accelerating' ? '▲' : t === 'decelerating' ? '▼' : t === 'flat' ? '→' : '—';
+        const epsLabel = stock.epsAcceleration ? `EPS ${sym(stock.epsAcceleration)} ${stock.epsAcceleration}` : null;
+        const revLabel = stock.revAcceleration ? `Rev ${sym(stock.revAcceleration)} ${stock.revAcceleration}` : null;
+        const parts = [epsLabel, revLabel].filter(Boolean).join(' | ');
+        block += `├ 💰 <b>Fundamentals:</b> ${parts}\n`;
+    }
+
     // Phase 2: Bollinger Band squeeze flag (volatility contraction = pre-breakout coil)
     if (
         stock.bbUpper != null &&

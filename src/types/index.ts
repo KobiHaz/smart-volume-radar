@@ -120,6 +120,16 @@ export interface StockData {
     /** Relative-Strength percentile (0-100) vs other watchlist members over 63 trading
      *  days, using SPY-relative return (alpha). Populated post-fetch in `index.ts`. */
     rsPercentile?: number;
+
+    // ─── Phase 3: Fundamentals (Finnhub, added 2026-05-07) ─────────────────
+    /** Next upcoming earnings date (YYYY-MM-DD). null if unknown / no upcoming. */
+    nextEarningsDate?: string | null;
+    /** Calendar days from today (scan date) to nextEarningsDate. */
+    daysToEarnings?: number | null;
+    /** EPS YoY growth-rate trajectory: accelerating / decelerating / flat / null. */
+    epsAcceleration?: AccelerationTrend | null;
+    /** Revenue YoY growth-rate trajectory. */
+    revAcceleration?: AccelerationTrend | null;
     /** Computed momentum signal (set by evaluateMomentumSetup downstream of fetch) */
     momentum?: MomentumResult;
 
@@ -135,6 +145,14 @@ export interface StockData {
     /** Where the stock sits in its breakout cycle (Setup → Fresh → Aging → ...) */
     breakoutStage?: BreakoutStage;
 }
+
+/**
+ * Trajectory of a fundamental metric's YoY growth rate over the last two
+ * quarters. 'accelerating' = latest YoY growth > prior YoY growth + threshold;
+ * 'decelerating' = latest < prior - threshold; 'flat' otherwise; null when
+ * not enough data.
+ */
+export type AccelerationTrend = 'accelerating' | 'decelerating' | 'flat';
 
 /**
  * Six-state action label that pairs with the continuous Champion Score.

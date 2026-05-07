@@ -3,6 +3,22 @@
 ## Unreleased
 
 ### Added
+- **ChampionScan Phase 3 (2026-05-07):** Fundamentals via Finnhub.
+  - New service `src/services/finnhubFundamentals.ts` — fetches earnings
+    calendar (next ≤90 days) + quarterly EPS + quarterly revenue. On-disk
+    cache at `results/finnhub-cache/{ticker}.json` with 7-day TTL.
+  - New utility `src/utils/acceleration.ts` — `computeAcceleration()`
+    classifies a quarterly series as `accelerating | decelerating | flat`
+    using YoY growth-rate trajectory (Q[0]/Q[4] vs Q[1]/Q[5], 5pp threshold).
+    Falls back to QoQ when 6th quarter missing.
+  - `enrichWithFundamentals(stocks)` — p-limit(3), populates 4 fields:
+    `nextEarningsDate`, `daysToEarnings`, `epsAcceleration`, `revAcceleration`.
+    Wired in `index.ts` after RS percentile, before Champion Score.
+  - **Champion Score v3** weights: +5 EPS accelerating, **-5** EPS decelerating,
+    +3 Rev accelerating. Earnings date is informational (no score change).
+  - Telegram block: `📅 Earnings in 5d ⚠️ elevated risk` line when ≤7 days,
+    `💰 Fundamentals: EPS ▲ accelerating | Rev ▲ accelerating` when set.
+  - `.gitignore` excludes `results/finnhub-cache/`.
 - **ChampionScan Phase 2 (2026-05-07):** Volume quality, trend bands, RS percentile.
   - New indicators in `src/utils/technicalAnalysis.ts`: `calculateBollingerBands`,
     `calculateEMA`, `countAccumulationDistributionDays` (25-day lookback,

@@ -9,6 +9,7 @@ import { fetchAllStocksAsOfDate, fetchMarketRegime, fetchSpy63dReturn } from './
 import { evaluateMomentumSetup } from './utils/setup.js';
 import { applyChampionScore } from './utils/championScore.js';
 import { applyRSPercentile } from './utils/rsPercentile.js';
+import { enrichWithFundamentals } from './services/finnhubFundamentals.js';
 import { calculateRVOL } from './services/rvolCalculator.js';
 import { enrichWithNews } from './services/newsService.js';
 import { sendDailyReport, sendTelegramMessage, formatMonitorTelegramMessage, GraduationInfo, MonitorMeta } from './services/telegramBot.js';
@@ -127,6 +128,19 @@ async function main(): Promise<void> {
         // the alpha baseline. Fail-soft: passes null → falls back to raw return.
         const spyReturn63d = await fetchSpy63dReturn(scanDate);
         applyRSPercentile(stocks, spyReturn63d);
+
+        // Enrich with Finnhub fundamentals (earnings date, EPS/Rev acceleration).
+        // Fail-soft: API errors leave fields undefined and the score gracefully ignores them.
+        // Cache TTL 7d → amortized ~100 API calls/day, well under free-tier 1k/day limit.
+        try {
+            const fStats = await enrichWithFundamentals(stocks, scanDate);
+            logger.info(
+                `💰 Fundamentals enrichment: ${fStats.enriched} stocks populated ` +
+                `(${fStats.cacheHits} cache hits, ${fStats.apiCalls} API calls)`
+            );
+        } catch (fErr) {
+            logger.warn(`Fundamentals enrichment failed (non-fatal): ${(fErr as Error).message}`);
+        }
         const populated = stocks.filter((s) => s.rsPercentile != null).length;
         if (populated > 0) {
             const top = [...stocks]

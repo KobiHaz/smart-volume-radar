@@ -306,6 +306,65 @@ describe('isBBSqueeze', () => {
     });
 });
 
+describe('Phase 3 score contributors (fundamentals)', () => {
+    it('+5 for epsAcceleration === "accelerating"', () => {
+        const base = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+        });
+        const accelerating = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+            epsAcceleration: 'accelerating',
+        });
+        expect(computeChampionScore(accelerating) - computeChampionScore(base)).toBe(5);
+    });
+
+    it('-5 for epsAcceleration === "decelerating"', () => {
+        const base = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+        });
+        const decelerating = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+            epsAcceleration: 'decelerating',
+        });
+        expect(computeChampionScore(decelerating) - computeChampionScore(base)).toBe(-5);
+    });
+
+    it('+3 for revAcceleration === "accelerating"', () => {
+        const base = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+        });
+        const accel = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+            revAcceleration: 'accelerating',
+        });
+        expect(computeChampionScore(accel) - computeChampionScore(base)).toBe(3);
+    });
+
+    it('flat acceleration contributes 0', () => {
+        const base = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+        });
+        const flat = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+            epsAcceleration: 'flat',
+            revAcceleration: 'flat',
+        });
+        expect(computeChampionScore(flat)).toBe(computeChampionScore(base));
+    });
+
+    it('combined: EPS acc + Rev acc adds +8', () => {
+        const base = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+        });
+        const both = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+            epsAcceleration: 'accelerating',
+            revAcceleration: 'accelerating',
+        });
+        expect(computeChampionScore(both) - computeChampionScore(base)).toBe(8);
+    });
+});
+
 describe('CAUTION_DISTRIBUTION action', () => {
     it('overrides BUY when distributionDays >= 4', () => {
         const stock = makeStock({
