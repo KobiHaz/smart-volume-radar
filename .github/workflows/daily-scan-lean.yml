@@ -1,0 +1,61 @@
+name: Smart Volume Radar - Lean Daily Scan
+
+# Runs on the `stable` branch only — sends a stripped-down 3-signal report
+# (consolidation breakout / RVOL 3x+ / healthy pullback) to the same Telegram
+# chat as the experimental main scanner. Goal: A/B comparison over 30 days.
+
+concurrency:
+  group: daily-scan-lean
+  cancel-in-progress: false
+
+on:
+  schedule:
+    # 20:15 UTC, Mon–Fri — same window as the experimental main scan.
+    - cron: '15 20 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  scan:
+    # Only run this workflow when triggered on the `stable` branch.
+    if: github.ref == 'refs/heads/stable'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout stable branch
+        uses: actions/checkout@v6
+        with:
+          ref: stable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Lean Scanner
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          # Force scan because Sundays-Fridays may be holidays / weekends in TASE.
+          FORCE_SCAN: 'true'
+        run: npm run start:lean
+
+      - name: Notify Telegram on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -d "chat_id=${TELEGRAM_CHAT_ID}&text=⚠️ 🪶 Lean scanner failed. Check GitHub Actions on stable branch."
+          fi
