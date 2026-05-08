@@ -17,7 +17,7 @@ import {
     getSectorForTicker,
 } from './config/index.js';
 import { fetchAllStocksAsOfDate } from './services/marketData.js';
-import { sendTelegramMessage } from './services/telegramBot.js';
+import { sendTelegramMessage, chunkMessage } from './services/telegramBot.js';
 import { getLastTradingDay } from './utils/tradingDate.js';
 import logger from './utils/logger.js';
 import { formatErrorForTelegram } from './utils/errorHandler.js';
@@ -175,10 +175,15 @@ async function main(): Promise<void> {
                 `+ ${result.nearConsolidation.length + result.nearVolume.length + result.nearPullback.length} near-misses`
         );
 
-        // Format + send
+        // Format + send (chunked — Telegram's hard limit is 4096 chars per message)
         const message = formatLeanReport(scanDate, result);
+        const chunks = chunkMessage(message);
+        logger.info(`📤 Sending lean report (${chunks.length} chunk${chunks.length > 1 ? 's' : ''})...`);
         if (!process.env.DRY_RUN) {
-            await sendTelegramMessage(message);
+            for (let i = 0; i < chunks.length; i++) {
+                if (i > 0) await new Promise((r) => setTimeout(r, 1200)); // gentle rate-limit
+                await sendTelegramMessage(chunks[i]!);
+            }
             logger.info('✉️ Lean report sent to Telegram');
         } else {
             logger.info('(DRY_RUN=1 — skipping Telegram send)');

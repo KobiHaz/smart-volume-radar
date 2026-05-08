@@ -395,9 +395,10 @@ function formatSingleStockBlock(stock: RVOLResult, monitorMeta?: MonitorMeta): s
 }
 
 /**
- * Split message into chunks that fit Telegram's limit
+ * Split message into chunks that fit Telegram's limit. Exported so other
+ * entrypoints (e.g. the lean scanner) can chunk before sending.
  */
-function chunkMessage(message: string, maxLen: number = TELEGRAM_MAX_LENGTH): string[] {
+export function chunkMessage(message: string, maxLen: number = TELEGRAM_MAX_LENGTH): string[] {
     if (message.length <= maxLen) {
         return [message];
     }
