@@ -9,6 +9,7 @@ import { fetchAllStocksAsOfDate, fetchMarketRegime, fetchSpy63dReturn } from './
 import { evaluateMomentumSetup } from './utils/setup.js';
 import { applyChampionScore } from './utils/championScore.js';
 import { applyRSPercentile } from './utils/rsPercentile.js';
+import { applySectorRanks } from './utils/sectorRank.js';
 import { enrichWithFundamentals } from './services/finnhubFundamentals.js';
 import { calculateRVOL } from './services/rvolCalculator.js';
 import { enrichWithNews } from './services/newsService.js';
@@ -128,6 +129,21 @@ async function main(): Promise<void> {
         // the alpha baseline. Fail-soft: passes null → falls back to raw return.
         const spyReturn63d = await fetchSpy63dReturn(scanDate);
         applyRSPercentile(stocks, spyReturn63d);
+
+        // Dynamic sector ranking (Phase 4B) — median return63d per sector,
+        // mutates each stock's sectorRank / sectorMedianReturn63d / sectorTotalCount.
+        const sectorRanks = applySectorRanks(stocks);
+        if (sectorRanks.size > 0) {
+            const top5 = Array.from(sectorRanks.entries())
+                .sort((a, b) => a[1].rank - b[1].rank)
+                .slice(0, 5)
+                .map(
+                    ([sec, info]) =>
+                        `${sec} #${info.rank} ${info.median63d >= 0 ? '+' : ''}${info.median63d.toFixed(1)}% (n=${info.count})`
+                )
+                .join(' | ');
+            logger.info(`🏭 Top sectors (63d median): ${top5}`);
+        }
 
         // Enrich with Finnhub fundamentals (earnings date, EPS/Rev acceleration).
         // Fail-soft: API errors leave fields undefined and the score gracefully ignores them.

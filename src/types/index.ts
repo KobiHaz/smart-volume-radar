@@ -117,9 +117,18 @@ export interface StockData {
     /** Total return over the last 63 trading days (~3 months), as % (e.g. +12.5).
      *  Used as the input for relative-strength ranking. */
     return63d?: number;
+    /** Total return over the last 21 trading days (~1 month), as % — used for
+     *  short-window sector context. */
+    return21d?: number;
     /** Relative-Strength percentile (0-100) vs other watchlist members over 63 trading
      *  days, using SPY-relative return (alpha). Populated post-fetch in `index.ts`. */
     rsPercentile?: number;
+    /** Sector rank (1 = best) from `applySectorRanks` — populated in pipeline. */
+    sectorRank?: number;
+    /** Sector's 63-day median return (%) — used for Telegram render. */
+    sectorMedianReturn63d?: number;
+    /** Number of stocks in this sector that had valid return63d (sector sample size). */
+    sectorTotalCount?: number;
 
     // ─── Phase 3: Fundamentals (Finnhub, added 2026-05-07) ─────────────────
     /** Next upcoming earnings date (YYYY-MM-DD). null if unknown / no upcoming. */

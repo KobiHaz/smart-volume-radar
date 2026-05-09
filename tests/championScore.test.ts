@@ -365,6 +365,44 @@ describe('Phase 3 score contributors (fundamentals)', () => {
     });
 });
 
+describe('Phase 4B sector-rank bonus', () => {
+    it('+5 when sectorRank ≤ 3 AND sectorTotalCount ≥ 5', () => {
+        const base = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+        });
+        const topSector = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+            sectorRank: 1,
+            sectorTotalCount: 12,
+        });
+        expect(computeChampionScore(topSector) - computeChampionScore(base)).toBe(5);
+    });
+
+    it('does not apply when sectorRank > 3 (rank 4+)', () => {
+        const base = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+        });
+        const midSector = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+            sectorRank: 4,
+            sectorTotalCount: 12,
+        });
+        expect(computeChampionScore(midSector)).toBe(computeChampionScore(base));
+    });
+
+    it('does not apply when sector has < 5 stocks (anti-gaming)', () => {
+        const base = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+        });
+        const tinySector = makeStock({
+            momentum: makeMomentum(makeCriteria({ pivotBreakout: true })),
+            sectorRank: 1,
+            sectorTotalCount: 3,
+        });
+        expect(computeChampionScore(tinySector)).toBe(computeChampionScore(base));
+    });
+});
+
 describe('CAUTION_DISTRIBUTION action', () => {
     it('overrides BUY when distributionDays >= 4', () => {
         const stock = makeStock({

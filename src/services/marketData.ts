@@ -169,6 +169,12 @@ export async function parseYahooChartResult(
         const past = closes[closes.length - 64]!;
         if (past > 0) return63d = ((lastPrice - past) / past) * 100;
     }
+    // 21-day total return — short-window sector context (Phase 4B sector rank).
+    let return21d: number | undefined = undefined;
+    if (closes.length >= 22) {
+        const past = closes[closes.length - 22]!;
+        if (past > 0) return21d = ((lastPrice - past) / past) * 100;
+    }
 
     return {
         ticker,
@@ -203,6 +209,7 @@ export async function parseYahooChartResult(
         accumulationDays: adDays.accumulationDays,
         distributionDays: adDays.distributionDays,
         return63d,
+        return21d,
     };
 }
 

@@ -65,7 +65,13 @@ const WEIGHTS = {
     epsDeceleratingPenalty: -5,
     /** Revenue YoY growth-rate accelerating — confirms top-line expansion. */
     revAccelerating: 3,
+    // ─── Phase 4B (sector rank, 2026-05-09) ───────────────────────────
+    /** Top-3 sector by 63d median return — only when sector has ≥5 stocks. */
+    topSector: 5,
 } as const;
+
+/** Minimum sector size for the top-3 bonus to apply (anti-gaming guard). */
+const MIN_SECTOR_SIZE_FOR_BONUS = 5;
 
 /** Threshold for the BB squeeze flag: (upper - lower) / price as a fraction. */
 const BB_SQUEEZE_FRACTION = 0.05;
@@ -123,6 +129,15 @@ export function computeChampionScore(stock: StockData): number {
     if (stock.epsAcceleration === 'accelerating') score += WEIGHTS.epsAccelerating;
     else if (stock.epsAcceleration === 'decelerating') score += WEIGHTS.epsDeceleratingPenalty;
     if (stock.revAcceleration === 'accelerating') score += WEIGHTS.revAccelerating;
+
+    // ─── Phase 4B: Top-sector bonus ───────────────────────────────────
+    if (
+        stock.sectorRank != null &&
+        stock.sectorRank <= 3 &&
+        (stock.sectorTotalCount ?? 0) >= MIN_SECTOR_SIZE_FOR_BONUS
+    ) {
+        score += WEIGHTS.topSector;
+    }
 
     return Math.max(0, Math.min(100, Math.round(score * 10) / 10));
 }

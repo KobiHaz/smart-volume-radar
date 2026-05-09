@@ -89,7 +89,8 @@ function formatReportHeader(
     bullish: number,
     bearish: number,
     regime: 'bull' | 'bear' | undefined,
-    actionCounts: { buy: number; watch: number; caution: number }
+    actionCounts: { buy: number; watch: number; caution: number },
+    topSectors?: Array<{ sector: string; rank: number; median63d: number }>
 ): string {
     const regimeBadge =
         regime === 'bear' ? ' | 🐻 Bear (SPY<SMA200)' : regime === 'bull' ? ' | 🐂 Bull' : '';
@@ -98,10 +99,20 @@ function formatReportHeader(
     if (actionCounts.caution > 0) actionBits.push(`⚠️ ${actionCounts.caution} CAUTION`);
     if (actionCounts.watch > 0) actionBits.push(`👀 ${actionCounts.watch} WATCH`);
     const actionLine = actionBits.length > 0 ? `${actionBits.join(' | ')}\n` : '';
+
+    let sectorLine = '';
+    if (topSectors && topSectors.length > 0) {
+        const fmt = topSectors
+            .map((s) => `#${s.rank} ${escapeHtml(s.sector)} ${s.median63d >= 0 ? '+' : ''}${s.median63d.toFixed(0)}%`)
+            .join(' | ');
+        sectorLine = `🏭 Top sectors: ${fmt}\n`;
+    }
+
     return (
         `🛰 <b>SMART VOLUME RADAR</b>\n` +
         `📅 <code>${date}</code>${regimeBadge}\n` +
         actionLine +
+        sectorLine +
         `🎭 Sentiment: ${bullish} 🟢 | ${bearish} 🔴\n` +
         `<i>🟢 BUY = at pivot + volume confirmed | ⚠️ CAUTION = extended or no volume | 👀 WATCH = setup forming</i>\n` +
         `━━━━━━━━━━━━━━━━━━━━━━\n\n`
@@ -244,7 +255,13 @@ function formatSingleStockBlock(stock: RVOLResult, monitorMeta?: MonitorMeta): s
         block += `  ·  <b>RS</b> ${stock.rsPercentile}`;
     }
     if (stock.sector) {
-        block += ` <i>(${escapeHtml(stock.sector)})</i>`;
+        let sectorTag = stock.sector;
+        // Phase 4B: append rank + 63d median return when available.
+        if (stock.sectorRank != null && stock.sectorMedianReturn63d != null) {
+            const sign = stock.sectorMedianReturn63d >= 0 ? '+' : '';
+            sectorTag += ` #${stock.sectorRank} ${sign}${stock.sectorMedianReturn63d.toFixed(0)}%`;
+        }
+        block += ` <i>(${escapeHtml(sectorTag)})</i>`;
     }
     block += '\n';
 
@@ -468,7 +485,28 @@ export function formatDailyReport(
         caution: actionBuckets.CAUTION.length,
     };
 
-    let message = formatReportHeader(date, bullish, bearish, regime, actionCounts);
+    // Top sectors line — derived from stocks that have sectorRank populated.
+    const seenSectors = new Set<string>();
+    const topSectors: Array<{ sector: string; rank: number; median63d: number }> = [];
+    for (const s of topSignals) {
+        if (
+            s.sector &&
+            s.sectorRank != null &&
+            s.sectorMedianReturn63d != null &&
+            !seenSectors.has(s.sector) &&
+            s.sectorRank <= 3
+        ) {
+            topSectors.push({
+                sector: s.sector,
+                rank: s.sectorRank,
+                median63d: s.sectorMedianReturn63d,
+            });
+            seenSectors.add(s.sector);
+        }
+    }
+    topSectors.sort((a, b) => a.rank - b.rank);
+
+    let message = formatReportHeader(date, bullish, bearish, regime, actionCounts, topSectors);
     if (gradSection) {
         message = gradSection + message;
     }
