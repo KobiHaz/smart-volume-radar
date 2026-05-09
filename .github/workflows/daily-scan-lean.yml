@@ -1,8 +1,8 @@
-name: Smart Volume Radar - Lean Daily Scan
+name: Lean Radar - Daily Scan
 
 # Runs on the `stable` branch only — sends a stripped-down 3-signal report
 # (consolidation breakout / RVOL 3x+ / healthy pullback) to the same Telegram
-# chat as the experimental main scanner. Goal: A/B comparison over 30 days.
+# chat as the experimental Radar (main). Goal: A/B comparison over 30 days.
 
 concurrency:
   group: daily-scan-lean
@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Lean Scanner
+      - name: Run Lean Radar
         env:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -57,5 +57,5 @@ jobs:
         run: |
           if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
             curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-              -d "chat_id=${TELEGRAM_CHAT_ID}&text=⚠️ 🪶 Lean scanner failed. Check GitHub Actions on stable branch."
+              -d "chat_id=${TELEGRAM_CHAT_ID}&text=⚠️ 🪶 Lean Radar failed. Check GitHub Actions on stable branch."
           fi
