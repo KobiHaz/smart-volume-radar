@@ -30,6 +30,11 @@ import {
     qualifiesAsPullbackNearMiss,
 } from './lean/signals.js';
 import { formatLeanReport, type LeanScanResult } from './lean/format.js';
+import { writeLeanSnapshot } from './utils/snapshotWriter.js';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __moduleDir = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Yahoo chart returns OHLC — we need close/high/low arrays for the
@@ -188,6 +193,62 @@ async function main(): Promise<void> {
         } else {
             logger.info('(DRY_RUN=1 — skipping Telegram send)');
             console.log('\n' + message.replace(/<[^>]+>/g, ''));
+        }
+
+        // Full debug snapshot for retrospective analysis (gitignored; captured
+        // via GitHub Actions artifact). Contains every fetched stock + detections.
+        try {
+            const resultsDir = path.join(__moduleDir, '..', 'results');
+            const snapshotPath = writeLeanSnapshot(
+                {
+                    scanDate,
+                    runStartedAt: new Date(startTime).toISOString(),
+                    version: process.env.npm_package_version ?? 'dev',
+                    // marketRegime intentionally omitted — Lean Radar doesn't compute it
+                    watchlist: {
+                        total: tickers.length,
+                        fetched: stocks.length,
+                        failed: failedTickers,
+                    },
+                    detections: {
+                        consolidationBreakouts: result.consolidationBreakouts.map((r) => ({
+                            ticker: r.stock.ticker,
+                            window: r.signal.window,
+                            baseRangePct: r.signal.baseRangePct,
+                            windowHigh: r.signal.windowHigh,
+                        })),
+                        highVolume: result.highVolume.map((r) => ({
+                            ticker: r.stock.ticker,
+                            level: r.signal.level,
+                            rvol: r.stock.rvol ?? 0,
+                        })),
+                        pullbacks: result.pullbacks.map((r) => ({
+                            ticker: r.stock.ticker,
+                            pctFromAth: r.signal.pctFromAth,
+                        })),
+                        nearConsolidation: result.nearConsolidation.map((r) => ({
+                            ticker: r.stock.ticker,
+                            window: r.signal.window,
+                            distanceToPivotPct: r.signal.distanceToPivotPct,
+                        })),
+                        nearVolume: result.nearVolume.map((r) => ({
+                            ticker: r.stock.ticker,
+                            rvol: r.signal.rvol,
+                        })),
+                        nearPullback: result.nearPullback.map((r) => ({
+                            ticker: r.stock.ticker,
+                            pctFromAth: r.signal.pctFromAth,
+                        })),
+                    },
+                    stocks,
+                },
+                resultsDir
+            );
+            if (snapshotPath) {
+                logger.info(`📸 Saved lean snapshot to ${snapshotPath} (${stocks.length} stocks)`);
+            }
+        } catch (snapErr) {
+            logger.error('⚠️ Failed to write lean snapshot (non-fatal):', (snapErr as Error).message);
         }
 
         const duration = ((Date.now() - startTime) / 1000).toFixed(1);
