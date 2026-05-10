@@ -49,6 +49,17 @@ jobs:
           FORCE_SCAN: 'true'
         run: npm run start:lean
 
+      # Persist the full per-run snapshot (lean-{date}.json + raw scan files)
+      # as a year-retained artifact for retrospective debugging.
+      - name: Upload Lean Radar artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean-radar-${{ github.run_number }}
+          path: results/
+          retention-days: 365
+          if-no-files-found: warn
+
       - name: Notify Telegram on failure
         if: failure()
         env:
