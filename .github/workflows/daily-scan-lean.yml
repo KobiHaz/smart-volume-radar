@@ -16,8 +16,12 @@ on:
 
 jobs:
   scan:
-    # Only run this workflow when triggered on the `stable` branch.
-    if: github.ref == 'refs/heads/stable'
+    # NOTE: GitHub Actions only triggers scheduled workflows from the DEFAULT
+    # branch (main), so we cannot gate on `github.ref == 'refs/heads/stable'`
+    # — that gate skipped every scheduled run (which is exactly what was
+    # happening 2026-05-08 → 2026-05-11). The job explicitly checks out
+    # `stable` below, so the source code is always correct regardless of
+    # which branch fired the trigger.
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
