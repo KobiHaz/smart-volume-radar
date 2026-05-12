@@ -78,7 +78,8 @@ export interface PullbackNearMiss {
 }
 
 // ─── Stage 2 helper ───────────────────────────────────────────────────
-function isStage2(stock: StockData): boolean {
+/** Stage 2 = price > SMA50 > SMA200. Exported for the Telegram formatter. */
+export function isStage2(stock: StockData): boolean {
     return (
         stock.lastPrice != null &&
         stock.sma50 != null &&

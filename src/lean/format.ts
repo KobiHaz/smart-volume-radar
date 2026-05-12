@@ -1,7 +1,18 @@
 /**
  * Smart Volume Radar — Lean Radar Telegram formatter (stable branch).
  *
- * One line per stock. Header `🪶 LEAN RADAR` distinguishes from main Radar.
+ * UNIFIED LINE FORMAT (2026-05-12 redesign):
+ * Every stock — in any section, including Silent Watchlist — shows the SAME
+ * four metrics, regardless of which signal flagged it:
+ *
+ *   TICKER (sector) · $price (day%)
+ *     📊 RVOL Xx · 📉 ATH−X% · 🪜 S2✓/✗ · ↳ [why it appeared in this section]
+ *
+ * Rationale: previously each section only displayed the metric it matched on
+ * (high-volume showed RVOL; pullback showed ATH%) — making cross-section
+ * triage hard. Unified format lets you assess every candidate against all
+ * four lenses at a glance.
+ *
  * Sections (only rendered when non-empty):
  *   📈 Consolidation Breakout
  *   🔥 High Volume (3x+)
@@ -10,6 +21,7 @@
  */
 import type { StockData } from '../types/index.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
+import { isStage2 } from './signals.js';
 import type {
     ConsolidationSignal,
     HighVolumeSignal,
@@ -51,6 +63,27 @@ function fmtPct(p: number | undefined): string {
     return `${sign}${p.toFixed(1)}%`;
 }
 
+/** Render the shared metrics block — `📊 RVOL · 📉 ATH · 🪜 S2`. */
+function metricsBlock(stock: StockData): string {
+    const stageFlag = isStage2(stock) ? '✓' : '✗';
+    const athPart = stock.pctFromAth != null ? `📉 ATH ${fmtPct(stock.pctFromAth)}` : '📉 ATH ?';
+    return `📊 RVOL ${fmtRvol(stock.rvol)}  ·  ${athPart}  ·  🪜 S2${stageFlag}`;
+}
+
+/** Render the identity line — `TICKER (sector) · $price (day%)`. */
+function identityLine(stock: StockData): string {
+    const sectorTag = stock.sector ? ` <i>(${escapeHtml(stock.sector)})</i>` : '';
+    return `${tickerLink(stock)}${sectorTag}  ·  $${fmtPrice(stock.lastPrice)}  (${fmtPct(stock.priceChange)})`;
+}
+
+/** Render a full per-stock block: identity + metrics + reason. */
+function stockBlock(stock: StockData, reason: string): string {
+    return (
+        `${identityLine(stock)}\n` +
+        `  ${metricsBlock(stock)}  ·  ↳ ${reason}`
+    );
+}
+
 /** Top-level format function. */
 export function formatLeanReport(date: string, result: LeanScanResult): string {
     const parts: string[] = [];
@@ -60,6 +93,7 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
         `🪶 <b>LEAN RADAR</b>\n` +
             `📅 <code>${date}</code>\n` +
             `<i>3 signals: 📈 breakout · 🔥 RVOL 3x+ · 📉 -15% pullback</i>\n` +
+            `<i>כל מנייה: 📊 RVOL · 📉 ATH% · 🪜 Stage2</i>\n` +
             `━━━━━━━━━━━━━━━━━━━━━━`
     );
 
@@ -84,12 +118,8 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
                 `━━━━━━━━━━━━━━━━━━━━━━`
         );
         for (const { stock, signal } of result.consolidationBreakouts) {
-            const sectorTag = stock.sector ? ` <i>(${escapeHtml(stock.sector)})</i>` : '';
-            parts.push(
-                `${tickerLink(stock)}${sectorTag} — שובר בסיס ${signal.window} ` +
-                    `(טווח ${signal.baseRangePct.toFixed(1)}%)  ·  RVOL ${fmtRvol(stock.rvol)}  ·  ` +
-                    `${fmtPct(stock.priceChange)}  ·  $${fmtPrice(stock.lastPrice)}`
-            );
+            const reason = `📈 שובר בסיס ${signal.window} (טווח ${signal.baseRangePct.toFixed(1)}%, פיבוט $${fmtPrice(signal.windowHigh)})`;
+            parts.push(stockBlock(stock, reason));
         }
     }
 
@@ -100,12 +130,9 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
                 `━━━━━━━━━━━━━━━━━━━━━━`
         );
         for (const { stock, signal } of result.highVolume) {
-            const tag = signal.level === 'extreme' ? '⚡ EXTREME' : '🔥';
-            const sectorTag = stock.sector ? ` <i>(${escapeHtml(stock.sector)})</i>` : '';
-            parts.push(
-                `${tag} ${tickerLink(stock)}${sectorTag} — RVOL ${fmtRvol(stock.rvol)}  ·  ` +
-                    `${fmtPct(stock.priceChange)}  ·  $${fmtPrice(stock.lastPrice)}`
-            );
+            const tag = signal.level === 'extreme' ? '⚡ EXTREME volume' : '🔥 נפח גבוה';
+            const reason = `${tag} (${fmtRvol(stock.rvol)})`;
+            parts.push(stockBlock(stock, reason));
         }
     }
 
@@ -116,43 +143,34 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
                 `━━━━━━━━━━━━━━━━━━━━━━`
         );
         for (const { stock, signal } of result.pullbacks) {
-            const sectorTag = stock.sector ? ` <i>(${escapeHtml(stock.sector)})</i>` : '';
-            parts.push(
-                `${tickerLink(stock)}${sectorTag} — ${fmtPct(signal.pctFromAth)} מ-ATH ` +
-                    `($${fmtPrice(stock.ath)})  ·  RVOL ${fmtRvol(stock.rvol)}  ·  ` +
-                    `$${fmtPrice(stock.lastPrice)}`
-            );
+            const reason = `📉 Pullback בריא (${fmtPct(signal.pctFromAth)} מ-ATH $${fmtPrice(stock.ath)}, מעל SMA200)`;
+            parts.push(stockBlock(stock, reason));
         }
     }
 
-    // 4. Silent Watchlist (near-misses)
+    // 4. Silent Watchlist (near-misses) — same unified format
     if (totalNear > 0) {
         parts.push(`\n👁️ <b>Silently Watching</b>  ·  ${totalNear}\n━━━━━━━━━━━━━━━━━━━━━━`);
 
         if (result.nearConsolidation.length > 0) {
-            parts.push(`<b>📈 קרובים לפריצה:</b>`);
+            parts.push(`\n<b>📈 קרובים לפריצה:</b>`);
             for (const { stock, signal } of result.nearConsolidation) {
-                parts.push(
-                    `  ${tickerLink(stock)} — בסיס ${signal.window}, ` +
-                        `${signal.distanceToPivotPct.toFixed(1)}% מתחת לפיבוט ` +
-                        `($${fmtPrice(signal.windowHigh)})  ·  RVOL ${fmtRvol(stock.rvol)}`
-                );
+                const reason = `📈 בסיס ${signal.window}, ${signal.distanceToPivotPct.toFixed(1)}% מתחת לפיבוט $${fmtPrice(signal.windowHigh)}`;
+                parts.push(stockBlock(stock, reason));
             }
         }
         if (result.nearVolume.length > 0) {
-            parts.push(`<b>🔥 כמעט 3x:</b>`);
+            parts.push(`\n<b>🔥 כמעט 3x:</b>`);
             for (const { stock, signal } of result.nearVolume) {
-                parts.push(
-                    `  ${tickerLink(stock)} — RVOL ${fmtRvol(signal.rvol)}  ·  ${fmtPct(stock.priceChange)}`
-                );
+                const reason = `🔥 כמעט 3x (${fmtRvol(signal.rvol)})`;
+                parts.push(stockBlock(stock, reason));
             }
         }
         if (result.nearPullback.length > 0) {
-            parts.push(`<b>📉 קרובים לאזור pullback:</b>`);
+            parts.push(`\n<b>📉 קרובים לאזור pullback:</b>`);
             for (const { stock, signal } of result.nearPullback) {
-                parts.push(
-                    `  ${tickerLink(stock)} — ${fmtPct(signal.pctFromAth)} מ-ATH (כמעט שם)`
-                );
+                const reason = `📉 קרוב ל-pullback band (${fmtPct(signal.pctFromAth)} מ-ATH)`;
+                parts.push(stockBlock(stock, reason));
             }
         }
     }
