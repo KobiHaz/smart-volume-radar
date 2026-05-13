@@ -84,7 +84,41 @@ function stockBlock(stock: StockData, reason: string): string {
     );
 }
 
-/** Top-level format function. */
+/**
+ * Build the "also-matches" badge for a stock. Lean signals are orthogonal
+ * (breakout / high-vol / pullback can all fire on the same stock), so we
+ * pre-compute which extras to badge under the PRIMARY section.
+ *
+ * Priority: breakout > pullback > high-volume. A stock is rendered once
+ * under its primary; the others become badges like "+ 🔥 5.2x" or
+ * "+ 📉 -18.7%" appended to the reason line.
+ */
+function buildSecondaryBadges(
+    ticker: string,
+    primary: 'breakout' | 'volume' | 'pullback',
+    result: LeanScanResult
+): string {
+    const badges: string[] = [];
+    if (primary !== 'breakout') {
+        const b = result.consolidationBreakouts.find((r) => r.stock.ticker === ticker);
+        if (b) badges.push(`+ 📈 בסיס ${b.signal.window}`);
+    }
+    if (primary !== 'pullback') {
+        const p = result.pullbacks.find((r) => r.stock.ticker === ticker);
+        if (p) badges.push(`+ 📉 Pullback ${fmtPct(p.signal.pctFromAth)}`);
+    }
+    if (primary !== 'volume') {
+        const v = result.highVolume.find((r) => r.stock.ticker === ticker);
+        if (v) {
+            const tag = v.signal.level === 'extreme' ? '⚡ EXTREME' : '🔥';
+            badges.push(`+ ${tag} ${fmtRvol(v.stock.rvol)}`);
+        }
+    }
+    return badges.length ? `  ·  <b>${badges.join('  ·  ')}</b>` : '';
+}
+
+/** Top-level format function. Deduplicates per ticker — same stock appears
+ * once, in its primary section, with badges for other matching signals. */
 export function formatLeanReport(date: string, result: LeanScanResult): string {
     const parts: string[] = [];
 
@@ -93,7 +127,7 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
         `🪶 <b>LEAN RADAR</b>\n` +
             `📅 <code>${date}</code>\n` +
             `<i>3 signals: 📈 breakout · 🔥 RVOL 3x+ · 📉 -15% pullback</i>\n` +
-            `<i>כל מנייה: 📊 RVOL · 📉 ATH% · 🪜 Stage2</i>\n` +
+            `<i>כל מנייה: 📊 RVOL · 📉 ATH% · 🪜 Stage2 · אם תואם כמה — מסומן עם +</i>\n` +
             `━━━━━━━━━━━━━━━━━━━━━━`
     );
 
@@ -111,66 +145,116 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
         return parts.join('\n');
     }
 
-    // 1. Consolidation Breakouts
+    // ─── Dedup: track which tickers we've already rendered in a real section
+    // so a stock that matches breakout+pullback+volume only shows ONCE under
+    // its highest-priority section. Also suppresses near-miss for tickers
+    // that already fired a real signal.
+    const renderedTickers = new Set<string>();
+
+    // 1. Consolidation Breakouts (PRIMARY — strongest action)
     if (result.consolidationBreakouts.length > 0) {
-        parts.push(
-            `\n📈 <b>פריצת קונסולידציה</b>  ·  ${result.consolidationBreakouts.length}\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━`
-        );
-        for (const { stock, signal } of result.consolidationBreakouts) {
-            const reason = `📈 שובר בסיס ${signal.window} (טווח ${signal.baseRangePct.toFixed(1)}%, פיבוט $${fmtPrice(signal.windowHigh)})`;
+        const items = result.consolidationBreakouts.filter((r) => !renderedTickers.has(r.stock.ticker));
+        parts.push(`\n📈 <b>פריצת קונסולידציה</b>  ·  ${items.length}\n━━━━━━━━━━━━━━━━━━━━━━`);
+        for (const { stock, signal } of items) {
+            const reason =
+                `📈 שובר בסיס ${signal.window} (טווח ${signal.baseRangePct.toFixed(1)}%, פיבוט $${fmtPrice(signal.windowHigh)})` +
+                buildSecondaryBadges(stock.ticker, 'breakout', result);
             parts.push(stockBlock(stock, reason));
+            renderedTickers.add(stock.ticker);
         }
     }
 
-    // 2. High Volume
-    if (result.highVolume.length > 0) {
-        parts.push(
-            `\n🔥 <b>נפח גבוה — 3x+</b>  ·  ${result.highVolume.length}\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━`
-        );
-        for (const { stock, signal } of result.highVolume) {
-            const tag = signal.level === 'extreme' ? '⚡ EXTREME volume' : '🔥 נפח גבוה';
-            const reason = `${tag} (${fmtRvol(stock.rvol)})`;
-            parts.push(stockBlock(stock, reason));
-        }
-    }
-
-    // 3. Healthy Pullback
+    // 2. Healthy Pullback (PRIMARY — entry opportunity)
     if (result.pullbacks.length > 0) {
-        parts.push(
-            `\n📉 <b>Pullback תקין (15-25% מ-52w high)</b>  ·  ${result.pullbacks.length}\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━`
-        );
-        for (const { stock, signal } of result.pullbacks) {
-            const reason = `📉 Pullback בריא (${fmtPct(signal.pctFromAth)} מ-ATH $${fmtPrice(stock.ath)}, מעל SMA200)`;
-            parts.push(stockBlock(stock, reason));
+        const items = result.pullbacks.filter((r) => !renderedTickers.has(r.stock.ticker));
+        if (items.length > 0) {
+            parts.push(`\n📉 <b>Pullback תקין (15-25% מ-52w high)</b>  ·  ${items.length}\n━━━━━━━━━━━━━━━━━━━━━━`);
+            for (const { stock, signal } of items) {
+                const reason =
+                    `📉 Pullback בריא (${fmtPct(signal.pctFromAth)} מ-ATH $${fmtPrice(stock.ath)}, מעל SMA200)` +
+                    buildSecondaryBadges(stock.ticker, 'pullback', result);
+                parts.push(stockBlock(stock, reason));
+                renderedTickers.add(stock.ticker);
+            }
         }
     }
 
-    // 4. Silent Watchlist (near-misses) — same unified format
-    if (totalNear > 0) {
-        parts.push(`\n👁️ <b>Silently Watching</b>  ·  ${totalNear}\n━━━━━━━━━━━━━━━━━━━━━━`);
+    // 3. High Volume (PRIMARY when alone — otherwise badge under another section)
+    if (result.highVolume.length > 0) {
+        const items = result.highVolume.filter((r) => !renderedTickers.has(r.stock.ticker));
+        if (items.length > 0) {
+            parts.push(`\n🔥 <b>נפח גבוה — 3x+</b>  ·  ${items.length}\n━━━━━━━━━━━━━━━━━━━━━━`);
+            for (const { stock, signal } of items) {
+                const tag = signal.level === 'extreme' ? '⚡ EXTREME volume' : '🔥 נפח גבוה';
+                const reason = `${tag} (${fmtRvol(stock.rvol)})` + buildSecondaryBadges(stock.ticker, 'volume', result);
+                parts.push(stockBlock(stock, reason));
+                renderedTickers.add(stock.ticker);
+            }
+        }
+    }
 
-        if (result.nearConsolidation.length > 0) {
+    // 4. Silent Watchlist — only stocks that did NOT fire any real signal.
+    //    Within near-misses, also dedup with same priority.
+    const nearRendered = new Set<string>();
+    const nearC = result.nearConsolidation.filter((r) => !renderedTickers.has(r.stock.ticker));
+    const nearP = result.nearPullback.filter((r) => !renderedTickers.has(r.stock.ticker));
+    const nearV = result.nearVolume.filter((r) => !renderedTickers.has(r.stock.ticker));
+
+    const nearTotal = new Set([
+        ...nearC.map((r) => r.stock.ticker),
+        ...nearP.map((r) => r.stock.ticker),
+        ...nearV.map((r) => r.stock.ticker),
+    ]).size;
+
+    if (nearTotal > 0) {
+        parts.push(`\n👁️ <b>Silently Watching</b>  ·  ${nearTotal}\n━━━━━━━━━━━━━━━━━━━━━━`);
+
+        const buildNearBadges = (ticker: string, primary: 'breakout' | 'volume' | 'pullback'): string => {
+            const badges: string[] = [];
+            if (primary !== 'breakout') {
+                const r = result.nearConsolidation.find((x) => x.stock.ticker === ticker);
+                if (r) badges.push(`+ 📈 ${r.signal.distanceToPivotPct.toFixed(1)}% מתחת לפיבוט`);
+            }
+            if (primary !== 'pullback') {
+                const r = result.nearPullback.find((x) => x.stock.ticker === ticker);
+                if (r) badges.push(`+ 📉 ${fmtPct(r.signal.pctFromAth)}`);
+            }
+            if (primary !== 'volume') {
+                const r = result.nearVolume.find((x) => x.stock.ticker === ticker);
+                if (r) badges.push(`+ 🔥 ${fmtRvol(r.signal.rvol)}`);
+            }
+            return badges.length ? `  ·  <b>${badges.join('  ·  ')}</b>` : '';
+        };
+
+        const itemsC = nearC.filter((r) => !nearRendered.has(r.stock.ticker));
+        if (itemsC.length > 0) {
             parts.push(`\n<b>📈 קרובים לפריצה:</b>`);
-            for (const { stock, signal } of result.nearConsolidation) {
-                const reason = `📈 בסיס ${signal.window}, ${signal.distanceToPivotPct.toFixed(1)}% מתחת לפיבוט $${fmtPrice(signal.windowHigh)}`;
+            for (const { stock, signal } of itemsC) {
+                const reason =
+                    `📈 בסיס ${signal.window}, ${signal.distanceToPivotPct.toFixed(1)}% מתחת לפיבוט $${fmtPrice(signal.windowHigh)}` +
+                    buildNearBadges(stock.ticker, 'breakout');
                 parts.push(stockBlock(stock, reason));
+                nearRendered.add(stock.ticker);
             }
         }
-        if (result.nearVolume.length > 0) {
-            parts.push(`\n<b>🔥 כמעט 3x:</b>`);
-            for (const { stock, signal } of result.nearVolume) {
-                const reason = `🔥 כמעט 3x (${fmtRvol(signal.rvol)})`;
-                parts.push(stockBlock(stock, reason));
-            }
-        }
-        if (result.nearPullback.length > 0) {
+        const itemsP = nearP.filter((r) => !nearRendered.has(r.stock.ticker));
+        if (itemsP.length > 0) {
             parts.push(`\n<b>📉 קרובים לאזור pullback:</b>`);
-            for (const { stock, signal } of result.nearPullback) {
-                const reason = `📉 קרוב ל-pullback band (${fmtPct(signal.pctFromAth)} מ-ATH)`;
+            for (const { stock, signal } of itemsP) {
+                const reason =
+                    `📉 קרוב ל-pullback band (${fmtPct(signal.pctFromAth)} מ-ATH)` +
+                    buildNearBadges(stock.ticker, 'pullback');
                 parts.push(stockBlock(stock, reason));
+                nearRendered.add(stock.ticker);
+            }
+        }
+        const itemsV = nearV.filter((r) => !nearRendered.has(r.stock.ticker));
+        if (itemsV.length > 0) {
+            parts.push(`\n<b>🔥 כמעט 3x:</b>`);
+            for (const { stock, signal } of itemsV) {
+                const reason = `🔥 כמעט 3x (${fmtRvol(signal.rvol)})` + buildNearBadges(stock.ticker, 'volume');
+                parts.push(stockBlock(stock, reason));
+                nearRendered.add(stock.ticker);
             }
         }
     }
