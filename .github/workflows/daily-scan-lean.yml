@@ -69,14 +69,26 @@ jobs:
           # if we're in a re-run (avoid downloading our own pending upload).
           allow_forks: false
 
-      - name: List downloaded snapshots
+      # dawidd6/action-download-artifact extracts each artifact into a
+      # subfolder named after the artifact (results/lean-radar-12/lean-...).
+      # graduates.ts looks for files directly under results/, so flatten:
+      # move any lean-*.json from those subfolders up one level. Idempotent.
+      - name: Flatten downloaded snapshots
         if: always()
         run: |
-          echo "results/ contents:"
-          ls -la results/ 2>/dev/null | head -30 || echo "(no results dir)"
+          set -e
+          if compgen -G "results/lean-radar-*/lean-*.json" > /dev/null; then
+            for f in results/lean-radar-*/lean-*.json; do
+              mv -f "$f" results/
+            done
+            rm -rf results/lean-radar-*
+            echo "✓ flattened lean snapshots into results/"
+          else
+            echo "(no prior lean-radar-*/ subfolders to flatten)"
+          fi
           echo ""
-          echo "lean snapshots present:"
-          ls results/lean-*.json 2>/dev/null || echo "(none yet)"
+          echo "lean snapshots now present:"
+          ls results/lean-*.json 2>/dev/null || echo "(none yet — first run or no prior artifact)"
 
       - name: Run Lean Radar
         env:
