@@ -26,6 +26,7 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
+      actions: read  # required by dawidd6/action-download-artifact for prior-run lookup
 
     steps:
       - name: Checkout stable branch
@@ -41,6 +42,41 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # Download yesterday's lean snapshot so the 🎓 Graduated detector can
+      # find tickers that were in the Silent Watchlist yesterday and fired
+      # a real signal today. Empirically the highest-quality cohort per
+      # 2026-05-13 conversion analysis (SNDK +1326%, MXL +484%, LITE +722%
+      # all came through the near→real path).
+      #
+      # Picks the most recent SUCCESSFUL previous run of this workflow and
+      # extracts its artifact directly into results/. Each daily artifact
+      # contains the full results/ dir from that run (lean-YYYY-MM-DD.json),
+      # so multiple successive runs accumulate snapshots — graduates.ts
+      # walks back up to 7 days to skip weekends/holidays.
+      #
+      # If no prior artifact exists (first run, all-runs pruned, etc.)
+      # the step warns and the Graduated section degrades to empty.
+      - name: Download previous Lean Radar snapshot
+        uses: dawidd6/action-download-artifact@v6
+        continue-on-error: true
+        with:
+          workflow: daily-scan-lean.yml
+          workflow_conclusion: success
+          path: results/
+          if_no_artifact_found: warn
+          # Skip artifacts from THIS run's own workflow_dispatch invocations
+          # if we're in a re-run (avoid downloading our own pending upload).
+          allow_forks: false
+
+      - name: List downloaded snapshots
+        if: always()
+        run: |
+          echo "results/ contents:"
+          ls -la results/ 2>/dev/null | head -30 || echo "(no results dir)"
+          echo ""
+          echo "lean snapshots present:"
+          ls results/lean-*.json 2>/dev/null || echo "(none yet)"
 
       - name: Run Lean Radar
         env:
