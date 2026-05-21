@@ -86,6 +86,7 @@ const DRY_RUN = has('dry-run');
 const REPLACE = has('replace');
 const HEADED = has('headed') || LOGIN_MODE;
 const WATCHLIST_NAME = arg('watchlist', 'Lean Radar');
+const WATCHLIST_FILE_EXPLICIT = process.argv.includes('--file');
 const WATCHLIST_FILE = arg('file', path.join(PROJECT_ROOT, 'results', 'tv-watchlist-latest.txt'));
 
 // ─── Log helper ─────────────────────────────────────────────────────
@@ -461,8 +462,15 @@ async function main() {
             return;
         }
 
-        // Determine watchlist source: prefer GH artifact, fall back to local.
-        let watchlistPath = downloadLatestArtifact() ?? WATCHLIST_FILE;
+        // Determine watchlist source: --file overrides GH artifact (user-specified
+        // wins). Otherwise prefer the latest artifact, fall back to local file.
+        let watchlistPath: string;
+        if (WATCHLIST_FILE_EXPLICIT) {
+            log(`📂 Using user-specified watchlist file (skipping artifact download)`);
+            watchlistPath = WATCHLIST_FILE;
+        } else {
+            watchlistPath = downloadLatestArtifact() ?? WATCHLIST_FILE;
+        }
         if (!fs.existsSync(watchlistPath)) {
             throw new Error(`Watchlist file not found: ${watchlistPath}. Run preview:lean to generate one.`);
         }
