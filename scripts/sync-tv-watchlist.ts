@@ -330,51 +330,97 @@ async function openWatchlist(page: Page, name: string): Promise<void> {
     log(`✓ Created watchlist "${name}"`);
 }
 
+/** Scroll the watchlist panel through its FULL height to materialize every
+ *  virtualized row, accumulating data-symbol-short from each scroll position.
+ *  TradingView virtualizes long watchlists — only visible rows are in DOM at
+ *  any time. Without scrolling, readCurrentSymbols undercounts on lists > ~40. */
 async function readCurrentSymbols(page: Page): Promise<string[]> {
-    // TradingView's watchlist DOM has changed over time. Grab symbols via
-    // multiple strategies, return the first non-empty list.
-    const strategies = await page.evaluate(() => {
-        const out: { strategy: string; symbols: string[] }[] = [];
+    const all = new Set<string>();
 
-        // Strategy 1: anything with data-symbol-short attribute (current TV pattern)
-        const s1 = Array.from(document.querySelectorAll('[data-symbol-short]'))
-            .map((el) => el.getAttribute('data-symbol-short') || '')
-            .filter(Boolean);
-        if (s1.length) out.push({ strategy: 'data-symbol-short', symbols: s1 });
-
-        // Strategy 2: data-symbol-full (e.g. "NASDAQ:NVDA")
-        const s2 = Array.from(document.querySelectorAll('[data-symbol-full]'))
-            .map((el) => (el.getAttribute('data-symbol-full') || '').split(':').pop() || '')
-            .filter(Boolean);
-        if (s2.length) out.push({ strategy: 'data-symbol-full', symbols: s2 });
-
-        // Strategy 3: within data-name="symbol-list-wrap", look at child text
-        const wrap = document.querySelector('[data-name="symbol-list-wrap"]');
-        if (wrap) {
-            const rows = wrap.querySelectorAll('[class*="symbol"], [class*="row"]');
-            const s3: string[] = [];
-            rows.forEach((r) => {
-                const t = (r.textContent || '').trim().split(/\s+/)[0];
-                if (t && /^[A-Z0-9.:_-]{1,15}$/.test(t)) s3.push(t);
-            });
-            if (s3.length) out.push({ strategy: 'symbol-list-wrap rows', symbols: s3 });
+    // Locate the scrollable watchlist container
+    const containerHandle = await page.evaluateHandle(() => {
+        // Try multiple candidate selectors for the scrollable list region
+        const candidates = [
+            '[data-name="symbol-list-wrap"]',
+            'div[class*="symbolListWrapper"]',
+            'div[class*="symbol-list"]',
+            'div[class*="list-container"]',
+        ];
+        for (const sel of candidates) {
+            const el = document.querySelector(sel) as HTMLElement | null;
+            if (el && el.scrollHeight > el.clientHeight) return el;
         }
-
-        // Strategy 4: data-rowkey attribute on watchlist rows
-        const s4 = Array.from(document.querySelectorAll('[data-rowkey]'))
-            .map((el) => el.getAttribute('data-rowkey') || '')
-            .filter(Boolean);
-        if (s4.length) out.push({ strategy: 'data-rowkey', symbols: s4 });
-
-        return out;
+        // Fallback: find any element whose data-symbol-short children have
+        // an overflow:auto ancestor
+        const sample = document.querySelector('[data-symbol-short]');
+        if (sample) {
+            let p = sample.parentElement;
+            while (p) {
+                const cs = getComputedStyle(p);
+                if ((cs.overflowY === 'auto' || cs.overflowY === 'scroll') && p.scrollHeight > p.clientHeight) {
+                    return p as HTMLElement;
+                }
+                p = p.parentElement;
+            }
+        }
+        return null;
     });
+    const container = containerHandle.asElement();
 
-    if (strategies.length === 0) return [];
-    // Use the FIRST non-empty strategy
-    const chosen = strategies[0]!;
-    log(`  (using selector strategy: ${chosen.strategy} → ${chosen.symbols.length} rows)`);
-    // Dedup
-    return [...new Set(chosen.symbols)];
+    // Snapshot helper — grab all visible symbols, dedup into `all`
+    const snapshot = async (): Promise<number> => {
+        const symbols = await page.evaluate(() => {
+            const out: string[] = [];
+            document.querySelectorAll('[data-symbol-short]').forEach((el) => {
+                const v = el.getAttribute('data-symbol-short');
+                if (v) out.push(v);
+            });
+            // Fallback strategies
+            if (out.length === 0) {
+                document.querySelectorAll('[data-symbol-full]').forEach((el) => {
+                    const v = (el.getAttribute('data-symbol-full') || '').split(':').pop();
+                    if (v) out.push(v);
+                });
+            }
+            return out;
+        });
+        let added = 0;
+        for (const s of symbols) if (!all.has(s)) { all.add(s); added++; }
+        return added;
+    };
+
+    await snapshot();
+
+    if (container) {
+        // Scroll incrementally to the bottom, snapshotting at each step
+        const { scrollHeight, clientHeight } = await container.evaluate((el) => ({
+            scrollHeight: (el as HTMLElement).scrollHeight,
+            clientHeight: (el as HTMLElement).clientHeight,
+        }));
+        const step = Math.max(100, clientHeight - 30);
+        let pos = 0;
+        let stagnant = 0;
+        while (pos < scrollHeight + step) {
+            await container.evaluate((el, p) => { (el as HTMLElement).scrollTop = p; }, pos);
+            await page.waitForTimeout(250);
+            const added = await snapshot();
+            if (added === 0) {
+                stagnant++;
+                if (stagnant >= 3) break;
+            } else {
+                stagnant = 0;
+            }
+            pos += step;
+        }
+        // Scroll back to top to leave the watchlist visually in a clean state
+        await container.evaluate((el) => { (el as HTMLElement).scrollTop = 0; }).catch(() => undefined);
+    } else {
+        log(`  (no scrollable watchlist container found — using single-snapshot count)`);
+    }
+
+    const list = [...all];
+    log(`  (scrolled watchlist → ${list.length} unique rows)`);
+    return list;
 }
 
 /** Click via JavaScript dispatch — bypasses Playwright's backdrop-intercept checks. */
