@@ -31,6 +31,7 @@ import {
 } from './lean/signals.js';
 import { formatLeanReport, type LeanScanResult } from './lean/format.js';
 import { attachGraduated } from './lean/graduates.js';
+import { writeTradingViewWatchlist } from './lean/tradingViewWatchlist.js';
 import { writeLeanSnapshot } from './utils/snapshotWriter.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -200,6 +201,19 @@ async function main(): Promise<void> {
         } else {
             logger.info('(DRY_RUN=1 — skipping Telegram send)');
             console.log('\n' + message.replace(/<[^>]+>/g, ''));
+        }
+
+        // TradingView watchlist export — daily file with every "approaching
+        // breakout" ticker (graduated + real breakouts + near-pivot). Used by
+        // manual paste-import into TradingView OR the browser-automation flow.
+        try {
+            const tvResultsDir = path.join(__moduleDir, '..', 'results');
+            const tvOut = writeTradingViewWatchlist(scanDate, result, tvResultsDir);
+            logger.info(
+                `📋 TradingView watchlist: ${tvOut.count} symbols → ${path.relative(process.cwd(), tvOut.txtPath)} (+ .csv, latest.txt)`
+            );
+        } catch (tvErr) {
+            logger.error('⚠️ Failed to write TradingView watchlist (non-fatal):', (tvErr as Error).message);
         }
 
         // Full debug snapshot for retrospective analysis (gitignored; captured
