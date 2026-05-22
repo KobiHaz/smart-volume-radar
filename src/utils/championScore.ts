@@ -232,6 +232,17 @@ export function determineAction(
 ): ActionLabel {
     if (score < 40) return 'PASS';
 
+    // Negative-sector guard (TD-10, 2026-05-22): sectors with 63d median return < 0
+    // were a coherent loser cohort in the 60-day study (Aerospace & Defense: 55
+    // alerts, 24% hit rate, −9.8% median). Hiding these from the action tier is
+    // more truthful than warning about them. The NOTABLE filter has belt-and-
+    // suspenders for the same condition. Stocks are still TRACKED (their signal
+    // level + criteria are computed) but they don't propagate to the Telegram
+    // action list.
+    if (stock.sectorMedianReturn63d != null && stock.sectorMedianReturn63d < 0) {
+        return 'PASS';
+    }
+
     // Distribution-pressure guard (Phase 2): institutional selling overrides
     // the breakout/extension cascade. ≥4 distribution days in 25 = warn.
     if ((stock.distributionDays ?? 0) >= 4) return 'CAUTION_DISTRIBUTION';
