@@ -449,7 +449,7 @@ function chunkMessage(message: string, maxLen: number = TELEGRAM_MAX_LENGTH): st
 export function formatDailyReport(
     date: string,
     topSignals: RVOLResult[],
-    volumeWithoutPrice: StockData[],
+    _volumeWithoutPrice: StockData[],
     _failedTickers: string[] = [],
     graduations?: GraduationInfo[],
     monitorMetaByTicker?: Map<string, MonitorMeta>
@@ -633,11 +633,6 @@ export function formatLegend(): string {
 <b>Tags:</b> SMA21 Touch, Pullback 15%, 1M Breakout`;
 }
 
-// STOCK_ROW_FORMAT, formatStockRow, getStocksForLlm, getAllSignalRows,
-// getSetupRowsFromData, formatSetupReference — all removed 2026-05-22 with
-// the LLM cleanup. They were only consumed by buildLlmSummaryMessage which
-// itself was removed.
-
 /**
  * Format a data header line for every Telegram message (date, stats, part).
  */
@@ -820,7 +815,7 @@ function formatMonitorReturn(entry: MonitorEntry, currentPrice: number | undefin
     return `${sign}${ret.toFixed(1)}%`;
 }
 
-/** Trading-day distance helper (Mon-Fri only). */
+/** Calendar-day distance between two ISO dates (clamped to ≥0). */
 function calendarDaysSince(fromIso: string, toIso: string): number {
     return Math.max(0, Math.round((Date.parse(toIso) - Date.parse(fromIso)) / 86400_000));
 }
