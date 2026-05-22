@@ -150,6 +150,12 @@
           "type": "re-alert-close",
           "price": 876,
           "rvol": 11.673768720069816
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 876,
+          "rvol": 10.45080247320536
         }
       ],
       "resolvedDate": "2026-01-09",
@@ -250,6 +256,12 @@
           "type": "re-alert-close",
           "price": 358.4599914550781,
           "rvol": 3.0149583159315165
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 358.4599914550781,
+          "rvol": 2.6991055399767863
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -434,6 +446,12 @@
           "type": "re-alert-close",
           "price": 496.5,
           "rvol": 3.822449832103639
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 496.5,
+          "rvol": 3.422002706835639
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -678,6 +696,12 @@
           "type": "re-alert-full",
           "price": 1592,
           "rvol": 3.2652532207940674
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 1592,
+          "rvol": 2.9231790738537367
         }
       ],
       "resolvedDate": "2026-01-09",
@@ -773,6 +797,12 @@
           "type": "re-alert-full",
           "price": 1345.199951171875,
           "rvol": 3.650595816920116
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 1345.199951171875,
+          "rvol": 3.268152445623723
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -951,6 +981,12 @@
           "type": "re-alert-close",
           "price": 125.22000122070312,
           "rvol": 2.072294724038353
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 125.22000122070312,
+          "rvol": 1.8551971815200494
         }
       ],
       "resolvedDate": "2026-01-30",
@@ -1028,6 +1064,12 @@
           "type": "re-alert-full",
           "price": 988.1699829101562,
           "rvol": 4.6581106533242105
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 988.1699829101562,
+          "rvol": 4.170118108690246
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -1135,6 +1177,12 @@
           "type": "re-alert-close",
           "price": 218.3699951171875,
           "rvol": 2.8984301135916177
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 218.3699951171875,
+          "rvol": 2.594785054072496
         }
       ],
       "resolvedDate": "2026-01-16",
@@ -1242,6 +1290,12 @@
           "type": "re-alert-close",
           "price": 92.05000305175781,
           "rvol": 3.2126221966647495
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 92.05000305175781,
+          "rvol": 2.876061776061776
         }
       ],
       "resolvedDate": "2026-01-27",
@@ -1300,6 +1354,12 @@
           "type": "re-alert-close",
           "price": 61.5,
           "rvol": 2.4889738261307417
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 61.5,
+          "rvol": 2.2282241872027595
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -1352,6 +1412,12 @@
           "type": "re-alert-close",
           "price": 95.16999816894531,
           "rvol": 3.6191403404029936
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 95.16999816894531,
+          "rvol": 3.2399923047417283
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -1458,6 +1524,12 @@
           "type": "re-alert-close",
           "price": 95500,
           "rvol": 4.99001622740078
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 95500,
+          "rvol": 4.467252622625461
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -1516,6 +1588,12 @@
           "type": "re-alert-close",
           "price": 78.80000305175781,
           "rvol": 2.679344886132646
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 78.80000305175781,
+          "rvol": 2.3986516123473214
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -1719,6 +1797,12 @@
           "type": "re-alert-close",
           "price": 91.55000305175781,
           "rvol": 2.1517470446048046
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 91.55000305175781,
+          "rvol": 1.9263259256462062
         }
       ],
       "resolvedDate": "2026-01-20",
@@ -2027,6 +2111,12 @@
           "type": "re-alert-close",
           "price": 44850,
           "rvol": 10.894779824695423
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 44850,
+          "rvol": 9.753421938298759
         }
       ],
       "resolvedDate": "2026-01-07",
@@ -2115,6 +2205,12 @@
           "type": "re-alert-close",
           "price": 57.7400016784668,
           "rvol": 2.848735707931327
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 57.7400016784668,
+          "rvol": 2.550296729005188
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -2216,6 +2312,12 @@
           "type": "re-alert-close",
           "price": 246.4600067138672,
           "rvol": 2.0326644779547345
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 246.4600067138672,
+          "rvol": 1.8197186755023338
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -2305,6 +2407,12 @@
           "type": "re-alert-close",
           "price": 51.52000045776367,
           "rvol": 2.03519472406981
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 51.52000045776367,
+          "rvol": 1.8219838482148776
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -2495,6 +2603,12 @@
           "type": "re-alert-close",
           "price": 8860,
           "rvol": 4.248474469093618
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 8860,
+          "rvol": 3.8033961913790493
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -2614,6 +2728,12 @@
           "type": "re-alert-close",
           "price": 763.719970703125,
           "rvol": 1.7594248490678153
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 763.719970703125,
+          "rvol": 1.5751041505940444
         }
       ],
       "resolvedDate": "2026-01-12",
@@ -2733,6 +2853,12 @@
           "type": "re-alert-close",
           "price": 56.52000045776367,
           "rvol": 4.05319202112593
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 56.52000045776367,
+          "rvol": 3.6285719046270226
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -2840,6 +2966,12 @@
           "type": "re-alert-close",
           "price": 338.7099914550781,
           "rvol": 1.8721232932738427
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 338.7099914550781,
+          "rvol": 1.675996091121345
         }
       ],
       "resolvedDate": "2026-02-06",
@@ -3042,6 +3174,12 @@
           "type": "re-alert-close",
           "price": 522.7899780273438,
           "rvol": 4.379309880642459
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 522.7899780273438,
+          "rvol": 3.9205250360037245
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -3106,6 +3244,12 @@
           "type": "re-alert-close",
           "price": 82.18000030517578,
           "rvol": 2.605829546522319
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 82.18000030517578,
+          "rvol": 2.3328378797437903
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -3146,6 +3290,12 @@
           "type": "re-alert-close",
           "price": 76.26000213623047,
           "rvol": 2.6878572618547194
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 76.26000213623047,
+          "rvol": 2.4062722153747016
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -3300,6 +3450,12 @@
           "type": "re-alert-close",
           "price": 27.6299991607666,
           "rvol": 4.915406039037149
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 27.6299991607666,
+          "rvol": 4.400458739709448
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -3436,6 +3592,12 @@
           "type": "re-alert-close",
           "price": 256.20001220703125,
           "rvol": 3.335139000445731
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 256.20001220703125,
+          "rvol": 2.985743486113321
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -3591,6 +3753,12 @@
           "type": "re-alert-close",
           "price": 287.20001220703125,
           "rvol": 3.724915930163782
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 287.20001220703125,
+          "rvol": 3.3346866422418624
         }
       ],
       "resolvedDate": "2026-02-13",
@@ -3679,6 +3847,12 @@
           "type": "re-alert-close",
           "price": 39.06999969482422,
           "rvol": 3.0319504140183198
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 39.06999969482422,
+          "rvol": 2.714317513502115
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -3827,6 +4001,12 @@
           "type": "re-alert-close",
           "price": 58.83000183105469,
           "rvol": 3.4541518756856155
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 58.83000183105469,
+          "rvol": 3.0922883458518844
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -4018,6 +4198,12 @@
           "type": "re-alert-close",
           "price": 86.93000030517578,
           "rvol": 3.111934250469506
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 86.93000030517578,
+          "rvol": 2.78592209089651
         }
       ],
       "resolvedDate": "2026-01-16",
@@ -4125,6 +4311,12 @@
           "type": "re-alert-close",
           "price": 155.2899932861328,
           "rvol": 3.329834383016574
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 155.2899932861328,
+          "rvol": 2.9809945905100763
         }
       ],
       "resolvedDate": "2026-01-29",
@@ -4310,6 +4502,12 @@
           "type": "re-alert-close",
           "price": 59.130001068115234,
           "rvol": 3.5724372153228665
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 59.130001068115234,
+          "rvol": 3.1981818880033286
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -4404,6 +4602,12 @@
           "type": "re-alert-close",
           "price": 15.3100004196167,
           "rvol": 3.787410211410051
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 15.3100004196167,
+          "rvol": 3.390633903548046
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -4516,6 +4720,12 @@
           "type": "re-alert-close",
           "price": 13500,
           "rvol": 6.4764168762815455
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 13500,
+          "rvol": 5.7979351082901465
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -4611,6 +4821,12 @@
           "type": "re-alert-close",
           "price": 3441,
           "rvol": 2.505828823495876
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 3441,
+          "rvol": 2.2433134229391656
         }
       ],
       "resolvedDate": "2026-01-29",
@@ -4706,6 +4922,12 @@
           "type": "re-alert-close",
           "price": 1133,
           "rvol": 2.3237769760495897
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1133,
+          "rvol": 2.080333673796776
         }
       ],
       "resolvedDate": "2026-01-29",
@@ -5069,6 +5291,12 @@
           "type": "re-alert-close",
           "price": 72430,
           "rvol": 2.68753239908891
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 72430,
+          "rvol": 2.405981385851024
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -5151,6 +5379,12 @@
           "type": "re-alert-close",
           "price": 59370,
           "rvol": 3.9240958442105023
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 59370,
+          "rvol": 3.5130000891027353
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -5288,6 +5522,12 @@
           "type": "re-alert-close",
           "price": 38820,
           "rvol": 2.3883079345585885
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 38820,
+          "rvol": 2.1381042461762605
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -5431,6 +5671,12 @@
           "type": "re-alert-close",
           "price": 5598,
           "rvol": 1.9125557442479117
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 5598,
+          "rvol": 1.712192761517178
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -5550,6 +5796,12 @@
           "type": "re-alert-close",
           "price": 9589,
           "rvol": 2.1850335968956074
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 9589,
+          "rvol": 1.9561253153160676
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -5759,6 +6011,12 @@
           "type": "re-alert-close",
           "price": 23640,
           "rvol": 4.347147540048083
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 23640,
+          "rvol": 3.8917320834716174
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -5967,6 +6225,12 @@
           "type": "re-alert-close",
           "price": 22200,
           "rvol": 3.743430252185416
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 22200,
+          "rvol": 3.3512613686231343
         }
       ],
       "resolvedDate": "2026-01-23",
@@ -6085,6 +6349,12 @@
           "type": "re-alert-close",
           "price": 3695,
           "rvol": 2.50396885512594
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 3695,
+          "rvol": 2.24164830839846
         }
       ],
       "resolvedDate": "2026-02-16",
@@ -6204,6 +6474,12 @@
           "type": "re-alert-close",
           "price": 2124,
           "rvol": 8.007932704878058
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 2124,
+          "rvol": 7.169006421509882
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -6305,6 +6581,12 @@
           "type": "re-alert-close",
           "price": 14760,
           "rvol": 1.7637977282868498
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 14760,
+          "rvol": 1.5790189186567987
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -6406,6 +6688,12 @@
           "type": "re-alert-close",
           "price": 42570,
           "rvol": 2.636503529737736
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 42570,
+          "rvol": 2.360298398050926
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -6477,6 +6765,12 @@
           "type": "re-alert-close",
           "price": 211,
           "rvol": 1.9874837591667531
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 211,
+          "rvol": 1.7792711748730934
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -6625,6 +6919,12 @@
           "type": "re-alert-close",
           "price": 21790,
           "rvol": 4.147037498489259
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 21790,
+          "rvol": 3.71258595102848
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -6833,6 +7133,12 @@
           "type": "re-alert-close",
           "price": 2386,
           "rvol": 3.368503821697716
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 2386,
+          "rvol": 3.015612945138908
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -7012,6 +7318,12 @@
           "type": "re-alert-close",
           "price": 28350,
           "rvol": 2.701109972928467
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 28350,
+          "rvol": 2.4181365471931033
         }
       ],
       "resolvedDate": "2026-01-06",
@@ -7107,6 +7419,12 @@
           "type": "re-alert-close",
           "price": 1032,
           "rvol": 5.056679198943918
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1032,
+          "rvol": 4.52693185429265
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -7268,6 +7586,12 @@
           "type": "re-alert-close",
           "price": 4123,
           "rvol": 1.7311594161260255
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 4123,
+          "rvol": 1.5497998582461563
         }
       ],
       "resolvedDate": "2026-01-07",
@@ -7600,6 +7924,12 @@
           "type": "re-alert-close",
           "price": 4646,
           "rvol": 2.4099217294297732
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 4646,
+          "rvol": 2.159835512224797
         }
       ],
       "resolvedDate": "2026-01-07",
@@ -7713,6 +8043,12 @@
           "type": "re-alert-full",
           "price": 68.25,
           "rvol": 4.0809767940950135
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 68.25,
+          "rvol": 3.653445891856488
         }
       ],
       "resolvedDate": "2026-02-02",
@@ -7862,6 +8198,12 @@
           "type": "re-alert-full",
           "price": 18.350000381469727,
           "rvol": 4.455271247263789
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 18.350000381469727,
+          "rvol": 3.9885285451694874
         }
       ],
       "resolvedDate": "2026-01-07",
@@ -7945,6 +8287,12 @@
           "type": "re-alert-close",
           "price": 299.3800048828125,
           "rvol": 4.478209936222607
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 299.3800048828125,
+          "rvol": 4.009064133380239
         }
       ],
       "resolvedDate": "2026-02-09",
@@ -8140,6 +8488,12 @@
           "type": "re-alert-close",
           "price": 298.3900146484375,
           "rvol": 3.265531169050719
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 298.3900146484375,
+          "rvol": 2.9234279037215964
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -8228,6 +8582,12 @@
           "type": "re-alert-close",
           "price": 384.2099914550781,
           "rvol": 5.762946235502656
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 384.2099914550781,
+          "rvol": 5.159209010830949
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -8400,6 +8760,12 @@
           "type": "re-alert-close",
           "price": 486.4599914550781,
           "rvol": 2.5101390483942456
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 486.4599914550781,
+          "rvol": 2.2471721004672296
         }
       ],
       "resolvedDate": "2026-01-28",
@@ -8489,6 +8855,12 @@
           "type": "re-alert-full",
           "price": 1542.239990234375,
           "rvol": 3.281724775081096
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 1542.239990234375,
+          "rvol": 2.937925036739267
         }
       ],
       "resolvedDate": "2026-01-09",
@@ -8637,6 +9009,12 @@
           "type": "re-alert-full",
           "price": 302.239990234375,
           "rvol": 3.830480165773099
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 302.239990234375,
+          "rvol": 3.429191767454012
         }
       ],
       "resolvedDate": "2026-01-09",
@@ -8726,6 +9104,12 @@
           "type": "re-alert-full",
           "price": 270.3999938964844,
           "rvol": 2.7134314867757796
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 270.3999938964844,
+          "rvol": 2.429167235780222
         }
       ],
       "resolvedDate": "2026-01-12",
@@ -8832,6 +9216,12 @@
           "type": "re-alert-close",
           "price": 149.0800018310547,
           "rvol": 4.0882784956525455
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 149.0800018310547,
+          "rvol": 3.6599826532508506
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -8891,6 +9281,12 @@
           "type": "re-alert-close",
           "price": 124.86000061035156,
           "rvol": 3.7917492178304433
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 124.86000061035156,
+          "rvol": 3.3945183473910636
         }
       ],
       "resolvedDate": "2026-01-27",
@@ -9034,6 +9430,12 @@
           "type": "re-alert-full",
           "price": 64.86000061035156,
           "rvol": 5.052978583782056
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 64.86000061035156,
+          "rvol": 4.523618922623935
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -9105,6 +9507,12 @@
           "type": "re-alert-close",
           "price": 12030,
           "rvol": 6.289948883590994
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 12030,
+          "rvol": 5.631001857690986
         }
       ],
       "resolvedDate": "2026-02-03",
@@ -9181,6 +9589,12 @@
           "type": "re-alert-close",
           "price": 194.27000427246094,
           "rvol": 3.677035422193336
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 194.27000427246094,
+          "rvol": 3.2918221874873677
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -9393,6 +9807,12 @@
           "type": "re-alert-close",
           "price": 3.559999942779541,
           "rvol": 3.058415271475295
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 3.559999942779541,
+          "rvol": 2.7380098620826447
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -9494,6 +9914,12 @@
           "type": "re-alert-close",
           "price": 191.00999450683594,
           "rvol": 3.083610804546183
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 191.00999450683594,
+          "rvol": 2.7605658631175354
         }
       ],
       "resolvedDate": "2026-01-30",
@@ -9613,6 +10039,12 @@
           "type": "re-alert-close",
           "price": 1800,
           "rvol": 4.483605018211201
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1800,
+          "rvol": 4.013894016303361
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -9756,6 +10188,12 @@
           "type": "re-alert-close",
           "price": 484.29998779296875,
           "rvol": 2.9134382597304724
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 484.29998779296875,
+          "rvol": 2.6082209182348994
         }
       ],
       "resolvedDate": "2026-01-21",
@@ -9826,6 +10264,12 @@
           "type": "re-alert-close",
           "price": 231.5,
           "rvol": 1.9386456896542137
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 231.5,
+          "rvol": 1.735549474547582
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -10142,6 +10586,12 @@
           "type": "re-alert-close",
           "price": 21680,
           "rvol": 7.937268559477475
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 21680,
+          "rvol": 7.105745186579835
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -10343,6 +10793,12 @@
           "type": "re-alert-close",
           "price": 13190,
           "rvol": 3.4984742789988807
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 13190,
+          "rvol": 3.1319674497704266
         }
       ],
       "resolvedDate": "2026-01-07",
@@ -10432,6 +10888,12 @@
           "type": "re-alert-close",
           "price": 38570,
           "rvol": 1.682432411698701
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 38570,
+          "rvol": 1.50617758761598
         }
       ],
       "resolvedDate": "2026-02-12",
@@ -10509,6 +10971,12 @@
           "type": "re-alert-close",
           "price": 3584,
           "rvol": 2.48617959854998
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 3584,
+          "rvol": 2.2257226882256966
         }
       ],
       "resolvedDate": "2026-01-16",
@@ -10682,6 +11150,12 @@
           "type": "re-alert-close",
           "price": 258.8999938964844,
           "rvol": 1.7630405695598168
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 258.8999938964844,
+          "rvol": 1.5783410813202168
         }
       ],
       "resolvedDate": "2026-01-21",
@@ -10795,6 +11269,12 @@
           "type": "re-alert-close",
           "price": 10270,
           "rvol": 2.3465901799530537
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 10270,
+          "rvol": 2.1007569230055907
         }
       ],
       "resolvedDate": "2026-02-04",
@@ -10872,6 +11352,12 @@
           "type": "re-alert-close",
           "price": 62180,
           "rvol": 2.6062001541195814
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 62180,
+          "rvol": 2.3331696617832445
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -11061,6 +11547,12 @@
           "type": "re-alert-close",
           "price": 17290,
           "rvol": 2.1391487924354387
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 17290,
+          "rvol": 1.9150474903707737
         }
       ],
       "resolvedDate": "2026-02-09",
@@ -11156,6 +11648,12 @@
           "type": "re-alert-full",
           "price": 6083,
           "rvol": 2.098749473810041
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 6083,
+          "rvol": 1.8611551937560744
         }
       ],
       "resolvedDate": "2026-01-23",
@@ -11262,6 +11760,12 @@
           "type": "re-alert-close",
           "price": 499.6199951171875,
           "rvol": 2.7977600129357625
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 499.6199951171875,
+          "rvol": 2.5074264266877115
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -11338,6 +11842,12 @@
           "type": "re-alert-full",
           "price": 68,
           "rvol": 4.248852672197585
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 68,
+          "rvol": 3.807933998667647
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -11414,6 +11924,12 @@
           "type": "re-alert-close",
           "price": 92.33999633789062,
           "rvol": 3.375731067723641
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 92.33999633789062,
+          "rvol": 3.0254193531485467
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -11640,6 +12156,12 @@
           "type": "re-alert-close",
           "price": 7460,
           "rvol": 4.83602874139251
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 7460,
+          "rvol": 4.329397158960915
         }
       ],
       "resolvedDate": "2026-01-30",
@@ -11692,6 +12214,12 @@
           "type": "re-alert-close",
           "price": 143.39999389648438,
           "rvol": 2.6827605812810065
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 143.39999389648438,
+          "rvol": 2.4017094727658534
         }
       ],
       "resolvedDate": "2026-02-18",
@@ -11798,6 +12326,12 @@
           "type": "re-alert-close",
           "price": 8.114999771118164,
           "rvol": 2.7618316669953633
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 8.114999771118164,
+          "rvol": 2.4724969209291823
         }
       ],
       "resolvedDate": "2026-02-18",
@@ -11857,6 +12391,12 @@
           "type": "re-alert-close",
           "price": 360.4800109863281,
           "rvol": 4.933072654047109
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 360.4800109863281,
+          "rvol": 4.41627456648027
         }
       ],
       "resolvedDate": "2026-01-13",
@@ -11964,6 +12504,12 @@
           "type": "re-alert-close",
           "price": 64,
           "rvol": 4.5048863742201934
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 64,
+          "rvol": 4.0329458969209355
         }
       ],
       "resolvedDate": "2026-01-27",
@@ -12071,6 +12617,12 @@
           "type": "re-alert-close",
           "price": 51.349998474121094,
           "rvol": 1.9662102403072697
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 51.349998474121094,
+          "rvol": 1.7602263103703177
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -12308,6 +12860,12 @@
           "type": "re-alert-close",
           "price": 31.360000610351562,
           "rvol": 2.3452470631700506
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 31.360000610351562,
+          "rvol": 2.099554513695093
         }
       ],
       "resolvedDate": "2026-02-18",
@@ -12403,6 +12961,12 @@
           "type": "re-alert-close",
           "price": 227850,
           "rvol": 2.8224818741023685
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 227850,
+          "rvol": 2.526793296815454
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -12480,6 +13044,12 @@
           "type": "re-alert-close",
           "price": 317.54998779296875,
           "rvol": 3.8424468451588103
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 317.54998779296875,
+          "rvol": 3.4399047947136014
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -12605,6 +13175,12 @@
           "type": "re-alert-close",
           "price": 306.3299865722656,
           "rvol": 2.557281809975532
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 306.3299865722656,
+          "rvol": 2.289376096549524
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -12694,6 +13270,12 @@
           "type": "re-alert-close",
           "price": 551.5800170898438,
           "rvol": 4.028784780274018
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 551.5800170898438,
+          "rvol": 3.6067216128167394
         }
       ],
       "resolvedDate": "2026-01-14",
@@ -12801,6 +13383,12 @@
           "type": "re-alert-close",
           "price": 175.97999572753906,
           "rvol": 2.5637646711760977
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 175.97999572753906,
+          "rvol": 2.2951798008624116
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -12883,6 +13471,12 @@
           "type": "re-alert-close",
           "price": 33.93000030517578,
           "rvol": 3.161607091656795
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 33.93000030517578,
+          "rvol": 2.830391110626083
         }
       ],
       "resolvedDate": "2026-02-18",
@@ -13037,6 +13631,12 @@
           "type": "re-alert-close",
           "price": 48.16999816894531,
           "rvol": 2.412416799289687
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 48.16999816894531,
+          "rvol": 2.159687420316482
         }
       ],
       "resolvedDate": "2026-02-18",
@@ -13234,6 +13834,12 @@
           "type": "re-alert-full",
           "price": 92.3499984741211,
           "rvol": 2.5568370117331325
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 92.3499984741211,
+          "rvol": 2.288977896218233
         }
       ],
       "resolvedDate": "2026-01-12",
@@ -13358,6 +13964,12 @@
           "type": "re-alert-close",
           "price": 96610,
           "rvol": 4.562139654275273
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 96610,
+          "rvol": 4.084201214303579
         }
       ],
       "resolvedDate": "2026-02-18",
@@ -13653,6 +14265,12 @@
           "type": "re-alert-close",
           "price": 18950,
           "rvol": 3.877649554122123
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 18950,
+          "rvol": 3.471419600833139
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -13790,6 +14408,12 @@
           "type": "re-alert-close",
           "price": 1903,
           "rvol": 4.986987935738745
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1903,
+          "rvol": 4.464541580566115
         }
       ],
       "resolvedDate": "2026-01-14",
@@ -13897,6 +14521,12 @@
           "type": "re-alert-close",
           "price": 1493,
           "rvol": 3.3505701404995376
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1493,
+          "rvol": 2.999558030542443
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -13949,6 +14579,12 @@
           "type": "re-alert-close",
           "price": 118.56999969482422,
           "rvol": 2.311704619150132
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 118.56999969482422,
+          "rvol": 2.0718107435779483
         }
       ],
       "resolvedDate": "2026-02-18",
@@ -14056,6 +14692,12 @@
           "type": "re-alert-close",
           "price": 130.89999389648438,
           "rvol": 2.5427636551993182
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 130.89999389648438,
+          "rvol": 2.2788919551314644
         }
       ],
       "resolvedDate": "2026-01-08",
@@ -14299,6 +14941,12 @@
           "type": "re-alert-close",
           "price": 3438.179931640625,
           "rvol": 6.214223555876039
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 3438.179931640625,
+          "rvol": 5.5693513000775825
         }
       ],
       "resolvedDate": "2026-02-18",
@@ -14388,6 +15036,12 @@
           "type": "re-alert-full",
           "price": 1940000,
           "rvol": 4.44398478023858
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 1940000,
+          "rvol": 3.9784244699278717
         }
       ],
       "resolvedDate": "2026-01-28",
@@ -14549,6 +15203,12 @@
           "type": "re-alert-close",
           "price": 91.30000305175781,
           "rvol": 2.7805651707453
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 91.30000305175781,
+          "rvol": 2.489267867143411
         }
       ],
       "resolvedDate": "2026-02-02",
@@ -14666,6 +15326,12 @@
           "type": "re-alert-full",
           "price": 587.22998046875,
           "rvol": 2.3439768386536173
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 587.22998046875,
+          "rvol": 2.098417360318477
         }
       ],
       "resolvedDate": "2026-01-09",
@@ -14706,6 +15372,12 @@
           "type": "re-alert-close",
           "price": 90.44000244140625,
           "rvol": 3.240050548223734
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 90.44000244140625,
+          "rvol": 2.9006166812669623
         }
       ],
       "resolvedDate": "2026-02-19",
@@ -14807,6 +15479,12 @@
           "type": "re-alert-close",
           "price": 22.43000030517578,
           "rvol": 11.389815918482395
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 22.43000030517578,
+          "rvol": 10.196597107974718
         }
       ],
       "resolvedDate": "2026-01-09",
@@ -14853,6 +15531,12 @@
           "type": "re-alert-close",
           "price": 381.510009765625,
           "rvol": 3.026040589780105
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 381.510009765625,
+          "rvol": 2.709026813707904
         }
       ],
       "resolvedDate": "2026-02-19",
@@ -14966,6 +15650,12 @@
           "type": "re-alert-close",
           "price": 1953,
           "rvol": 2.2146338366725273
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1953,
+          "rvol": 1.9826245775925484
         }
       ],
       "resolvedDate": "2026-02-13",
@@ -15073,6 +15763,12 @@
           "type": "re-alert-close",
           "price": 54.66999816894531,
           "rvol": 2.612621256854207
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 54.66999816894531,
+          "rvol": 2.338918077564719
         }
       ],
       "resolvedDate": "2026-01-09",
@@ -15168,6 +15864,12 @@
           "type": "re-alert-close",
           "price": 259.8900146484375,
           "rvol": 2.891587569091188
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 259.8900146484375,
+          "rvol": 2.588659347567349
         }
       ],
       "resolvedDate": "2026-02-12",
@@ -15233,6 +15935,12 @@
           "type": "re-alert-close",
           "price": 131.47000122070312,
           "rvol": 4.592450551227713
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 131.47000122070312,
+          "rvol": 4.111336683956238
         }
       ],
       "resolvedDate": "2026-02-10",
@@ -15357,6 +16065,12 @@
           "type": "re-alert-close",
           "price": 8050,
           "rvol": 5.89863890807911
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 8050,
+          "rvol": 5.2806862605660605
         }
       ],
       "resolvedDate": "2026-02-19",
@@ -15523,6 +16237,12 @@
           "type": "re-alert-close",
           "price": 8394,
           "rvol": 2.0992551996118243
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 8394,
+          "rvol": 1.8793332263191573
         }
       ],
       "resolvedDate": "2026-01-20",
@@ -15648,6 +16368,12 @@
           "type": "re-alert-full",
           "price": 4970,
           "rvol": 2.8514803429370508
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 4970,
+          "rvol": 2.5527538308198356
         }
       ],
       "resolvedDate": "2026-01-14",
@@ -15880,6 +16606,12 @@
           "type": "re-alert-close",
           "price": 4553,
           "rvol": 1.8110937223644725
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 4553,
+          "rvol": 1.6060642443609479
         }
       ],
       "resolvedDate": "2026-01-12",
@@ -15920,6 +16652,12 @@
           "type": "re-alert-close",
           "price": 1050.449951171875,
           "rvol": 4.7773505194013
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1050.449951171875,
+          "rvol": 4.2815877296521085
         }
       ],
       "resolvedDate": "2026-02-19",
@@ -16103,6 +16841,12 @@
           "type": "re-alert-close",
           "price": 285.8299865722656,
           "rvol": 3.0752562651940076
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 285.8299865722656,
+          "rvol": 2.7530865612213025
         }
       ],
       "resolvedDate": "2026-02-20",
@@ -16185,6 +16929,12 @@
           "type": "re-alert-close",
           "price": 78.33999633789062,
           "rvol": 3.820775472212559
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 78.33999633789062,
+          "rvol": 3.4205037560760054
         }
       ],
       "resolvedDate": "2026-02-20",
@@ -16250,6 +17000,12 @@
           "type": "re-alert-close",
           "price": 5.572999954223633,
           "rvol": 2.2428750518843774
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 5.572999954223633,
+          "rvol": 2.0079071893060143
         }
       ],
       "resolvedDate": "2026-01-13",
@@ -16296,6 +17052,12 @@
           "type": "re-alert-close",
           "price": 313.7799987792969,
           "rvol": 4.23994664174688
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 313.7799987792969,
+          "rvol": 3.7999521789240913
         }
       ],
       "resolvedDate": "2026-02-20",
@@ -16396,6 +17158,12 @@
           "type": "re-alert-close",
           "price": 97.58999633789062,
           "rvol": 2.5519365444780853
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 97.58999633789062,
+          "rvol": 2.287112940805831
         }
       ],
       "resolvedDate": "2026-02-20",
@@ -16533,6 +17301,12 @@
           "type": "re-alert-close",
           "price": 128,
           "rvol": 3.4179705829221434
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 128,
+          "rvol": 3.0598974742350618
         }
       ],
       "resolvedDate": "2026-01-21",
@@ -16676,6 +17450,12 @@
           "type": "re-alert-close",
           "price": 123,
           "rvol": 1.9540390835078503
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 123,
+          "rvol": 1.7493302271403612
         }
       ],
       "resolvedDate": "2026-02-13",
@@ -16741,6 +17521,12 @@
           "type": "re-alert-close",
           "price": 148.85000610351562,
           "rvol": 4.024085861324747
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 148.85000610351562,
+          "rvol": 3.6025149615669174
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -16811,6 +17597,12 @@
           "type": "re-alert-close",
           "price": 1078.4200439453125,
           "rvol": 3.7847347548749415
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1078.4200439453125,
+          "rvol": 3.3882387329356622
         }
       ],
       "resolvedDate": "2026-02-23",
@@ -16869,6 +17661,12 @@
           "type": "re-alert-close",
           "price": 10.84000015258789,
           "rvol": 2.289960436471564
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 10.84000015258789,
+          "rvol": 2.0500598193174002
         }
       ],
       "resolvedDate": "2026-02-23",
@@ -17069,6 +17867,12 @@
           "type": "re-alert-close",
           "price": 10040,
           "rvol": 3.7593386934103625
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 10040,
+          "rvol": 3.333753180948813
         }
       ],
       "resolvedDate": "2026-01-14",
@@ -17152,6 +17956,12 @@
           "type": "re-alert-close",
           "price": 121.33999633789062,
           "rvol": 11.53627523432741
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 121.33999633789062,
+          "rvol": 10.339114596802869
         }
       ],
       "resolvedDate": "2026-01-16",
@@ -17222,6 +18032,12 @@
           "type": "re-alert-close",
           "price": 309.70001220703125,
           "rvol": 2.209242023741868
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 309.70001220703125,
+          "rvol": 1.9799810590139384
         }
       ],
       "resolvedDate": "2026-02-23",
@@ -17380,6 +18196,12 @@
           "type": "re-alert-full",
           "price": 298.2300109863281,
           "rvol": 10.788404616413466
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 298.2300109863281,
+          "rvol": 9.658190799455864
         }
       ],
       "resolvedDate": "2026-02-24",
@@ -17451,6 +18273,12 @@
           "type": "re-alert-close",
           "price": 48800,
           "rvol": 3.5959417467754684
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 48800,
+          "rvol": 3.219224039970419
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -17534,6 +18362,12 @@
           "type": "re-alert-close",
           "price": 75.91999816894531,
           "rvol": 2.1776761673481224
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 75.91999816894531,
+          "rvol": 1.949538664102129
         }
       ],
       "resolvedDate": "2026-02-02",
@@ -17611,6 +18445,12 @@
           "type": "re-alert-close",
           "price": 303,
           "rvol": 3.4345840797666374
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 303,
+          "rvol": 3.0747705095053712
         }
       ],
       "resolvedDate": "2026-02-04",
@@ -17782,6 +18622,12 @@
           "type": "re-alert-close",
           "price": 176.30999755859375,
           "rvol": 3.337657084487355
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 176.30999755859375,
+          "rvol": 2.9879977708743946
         }
       ],
       "resolvedDate": "2026-02-24",
@@ -18048,6 +18894,12 @@
           "type": "re-alert-close",
           "price": 92.4800033569336,
           "rvol": 2.0393883049855166
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 92.4800033569336,
+          "rvol": 1.8257381016060816
         }
       ],
       "resolvedDate": "2026-02-24",
@@ -18387,6 +19239,12 @@
           "type": "re-alert-close",
           "price": 88.88999938964844,
           "rvol": 3.7360325739487257
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 88.88999938964844,
+          "rvol": 3.3446386852493353
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -18451,6 +19309,12 @@
           "type": "re-alert-close",
           "price": 2430,
           "rvol": 2.5741573402522246
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 2430,
+          "rvol": 2.304483714130563
         }
       ],
       "resolvedDate": "2026-02-24",
@@ -18570,6 +19434,12 @@
           "type": "re-alert-close",
           "price": 19350,
           "rvol": 4.766572185725093
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 19350,
+          "rvol": 4.267217004363417
         }
       ],
       "resolvedDate": "2026-01-14",
@@ -18623,6 +19493,12 @@
           "type": "re-alert-close",
           "price": 51.4900016784668,
           "rvol": 2.911182380637026
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 51.4900016784668,
+          "rvol": 2.606201369332195
         }
       ],
       "resolvedDate": "2026-02-02",
@@ -18730,6 +19606,12 @@
           "type": "re-alert-full",
           "price": 200.50999450683594,
           "rvol": 3.745928665031415
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 200.50999450683594,
+          "rvol": 3.353498042980505
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -18825,6 +19707,12 @@
           "type": "re-alert-close",
           "price": 12470,
           "rvol": 14.77765756276996
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 12470,
+          "rvol": 13.229522008575014
         }
       ],
       "resolvedDate": "2026-01-15",
@@ -18907,6 +19795,12 @@
           "type": "re-alert-close",
           "price": 9.899999618530273,
           "rvol": 4.4787754880235395
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 9.899999618530273,
+          "rvol": 4.009570436897264
         }
       ],
       "resolvedDate": "2026-02-25",
@@ -18990,6 +19884,12 @@
           "type": "re-alert-close",
           "price": 134.25,
           "rvol": 4.353104452192817
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 134.25,
+          "rvol": 3.8970649381535694
         }
       ],
       "resolvedDate": "2026-01-21",
@@ -19187,6 +20087,12 @@
           "type": "re-alert-close",
           "price": 32.560001373291016,
           "rvol": 32.69569850515132
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 32.560001373291016,
+          "rvol": 29.27043485223071
         }
       ],
       "resolvedDate": "2026-02-03",
@@ -19251,6 +20157,12 @@
           "type": "re-alert-close",
           "price": 1865,
           "rvol": 1.8793712202822455
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1865,
+          "rvol": 1.6824847114907724
         }
       ],
       "resolvedDate": "2026-02-25",
@@ -19388,6 +20300,12 @@
           "type": "re-alert-close",
           "price": 70.23999786376953,
           "rvol": 2.7366763485967085
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 70.23999786376953,
+          "rvol": 2.449976921600863
         }
       ],
       "resolvedDate": "2026-02-13",
@@ -19511,6 +20429,12 @@
           "type": "re-alert-close",
           "price": 94.76000213623047,
           "rvol": 2.3228805901267644
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 94.76000213623047,
+          "rvol": 2.0818269439815342
         }
       ],
       "resolvedDate": "2026-02-25",
@@ -19682,6 +20606,12 @@
           "type": "re-alert-close",
           "price": 407.1499938964844,
           "rvol": 2.6694616550474524
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 407.1499938964844,
+          "rvol": 2.3898037673758146
         }
       ],
       "resolvedDate": "2026-02-26",
@@ -19765,6 +20695,12 @@
           "type": "re-alert-close",
           "price": 427.3599853515625,
           "rvol": 3.43848742149099
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 427.3599853515625,
+          "rvol": 3.0782649297157434
         }
       ],
       "resolvedDate": "2026-02-13",
@@ -19848,6 +20784,12 @@
           "type": "re-alert-close",
           "price": 1842.1800537109375,
           "rvol": 3.459460139377924
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1842.1800537109375,
+          "rvol": 3.097040505728808
         }
       ],
       "resolvedDate": "2026-02-11",
@@ -20139,6 +21081,12 @@
           "type": "re-alert-full",
           "price": 72.58000183105469,
           "rvol": 9.584675971267997
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 72.58000183105469,
+          "rvol": 8.580567059992303
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -20258,6 +21206,12 @@
           "type": "re-alert-close",
           "price": 133.8800048828125,
           "rvol": 2.3131839576272046
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 133.8800048828125,
+          "rvol": 2.0708504001614974
         }
       ],
       "resolvedDate": "2026-02-10",
@@ -20413,6 +21367,12 @@
           "type": "re-alert-close",
           "price": 1208.199951171875,
           "rvol": 2.2627683458907164
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1208.199951171875,
+          "rvol": 2.0257164239402607
         }
       ],
       "resolvedDate": "2026-02-02",
@@ -20644,6 +21604,12 @@
           "type": "re-alert-close",
           "price": 824.7999877929688,
           "rvol": 3.964294353279914
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 824.7999877929688,
+          "rvol": 3.5489873257934477
         }
       ],
       "resolvedDate": "2026-02-26",
@@ -20727,6 +21693,12 @@
           "type": "re-alert-close",
           "price": 1063.75,
           "rvol": 3.2401691681825504
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1063.75,
+          "rvol": 2.9039251978994556
         }
       ],
       "resolvedDate": "2026-01-28",
@@ -20888,6 +21860,12 @@
           "type": "re-alert-close",
           "price": 24620,
           "rvol": 2.980369481942882
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 24620,
+          "rvol": 2.668140298120295
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -20977,6 +21955,12 @@
           "type": "re-alert-close",
           "price": 190.38999938964844,
           "rvol": 3.462014543414155
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 190.38999938964844,
+          "rvol": 3.0993273055326718
         }
       ],
       "resolvedDate": "2026-01-19",
@@ -21047,6 +22031,12 @@
           "type": "re-alert-close",
           "price": 136.9199981689453,
           "rvol": 3.7980456017137567
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 136.9199981689453,
+          "rvol": 3.4001551101056493
         }
       ],
       "resolvedDate": "2026-02-27",
@@ -21148,6 +22138,12 @@
           "type": "re-alert-close",
           "price": 716.9099731445312,
           "rvol": 3.3770187369886906
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 716.9099731445312,
+          "rvol": 3.023235821685114
         }
       ],
       "resolvedDate": "2026-01-19",
@@ -21278,6 +22274,12 @@
           "type": "re-alert-close",
           "price": 36.16999816894531,
           "rvol": 4.132687327731484
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 36.16999816894531,
+          "rvol": 3.699739131492948
         }
       ],
       "resolvedDate": "2026-02-27",
@@ -21354,6 +22356,12 @@
           "type": "re-alert-close",
           "price": 95.3499984741211,
           "rvol": 2.001518879806172
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 95.3499984741211,
+          "rvol": 1.7918359495407634
         }
       ],
       "resolvedDate": "2026-02-27",
@@ -21443,6 +22451,12 @@
           "type": "re-alert-close",
           "price": 25520,
           "rvol": 4.686641648071756
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 25520,
+          "rvol": 4.195660142083287
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -21537,6 +22551,12 @@
           "type": "re-alert-close",
           "price": 21.940000534057617,
           "rvol": 2.751756129092293
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 21.940000534057617,
+          "rvol": 2.4634769155683385
         }
       ],
       "resolvedDate": "2026-02-27",
@@ -21661,6 +22681,12 @@
           "type": "re-alert-close",
           "price": 13.170000076293945,
           "rvol": 3.240727519913243
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 13.170000076293945,
+          "rvol": 2.904425607469416
         }
       ],
       "resolvedDate": "2026-02-27",
@@ -21756,6 +22782,12 @@
           "type": "re-alert-close",
           "price": 31500,
           "rvol": 2.3675436758118598
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 31500,
+          "rvol": 2.119515290726808
         }
       ],
       "resolvedDate": "2026-01-23",
@@ -21814,6 +22846,12 @@
           "type": "re-alert-close",
           "price": 5290,
           "rvol": 3.378320771041825
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 5290,
+          "rvol": 3.024401452170777
         }
       ],
       "resolvedDate": "2026-03-02",
@@ -22028,6 +23066,12 @@
           "type": "re-alert-close",
           "price": 9219,
           "rvol": 2.6697829664661334
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 9219,
+          "rvol": 2.390091417598253
         }
       ],
       "resolvedDate": "2026-01-23",
@@ -22147,6 +23191,12 @@
           "type": "re-alert-close",
           "price": 5146,
           "rvol": 2.3557520478838416
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 5146,
+          "rvol": 2.108958976200773
         }
       ],
       "resolvedDate": "2026-01-21",
@@ -22248,6 +23298,12 @@
           "type": "re-alert-close",
           "price": 90.41000366210938,
           "rvol": 3.260680514989585
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 90.41000366210938,
+          "rvol": 2.919085413419247
         }
       ],
       "resolvedDate": "2026-01-21",
@@ -22307,6 +23363,12 @@
           "type": "re-alert-close",
           "price": 47.88999938964844,
           "rvol": 3.3464068271822285
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 47.88999938964844,
+          "rvol": 2.995830873858376
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -22396,6 +23458,12 @@
           "type": "re-alert-close",
           "price": 61.790000915527344,
           "rvol": 3.167674740887012
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 61.790000915527344,
+          "rvol": 2.835823101365516
         }
       ],
       "resolvedDate": "2026-01-21",
@@ -22478,6 +23546,12 @@
           "type": "re-alert-close",
           "price": 91.55000305175781,
           "rvol": 2.243583767279476
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 91.55000305175781,
+          "rvol": 2.008541658326388
         }
       ],
       "resolvedDate": "2026-03-03",
@@ -22524,6 +23598,12 @@
           "type": "re-alert-close",
           "price": 183.77999877929688,
           "rvol": 3.8432749793897174
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 183.77999877929688,
+          "rvol": 3.4406461720250805
         }
       ],
       "resolvedDate": "2026-03-03",
@@ -22594,6 +23674,12 @@
           "type": "re-alert-close",
           "price": 92.04000091552734,
           "rvol": 3.698138812423403
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 92.04000091552734,
+          "rvol": 3.310714746359999
         }
       ],
       "resolvedDate": "2026-03-03",
@@ -22664,6 +23750,12 @@
           "type": "re-alert-close",
           "price": 223.8000030517578,
           "rvol": 5.08823934254709
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 223.8000030517578,
+          "rvol": 4.555185697137395
         }
       ],
       "resolvedDate": "2026-03-03",
@@ -22728,6 +23820,12 @@
           "type": "re-alert-close",
           "price": 35.65999984741211,
           "rvol": 2.539971930186857
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 35.65999984741211,
+          "rvol": 2.27387963273871
         }
       ],
       "resolvedDate": "2026-03-03",
@@ -22835,6 +23933,12 @@
           "type": "re-alert-close",
           "price": 301.760009765625,
           "rvol": 3.3976987825327796
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 301.760009765625,
+          "rvol": 3.0451073994397557
         }
       ],
       "resolvedDate": "2026-02-03",
@@ -22870,6 +23974,12 @@
           "type": "re-alert-close",
           "price": 415.7300109863281,
           "rvol": 4.06609409599988
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 415.7300109863281,
+          "rvol": 3.6441409350942315
         }
       ],
       "resolvedDate": "2026-01-26",
@@ -22988,6 +24098,12 @@
           "type": "re-alert-close",
           "price": 165.9600067138672,
           "rvol": 4.934333251938166
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 165.9600067138672,
+          "rvol": 4.422279801265337
         }
       ],
       "resolvedDate": "2026-03-03",
@@ -23059,6 +24175,12 @@
           "type": "re-alert-full",
           "price": 81.3499984741211,
           "rvol": 11.089902464214571
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 81.3499984741211,
+          "rvol": 9.928103158439713
         }
       ],
       "resolvedDate": "2026-02-06",
@@ -23141,6 +24263,12 @@
           "type": "re-alert-close",
           "price": 419.0899963378906,
           "rvol": 3.7857347584155248
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 419.0899963378906,
+          "rvol": 3.389133974200565
         }
       ],
       "resolvedDate": "2026-03-04",
@@ -23302,6 +24430,12 @@
           "type": "re-alert-close",
           "price": 63.459999084472656,
           "rvol": 4.309433046984288
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 63.459999084472656,
+          "rvol": 3.857968632538315
         }
       ],
       "resolvedDate": "2026-01-22",
@@ -23415,6 +24549,12 @@
           "type": "re-alert-close",
           "price": 69.20999908447266,
           "rvol": 3.181122076830683
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 69.20999908447266,
+          "rvol": 2.8478616687817544
         }
       ],
       "resolvedDate": "2026-01-27",
@@ -23504,6 +24644,12 @@
           "type": "re-alert-close",
           "price": 32.900001525878906,
           "rvol": 4.691012818087826
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 32.900001525878906,
+          "rvol": 4.199573380002435
         }
       ],
       "resolvedDate": "2026-01-26",
@@ -23587,6 +24733,12 @@
           "type": "re-alert-close",
           "price": 86.31999969482422,
           "rvol": 3.18173192108309
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 86.31999969482422,
+          "rvol": 2.8484076245886714
         }
       ],
       "resolvedDate": "2026-02-03",
@@ -23645,6 +24797,12 @@
           "type": "re-alert-close",
           "price": 23.540000915527344,
           "rvol": 3.5744857010772617
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 23.540000915527344,
+          "rvol": 3.2000157704882155
         }
       ],
       "resolvedDate": "2026-03-04",
@@ -23685,6 +24843,12 @@
           "type": "re-alert-close",
           "price": 65.08999633789062,
           "rvol": 3.725906674052566
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 65.08999633789062,
+          "rvol": 3.335573593913726
         }
       ],
       "resolvedDate": "2026-03-04",
@@ -23807,6 +24971,12 @@
           "type": "re-alert-full",
           "price": 218.0399932861328,
           "rvol": 3.1212726036825864
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 218.0399932861328,
+          "rvol": 2.794282140439649
         }
       ],
       "resolvedDate": "2026-03-04",
@@ -23890,6 +25060,12 @@
           "type": "re-alert-close",
           "price": 27320,
           "rvol": 3.842034718431124
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 27320,
+          "rvol": 3.4395358431669107
         }
       ],
       "resolvedDate": "2026-02-25",
@@ -24155,6 +25331,12 @@
           "type": "re-alert-full",
           "price": 40050,
           "rvol": 5.805736569241866
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 40050,
+          "rvol": 5.148483372723919
         }
       ],
       "resolvedDate": "2026-02-09",
@@ -24244,6 +25426,12 @@
           "type": "re-alert-close",
           "price": 13.40999984741211,
           "rvol": 2.6734310047484393
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 13.40999984741211,
+          "rvol": 2.3933572804414602
         }
       ],
       "resolvedDate": "2026-01-29",
@@ -24326,6 +25514,12 @@
           "type": "re-alert-close",
           "price": 57.720001220703125,
           "rvol": 2.8460488603794185
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 57.720001220703125,
+          "rvol": 2.5478913607206226
         }
       ],
       "resolvedDate": "2026-03-05",
@@ -24373,6 +25567,12 @@
           "type": "re-alert-close",
           "price": 14.444999694824219,
           "rvol": 3.4064998456999342
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 14.444999694824219,
+          "rvol": 3.0496284332932744
         }
       ],
       "resolvedDate": "2026-02-17",
@@ -24468,6 +25668,12 @@
           "type": "re-alert-close",
           "price": 173.6199951171875,
           "rvol": 2.5599073038775426
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 173.6199951171875,
+          "rvol": 2.291726538709419
         }
       ],
       "resolvedDate": "2026-01-23",
@@ -24538,6 +25744,12 @@
           "type": "re-alert-close",
           "price": 1209.4000244140625,
           "rvol": 2.876403738070804
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1209.4000244140625,
+          "rvol": 2.575066203606244
         }
       ],
       "resolvedDate": "2026-03-05",
@@ -24603,6 +25815,12 @@
           "type": "re-alert-close",
           "price": 799,
           "rvol": 2.6769492566929443
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 799,
+          "rvol": 2.3965069536108263
         }
       ],
       "resolvedDate": "2026-01-23",
@@ -24756,6 +25974,12 @@
           "type": "re-alert-close",
           "price": 14870,
           "rvol": 2.0623720061086814
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 14870,
+          "rvol": 1.8463139864211056
         }
       ],
       "resolvedDate": "2026-01-30",
@@ -24851,6 +26075,12 @@
           "type": "re-alert-close",
           "price": 52670,
           "rvol": 3.2311394494543513
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 52670,
+          "rvol": 2.892639126178181
         }
       ],
       "resolvedDate": "2026-01-30",
@@ -24934,6 +26164,12 @@
           "type": "re-alert-close",
           "price": 213.75999450683594,
           "rvol": 2.2556360081648394
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 213.75999450683594,
+          "rvol": 2.0193312834999517
         }
       ],
       "resolvedDate": "2026-02-26",
@@ -25004,6 +26240,12 @@
           "type": "re-alert-close",
           "price": 99.69000244140625,
           "rvol": 4.629814924492815
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 99.69000244140625,
+          "rvol": 4.144786694307854
         }
       ],
       "resolvedDate": "2026-03-06",
@@ -25099,6 +26341,12 @@
           "type": "re-alert-close",
           "price": 18650,
           "rvol": 2.4631566274522325
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 18650,
+          "rvol": 2.205111647433428
         }
       ],
       "resolvedDate": "2026-02-20",
@@ -25175,6 +26423,12 @@
           "type": "re-alert-close",
           "price": 2595,
           "rvol": 2.68229872890607
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 2595,
+          "rvol": 2.4012960049254346
         }
       ],
       "resolvedDate": "2026-03-09",
@@ -25335,6 +26589,12 @@
           "type": "re-alert-close",
           "price": 78.52999877929688,
           "rvol": 4.9043052056571295
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 78.52999877929688,
+          "rvol": 4.390520850778763
         }
       ],
       "resolvedDate": "2026-02-02",
@@ -25418,6 +26678,12 @@
           "type": "re-alert-close",
           "price": 89.69000244140625,
           "rvol": 5.064709634612637
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 89.69000244140625,
+          "rvol": 4.534121006224646
         }
       ],
       "resolvedDate": "2026-02-27",
@@ -25555,6 +26821,12 @@
           "type": "re-alert-close",
           "price": 92.62000274658203,
           "rvol": 6.57426407544011
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 92.62000274658203,
+          "rvol": 5.885531648489242
         }
       ],
       "resolvedDate": "2026-02-06",
@@ -25596,6 +26868,12 @@
           "type": "re-alert-close",
           "price": 219.61000061035156,
           "rvol": 3.86677887194833
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 219.61000061035156,
+          "rvol": 3.4616877520299343
         }
       ],
       "resolvedDate": "2026-02-04",
@@ -25720,6 +26998,12 @@
           "type": "re-alert-close",
           "price": 860,
           "rvol": 3.8511705536429863
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 860,
+          "rvol": 3.447714590880388
         }
       ],
       "resolvedDate": "2026-03-10",
@@ -25815,6 +27099,12 @@
           "type": "re-alert-close",
           "price": 81650,
           "rvol": 7.028858984778882
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 81650,
+          "rvol": 6.2925023292306195
         }
       ],
       "resolvedDate": "2026-02-03",
@@ -25880,6 +27170,12 @@
           "type": "re-alert-close",
           "price": 98.25,
           "rvol": 2.9377060910852255
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 98.25,
+          "rvol": 2.632849798614117
         }
       ],
       "resolvedDate": "2026-02-24",
@@ -25939,6 +27235,12 @@
           "type": "re-alert-close",
           "price": 104.12999725341797,
           "rvol": 4.450712194976995
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 104.12999725341797,
+          "rvol": 3.9888458351208915
         }
       ],
       "resolvedDate": "2026-02-03",
@@ -26015,6 +27317,12 @@
           "type": "re-alert-close",
           "price": 121.0199966430664,
           "rvol": 6.815892437021286
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 121.0199966430664,
+          "rvol": 6.101846562666675
         }
       ],
       "resolvedDate": "2026-03-11",
@@ -26067,6 +27375,12 @@
           "type": "re-alert-close",
           "price": 70.80999755859375,
           "rvol": 3.171467021105274
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 70.80999755859375,
+          "rvol": 2.8392180950847217
         }
       ],
       "resolvedDate": "2026-03-11",
@@ -26250,6 +27564,12 @@
           "type": "re-alert-full",
           "price": 3580,
           "rvol": 3.607734649370246
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 3580,
+          "rvol": 3.2297814956266966
         }
       ],
       "resolvedDate": "2026-01-30",
@@ -26345,6 +27665,12 @@
           "type": "re-alert-close",
           "price": 143840,
           "rvol": 5.0329607634475355
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 143840,
+          "rvol": 4.505698207276842
         }
       ],
       "resolvedDate": "2026-02-09",
@@ -26594,6 +27920,12 @@
           "type": "re-alert-full",
           "price": 279.010009765625,
           "rvol": 2.2351941044499917
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 279.010009765625,
+          "rvol": 2.0010309125552306
         }
       ],
       "resolvedDate": "2026-03-12",
@@ -26683,6 +28015,12 @@
           "type": "re-alert-close",
           "price": 123.4000015258789,
           "rvol": 4.06375724674949
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 123.4000015258789,
+          "rvol": 3.6380302970900202
         }
       ],
       "resolvedDate": "2026-02-09",
@@ -26796,6 +28134,12 @@
           "type": "re-alert-close",
           "price": 38.34000015258789,
           "rvol": 3.115191906711534
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 38.34000015258789,
+          "rvol": 2.7888384688655643
         }
       ],
       "resolvedDate": "2026-02-04",
@@ -26950,6 +28294,12 @@
           "type": "re-alert-full",
           "price": 86000,
           "rvol": 6.615376363043372
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 86000,
+          "rvol": 5.922336934534067
         }
       ],
       "resolvedDate": "2026-01-30",
@@ -27015,6 +28365,12 @@
           "type": "re-alert-close",
           "price": 865.9500122070312,
           "rvol": 3.0047378572124055
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 865.9500122070312,
+          "rvol": 2.6929254380677223
         }
       ],
       "resolvedDate": "2026-02-02",
@@ -27061,6 +28417,12 @@
           "type": "re-alert-close",
           "price": 44,
           "rvol": 2.1742936064584573
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 44,
+          "rvol": 1.948659364278806
         }
       ],
       "resolvedDate": "2026-03-12",
@@ -27143,6 +28505,12 @@
           "type": "re-alert-recovery",
           "price": 252.9199981689453,
           "rvol": 2.932974080034226
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-recovery",
+          "price": 252.9199981689453,
+          "rvol": 2.6286088453136935
         }
       ],
       "resolvedDate": "2026-03-12",
@@ -27244,6 +28612,12 @@
           "type": "re-alert-close",
           "price": 964.5,
           "rvol": 3.684295178370672
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 964.5,
+          "rvol": 3.2983213977794597
         }
       ],
       "resolvedDate": "2026-02-04",
@@ -27315,6 +28689,12 @@
           "type": "re-alert-full",
           "price": 81.16999816894531,
           "rvol": 4.225146274045562
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 81.16999816894531,
+          "rvol": 3.782511902478884
         }
       ],
       "resolvedDate": "2026-03-10",
@@ -27386,6 +28766,12 @@
           "type": "re-alert-close",
           "price": 353.44000244140625,
           "rvol": 4.198440368051612
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 353.44000244140625,
+          "rvol": 3.7586037580652536
         }
       ],
       "resolvedDate": "2026-02-03",
@@ -27517,6 +28903,12 @@
           "type": "re-alert-full",
           "price": 567.8800048828125,
           "rvol": 3.532342381739992
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 567.8800048828125,
+          "rvol": 3.1622874655577076
         }
       ],
       "resolvedDate": "2026-02-09",
@@ -27576,6 +28968,12 @@
           "type": "re-alert-full",
           "price": 62.34000015258789,
           "rvol": 11.386515779651994
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 62.34000015258789,
+          "rvol": 10.193642697974168
         }
       ],
       "resolvedDate": "2026-03-02",
@@ -27647,6 +29045,12 @@
           "type": "re-alert-close",
           "price": 7987,
           "rvol": 2.3496028818093646
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 7987,
+          "rvol": 2.1034540084769553
         }
       ],
       "resolvedDate": "2026-03-11",
@@ -27729,6 +29133,12 @@
           "type": "re-alert-close",
           "price": 19.985000610351562,
           "rvol": 2.3878004881446055
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 19.985000610351562,
+          "rvol": 2.1376499608151707
         }
       ],
       "resolvedDate": "2026-03-17",
@@ -27793,6 +29203,12 @@
           "type": "re-alert-close",
           "price": 9.920000076293945,
           "rvol": 1.7658797857062831
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 9.920000076293945,
+          "rvol": 1.580882855775149
         }
       ],
       "resolvedDate": "2026-03-17",
@@ -27911,6 +29327,12 @@
           "type": "re-alert-close",
           "price": 46120,
           "rvol": 4.355226688565312
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 46120,
+          "rvol": 3.8989648450013275
         }
       ],
       "resolvedDate": "2026-03-17",
@@ -27969,6 +29391,12 @@
           "type": "re-alert-close",
           "price": 151.49000549316406,
           "rvol": 5.2621879166532395
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 151.49000549316406,
+          "rvol": 4.666468529862307
         }
       ],
       "resolvedDate": "2026-03-17",
@@ -28109,6 +29537,12 @@
           "type": "re-alert-full",
           "price": 524.7100219726562,
           "rvol": 3.614618545478783
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 524.7100219726562,
+          "rvol": 3.2359442216667205
         }
       ],
       "resolvedDate": "2026-03-18",
@@ -28168,6 +29602,12 @@
           "type": "re-alert-close",
           "price": 1561.25,
           "rvol": 3.1500109536242986
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1561.25,
+          "rvol": 2.8200098061017536
         }
       ],
       "resolvedDate": "2026-02-06",
@@ -28251,6 +29691,12 @@
           "type": "re-alert-close",
           "price": 109.61000061035156,
           "rvol": 2.879221575528492
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 109.61000061035156,
+          "rvol": 2.5775888390445547
         }
       ],
       "resolvedDate": "2026-02-10",
@@ -28322,6 +29768,12 @@
           "type": "re-alert-close",
           "price": 32.63999938964844,
           "rvol": 4.181527001897345
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 32.63999938964844,
+          "rvol": 3.7434622683652425
         }
       ],
       "resolvedDate": "2026-02-05",
@@ -28374,6 +29826,12 @@
           "type": "re-alert-close",
           "price": 383.4700012207031,
           "rvol": 3.5953036115103605
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 383.4700012207031,
+          "rvol": 3.21865275697118
         }
       ],
       "resolvedDate": "2026-03-18",
@@ -28511,6 +29969,12 @@
           "type": "re-alert-close",
           "price": 3248,
           "rvol": 7.9820788040929855
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 3248,
+          "rvol": 7.145861024616578
         }
       ],
       "resolvedDate": "2026-02-05",
@@ -28588,6 +30052,12 @@
           "type": "re-alert-full",
           "price": 63,
           "rvol": 7.006724959850626
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 63,
+          "rvol": 6.272687106913893
         }
       ],
       "resolvedDate": "2026-03-13",
@@ -28665,6 +30135,12 @@
           "type": "re-alert-close",
           "price": 644.6400146484375,
           "rvol": 2.042236777057509
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 644.6400146484375,
+          "rvol": 1.8282881623181508
         }
       ],
       "resolvedDate": "2026-02-11",
@@ -28705,6 +30181,12 @@
           "type": "re-alert-close",
           "price": 44.54999923706055,
           "rvol": 2.550743261822324
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 44.54999923706055,
+          "rvol": 2.2835225391552236
         }
       ],
       "resolvedDate": "2026-03-18",
@@ -28776,6 +30258,12 @@
           "type": "re-alert-close",
           "price": 726.8800048828125,
           "rvol": 3.765354180209471
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 726.8800048828125,
+          "rvol": 3.3708885041875267
         }
       ],
       "resolvedDate": "2026-02-12",
@@ -28816,6 +30304,12 @@
           "type": "re-alert-close",
           "price": 268.4599914550781,
           "rvol": 3.2933841007640448
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 268.4599914550781,
+          "rvol": 2.948362909255431
         }
       ],
       "resolvedDate": "2026-03-19",
@@ -28947,6 +30441,12 @@
           "type": "re-alert-close",
           "price": 22830,
           "rvol": 3.9954933667229064
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 22830,
+          "rvol": 3.5769178711614593
         }
       ],
       "resolvedDate": "2026-02-23",
@@ -29024,6 +30524,12 @@
           "type": "re-alert-close",
           "price": 7717,
           "rvol": 4.892249475089794
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 7717,
+          "rvol": 4.379728101508959
         }
       ],
       "resolvedDate": "2026-02-06",
@@ -29094,6 +30600,12 @@
           "type": "re-alert-close",
           "price": 2118,
           "rvol": 2.1196143675765473
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 2118,
+          "rvol": 1.8975595290685283
         }
       ],
       "resolvedDate": "2026-03-19",
@@ -29159,6 +30671,12 @@
           "type": "re-alert-close",
           "price": 311.79998779296875,
           "rvol": 3.0260136889782374
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 311.79998779296875,
+          "rvol": 2.7090027310852793
         }
       ],
       "resolvedDate": "2026-03-12",
@@ -29265,6 +30783,12 @@
           "type": "re-alert-close",
           "price": 3500,
           "rvol": 2.62180342929874
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 3500,
+          "rvol": 2.3471383081341104
         }
       ],
       "resolvedDate": "2026-03-19",
@@ -29369,6 +30893,12 @@
           "type": "re-alert-close",
           "price": 4978,
           "rvol": 2.6041410868238537
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 4978,
+          "rvol": 2.33132630629945
         }
       ],
       "resolvedDate": "2026-03-19",
@@ -29493,6 +31023,12 @@
           "type": "re-alert-close",
           "price": 7095,
           "rvol": 2.190498303662949
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 7095,
+          "rvol": 1.9610175289934975
         }
       ],
       "resolvedDate": "2026-03-19",
@@ -29588,6 +31124,12 @@
           "type": "re-alert-close",
           "price": 1314,
           "rvol": 6.297303310177872
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 1314,
+          "rvol": 5.637585820540191
         }
       ],
       "resolvedDate": "2026-02-12",
@@ -29704,6 +31246,12 @@
           "type": "re-alert-close",
           "price": 26730,
           "rvol": 6.238344105809783
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 26730,
+          "rvol": 5.584803294724949
         }
       ],
       "resolvedDate": "2026-03-19",
@@ -29787,6 +31335,12 @@
           "type": "re-alert-close",
           "price": 4100,
           "rvol": 2.9893702701419627
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 4100,
+          "rvol": 2.6761981466032814
         }
       ],
       "resolvedDate": "2026-02-10",
@@ -29881,6 +31435,12 @@
           "type": "re-alert-close",
           "price": 2116,
           "rvol": 3.8419494999011876
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 2116,
+          "rvol": 3.439459552292492
         }
       ],
       "resolvedDate": "2026-03-19",
@@ -30062,6 +31622,12 @@
           "type": "re-alert-close",
           "price": 6.820000171661377,
           "rvol": 3.6394728549341555
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 6.820000171661377,
+          "rvol": 3.258194746322006
         }
       ],
       "resolvedDate": "2026-02-11",
@@ -30151,6 +31717,12 @@
           "type": "re-alert-close",
           "price": 52.34000015258789,
           "rvol": 1.872310011718144
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 52.34000015258789,
+          "rvol": 1.6761632485857672
         }
       ],
       "resolvedDate": "2026-02-26",
@@ -30204,6 +31776,12 @@
           "type": "re-alert-close",
           "price": 323.3999938964844,
           "rvol": 2.862254010085521
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 323.3999938964844,
+          "rvol": 2.562398828076562
         }
       ],
       "resolvedDate": "2026-03-09",
@@ -30281,6 +31859,12 @@
           "type": "re-alert-close",
           "price": 247.7899932861328,
           "rvol": 2.947074135460106
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 247.7899932861328,
+          "rvol": 2.6383330355547616
         }
       ],
       "resolvedDate": "2026-02-13",
@@ -30364,6 +31948,12 @@
           "type": "re-alert-close",
           "price": 38540,
           "rvol": 2.0957787454792105
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 38540,
+          "rvol": 1.8762209721432934
         }
       ],
       "resolvedDate": "2026-02-12",
@@ -30410,6 +32000,12 @@
           "type": "re-alert-close",
           "price": 79.37999725341797,
           "rvol": 4.4616159530419175
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 79.37999725341797,
+          "rvol": 3.9986180711224737
         }
       ],
       "resolvedDate": "2026-03-25",
@@ -30481,6 +32077,12 @@
           "type": "re-alert-full",
           "price": 219.92999267578125,
           "rvol": 5.602054897312023
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 219.92999267578125,
+          "rvol": 5.0151729556888585
         }
       ],
       "resolvedDate": "2026-03-09",
@@ -30564,6 +32166,12 @@
           "type": "re-alert-close",
           "price": 129.61000061035156,
           "rvol": 5.921062687295335
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 129.61000061035156,
+          "rvol": 5.300760881959634
         }
       ],
       "resolvedDate": "2026-03-10",
@@ -30634,6 +32242,12 @@
           "type": "re-alert-close",
           "price": 261.45001220703125,
           "rvol": 3.3455508023311613
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 261.45001220703125,
+          "rvol": 2.9950645278012304
         }
       ],
       "resolvedDate": "2026-03-27",
@@ -30716,6 +32330,12 @@
           "type": "re-alert-close",
           "price": 91.55999755859375,
           "rvol": 2.7916158142142256
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 91.55999755859375,
+          "rvol": 2.499160824153688
         }
       ],
       "resolvedDate": "2026-03-31",
@@ -30823,6 +32443,12 @@
           "type": "re-alert-close",
           "price": 70.31999969482422,
           "rvol": 2.2320590655654993
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 70.31999969482422,
+          "rvol": 1.9982243063157803
         }
       ],
       "resolvedDate": "2026-03-23",
@@ -30881,6 +32507,12 @@
           "type": "re-alert-close",
           "price": 30.139999389648438,
           "rvol": 5.485797110868627
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 30.139999389648438,
+          "rvol": 4.911094556396676
         }
       ],
       "resolvedDate": "2026-04-01",
@@ -30927,6 +32559,12 @@
           "type": "re-alert-close",
           "price": 107.58000183105469,
           "rvol": 4.55658363502441
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 107.58000183105469,
+          "rvol": 4.07922725421233
         }
       ],
       "resolvedDate": "2026-04-03",
@@ -30985,6 +32623,12 @@
           "type": "re-alert-close",
           "price": 44.38999938964844,
           "rvol": 3.462108569425225
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 44.38999938964844,
+          "rvol": 3.1028331518433623
         }
       ],
       "resolvedDate": "2026-04-03",
@@ -31145,6 +32789,12 @@
           "type": "re-alert-close",
           "price": 193.55999755859375,
           "rvol": 2.0662315044745796
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 193.55999755859375,
+          "rvol": 1.8323185039680232
         }
       ],
       "resolvedDate": "2026-04-08",
@@ -31185,6 +32835,12 @@
           "type": "re-alert-close",
           "price": 217.41000366210938,
           "rvol": 4.83189143028224
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 217.41000366210938,
+          "rvol": 4.330468734686914
         }
       ],
       "resolvedDate": "2026-04-08",
@@ -31237,6 +32893,12 @@
           "type": "re-alert-close",
           "price": 503.9800109863281,
           "rvol": 3.089403830744992
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 503.9800109863281,
+          "rvol": 2.7657520008574212
         }
       ],
       "resolvedDate": "2026-04-09",
@@ -31278,6 +32940,12 @@
           "type": "re-alert-close",
           "price": 219.50999450683594,
           "rvol": 4.917093993090375
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 219.50999450683594,
+          "rvol": 4.401969860480907
         }
       ],
       "resolvedDate": "2026-03-11",
@@ -31394,6 +33062,12 @@
           "type": "re-alert-close",
           "price": 30.299999237060547,
           "rvol": 2.6143390725238866
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 30.299999237060547,
+          "rvol": 2.3404559315928126
         }
       ],
       "resolvedDate": "2026-04-10",
@@ -31446,6 +33120,12 @@
           "type": "re-alert-close",
           "price": 48.51499938964844,
           "rvol": 1.8054635664261667
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 48.51499938964844,
+          "rvol": 1.61631976422914
         }
       ],
       "resolvedDate": "2026-04-13",
@@ -31538,6 +33218,12 @@
           "type": "re-alert-close",
           "price": 6.360000133514404,
           "rvol": 2.732510485340474
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 6.360000133514404,
+          "rvol": 2.4462474821143294
         }
       ],
       "resolvedDate": "2026-04-14",
@@ -31590,6 +33276,12 @@
           "type": "re-alert-close",
           "price": 6570,
           "rvol": 2.4414938807877564
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 6570,
+          "rvol": 2.1857183313718966
         }
       ],
       "resolvedDate": "2026-04-15",
@@ -31697,6 +33389,12 @@
           "type": "re-alert-full",
           "price": 190.69000244140625,
           "rvol": 3.5627737168865607
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 190.69000244140625,
+          "rvol": 3.189530756069874
         }
       ],
       "resolvedDate": "2026-03-31",
@@ -31731,6 +33429,12 @@
           "type": "re-alert-close",
           "price": 414.57000732421875,
           "rvol": 2.9177493166199127
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 414.57000732421875,
+          "rvol": 2.612080340593065
         }
       ],
       "resolvedDate": "2026-04-16",
@@ -31789,6 +33493,12 @@
           "type": "re-alert-close",
           "price": 15.829999923706055,
           "rvol": 4.16192035109453
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 15.829999923706055,
+          "rvol": 3.7259096476465317
         }
       ],
       "resolvedDate": "2026-04-16",
@@ -31841,6 +33551,12 @@
           "type": "re-alert-full",
           "price": 188.4600067138672,
           "rvol": 2.9994009712538965
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-full",
+          "price": 188.4600067138672,
+          "rvol": 2.6851780123606313
         }
       ],
       "resolvedDate": "2026-04-16",
@@ -31887,6 +33603,12 @@
           "type": "re-alert-close",
           "price": 96.45999908447266,
           "rvol": 3.877726675732671
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 96.45999908447266,
+          "rvol": 3.471488643036868
         }
       ],
       "resolvedDate": "2026-04-20",
@@ -31973,6 +33695,12 @@
           "type": "re-alert-close",
           "price": 189.77000427246094,
           "rvol": 1.8045165174977196
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 189.77000427246094,
+          "rvol": 1.6154719299503395
         }
       ],
       "resolvedDate": "2026-04-21",
@@ -32013,6 +33741,12 @@
           "type": "re-alert-close",
           "price": 126.76000213623047,
           "rvol": 4.050618472644056
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 126.76000213623047,
+          "rvol": 3.6302712726526924
         }
       ],
       "resolvedDate": "2026-04-29",
@@ -32081,6 +33815,12 @@
           "type": "re-alert-recovery",
           "price": 297.8399963378906,
           "rvol": 5.4121369417483
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-recovery",
+          "price": 297.8399963378906,
+          "rvol": 4.845151166898479
         }
       ],
       "resolvedDate": "2026-05-01",
@@ -32127,6 +33867,12 @@
           "type": "re-alert-close",
           "price": 28.780000686645508,
           "rvol": 3.3727004120086863
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 28.780000686645508,
+          "rvol": 3.0193698926553956
         }
       ],
       "resolvedDate": "2026-05-01",
@@ -32221,6 +33967,12 @@
           "type": "re-alert-close",
           "price": 15710,
           "rvol": 5.610356552059186
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 15710,
+          "rvol": 5.022604913272034
         }
       ],
       "resolvedDate": "2026-05-06",
@@ -32362,6 +34114,12 @@
           "type": "re-alert-close",
           "price": 8.199999809265137,
           "rvol": 4.592007175317896
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 8.199999809265137,
+          "rvol": 4.11093975695126
         }
       ]
     },
@@ -32387,6 +34145,12 @@
           "type": "re-alert-close",
           "price": 417.8500061035156,
           "rvol": 2.8291523667383163
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 417.8500061035156,
+          "rvol": 2.532764975937159
         }
       ]
     },
@@ -32483,6 +34247,12 @@
           "type": "re-alert-recovery",
           "price": 69.5,
           "rvol": 8.385172810690328
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-recovery",
+          "price": 69.5,
+          "rvol": 7.515013368071521
         }
       ]
     },
@@ -32501,6 +34271,12 @@
           "price": 351.94000244140625,
           "rvol": 4.734847593655597,
           "note": "First alert (close)"
+        },
+        {
+          "date": "2026-05-21",
+          "type": "re-alert-close",
+          "price": 351.94000244140625,
+          "rvol": 4.198827111354964
         }
       ]
     }
