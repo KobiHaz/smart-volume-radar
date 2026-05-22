@@ -119,6 +119,17 @@ async function main(): Promise<void> {
         const marketRegime = await fetchMarketRegime(scanDate);
         logger.info(`🧭 Market regime: ${marketRegime.toUpperCase()} (SPY vs SMA200)`);
         const { stocks, failedTickers } = await fetchAllStocksAsOfDate(tickers, scanDate);
+
+        // BUG FIX 2026-05-22 (TD-1): fetchAllStocks doesn't populate `sector` —
+        // it comes from the Google Sheet via getSectorForTicker. Without this
+        // assignment here, applySectorRanks() skipped every stock (because
+        // `if (!s.sector) continue`), and sectorRank / sectorMedianReturn63d
+        // stayed null on all stocks. The new spam-fix sector filter in
+        // formatNotableSection was silently a no-op as a result.
+        for (const s of stocks) {
+            s.sector = getSectorForTicker(s.ticker);
+        }
+
         // Compute RS percentile across the watchlist using SPY's 63-day return as
         // the alpha baseline. Fail-soft: passes null → falls back to raw return.
         const spyReturn63d = await fetchSpy63dReturn(scanDate);
@@ -227,10 +238,10 @@ async function main(): Promise<void> {
         logger.info(`🎯 Telegram signals: ${buyCount} BUY + ${watchCount} WATCH + ${cautionCount} CAUTION`);
 
         // 7. (News enrichment removed 2026-05-22 — see decisions-log.)
-        // Build RVOLResult shape (with sector). isVolumeWithoutPrice always false for momentum.
+        // Build RVOLResult shape. sector is already populated above (before
+        // applySectorRanks). isVolumeWithoutPrice always false for momentum.
         const finalSignals: RVOLResult[] = actionableStocks.map((s) => ({
             ...s,
-            sector: getSectorForTicker(s.ticker),
             isVolumeWithoutPrice: false,
         }));
 
@@ -347,12 +358,10 @@ async function main(): Promise<void> {
         });
 
         // JSON history keeps the legacy 3-path + silent set so backtest scripts still see them.
-        // News not enriched here (it's only fetched for momentum stocks above) — empty array is fine.
+        // sector is already populated on stocks (see line ~130 — assigned before applySectorRanks).
         const legacyForHistory: RVOLResult[] = topSignals.map((s) => ({
             ...s,
-            sector: getSectorForTicker(s.ticker),
             isVolumeWithoutPrice: false,
-            news: [],
         }));
         const stored = buildStoredScanResult(scanDate, legacyForHistory, volumeWithoutPrice);
         writeScanResults(stored, resultsDir);
