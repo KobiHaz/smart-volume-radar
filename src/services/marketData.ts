@@ -272,7 +272,7 @@ export async function fetchYahooChartAsOfDate(ticker: string, asOfDate: string):
  * Default 0 (no filter — scan everything in the watchlist).
  * Override with env var, e.g. MIN_AVG_DAILY_VOLUME=100000 to filter pump-and-dump candidates.
  */
-const MIN_AVG_DAILY_VOLUME = (() => {
+const MIN_AVG_DAILY_VOLUME: number = ((): number => {
     const n = parseInt(process.env.MIN_AVG_DAILY_VOLUME ?? '0', 10);
     return Number.isFinite(n) && n >= 0 ? n : 0;
 })();
@@ -346,7 +346,7 @@ async function fetchFromYahooChart(ticker: string, isFallback = false, attempt =
             return null;
         }
 
-        const data = await response.json() as any;
+        const data = await response.json() as YahooChartApiResponse;
         const result = data?.chart?.result?.[0];
         const error = data?.chart?.error;
 
@@ -371,6 +371,41 @@ async function fetchFromYahooChart(ticker: string, isFallback = false, attempt =
     }
 }
 
+// ─── API response types (replace `any` casts on JSON parsing) ───────────────
+
+/** Yahoo Chart API response — top-level wrapper. Parsing of `result[0]`
+ *  is delegated to `parseYahooChartResult` which has its own internal types. */
+interface YahooChartApiResponse {
+    chart?: {
+        result?: unknown[];
+        error?: { description?: string; code?: string } | null;
+    };
+}
+
+/** Twelve Data indicator (RSI / SMA / etc.) response. */
+interface TwelveDataIndicatorResponse {
+    status?: string;
+    values?: Array<{ rsi?: string; sma?: string; datetime?: string }>;
+}
+
+/** Twelve Data quote/price response. Includes both success + error variants. */
+interface TwelveDataQuoteResponse {
+    status?: 'ok' | 'error';
+    code?: number;
+    message?: string;
+    symbol?: string;
+    close?: string;
+    high?: string;
+    low?: string;
+    open?: string;
+    previous_close?: string;
+    percent_change?: string;
+    volume?: string;
+    average_volume?: string;
+    fifty_two_week?: { high?: string };
+    datetime?: string;
+}
+
 /** Twelve Data API base */
 const TWELVE_DATA_BASE = 'https://api.twelvedata.com';
 
@@ -389,12 +424,12 @@ async function fetchIndicatorsFromTwelveData(
             fetch(`${TWELVE_DATA_BASE}/sma?symbol=${encodedTicker}&interval=1day&time_period=21&series_type=close&apikey=${apiKey}`),
         ]);
 
-        const rsiData = (await rsiRes.json()) as any;
+        const rsiData = (await rsiRes.json()) as TwelveDataIndicatorResponse;
         if (rsiData?.status === 'ok' && rsiData?.values?.[0]?.rsi != null) {
             result.rsi = parseFloat(rsiData.values[0].rsi);
         }
 
-        const smaData = (await smaRes.json()) as any;
+        const smaData = (await smaRes.json()) as TwelveDataIndicatorResponse;
         if (smaData?.status === 'ok' && smaData?.values?.[0]?.sma != null) {
             result.sma21 = parseFloat(smaData.values[0].sma);
         }
@@ -436,7 +471,7 @@ async function fetchFromTwelveData(ticker: string, isFallback = false, attempt =
             return null;
         }
 
-        const data = await response.json() as any;
+        const data = await response.json() as TwelveDataQuoteResponse;
 
         if (data.status === 'error' || !data.close) {
             if (data.status === 'error') {
@@ -452,9 +487,12 @@ async function fetchFromTwelveData(ticker: string, isFallback = false, attempt =
             return null;
         }
 
-        const volume = parseFloat(data.volume) || 0;
-        const avgVolume = parseFloat(data.average_volume) || parseFloat(data.volume) || 1;
-        const lastPrice = parseFloat(data.close) || 0;
+        // parseFloat coerces undefined → NaN; the `|| 0` / `|| 1` fallbacks already
+        // handle that, so the ?? '' is just for TS type narrowing (close was checked
+        // above so it's non-empty, the rest may be missing on partial responses).
+        const volume = parseFloat(data.volume ?? '') || 0;
+        const avgVolume = parseFloat(data.average_volume ?? '') || parseFloat(data.volume ?? '') || 1;
+        const lastPrice = parseFloat(data.close ?? '') || 0;
         const fiftyTwoWeek = data.fifty_two_week;
         const high52w = fiftyTwoWeek?.high != null ? parseFloat(fiftyTwoWeek.high) : undefined;
 
@@ -479,7 +517,7 @@ async function fetchFromTwelveData(ticker: string, isFallback = false, attempt =
             currentVolume: volume,
             avgVolume,
             rvol: volume / avgVolume,
-            priceChange: parseFloat(data.percent_change) || 0,
+            priceChange: parseFloat(data.percent_change ?? '') || 0,
             lastPrice,
             sma21,
             rsi,
