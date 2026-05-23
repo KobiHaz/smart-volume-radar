@@ -210,19 +210,12 @@ export function computeTradePlan(stock: StockData): TradePlan | undefined {
  *
  * Decision tree:
  *   1. If score < 40 → PASS (weak setup overall)
- *   2. If extension > 10% → PASS_TOO_LATE (deeply extended, missed entry)
- *   3. If extension > 5% → CAUTION_EXTENDED (past pivot, tight stop required)
- *   4. If stage == Failed → PASS (broke base)
- *   5. If stage == Breaking Out:
- *        rvolPass → BUY
- *        else     → CAUTION_NO_VOL
- *   6. If stage in {Fresh, Aging} AND price near pivot:
- *        rvolPass → BUY
- *        else     → CAUTION_NO_VOL
- *   7. If RVOL < 1.2 → PASS (stock isn't waking up — anti-noise gate)
- *   8. If stage == Pre-Pivot AND score ≥ 65 → WATCH
- *   9. If stage == Setup AND score ≥ 70 → WATCH
- *  10. Otherwise → PASS
+ *   2. If sector 63d median < 0 → PASS (TD-10: loser-cohort gate)
+ *   3. Determine the base action from stage/extension/RVOL cascade.
+ *   4. If base action is BUY or WATCH AND distributionDays ≥ 4 → demote
+ *      to CAUTION_DISTRIBUTION (institutional selling on an otherwise-
+ *      actionable setup is the only case where the warning is meaningful).
+ *   5. Otherwise return base action.
  */
 export function determineAction(
     stock: StockData,
@@ -243,10 +236,43 @@ export function determineAction(
         return 'PASS';
     }
 
-    // Distribution-pressure guard (Phase 2): institutional selling overrides
-    // the breakout/extension cascade. ≥4 distribution days in 25 = warn.
-    if ((stock.distributionDays ?? 0) >= 4) return 'CAUTION_DISTRIBUTION';
+    // ─── Base action from the stage/extension/RVOL cascade ────────────
+    const baseAction = computeBaseAction(stock, score, stage, plan);
 
+    // Distribution-pressure demotion (TD-13, 2026-05-23): institutional
+    // selling pressure only matters when there's a setup to protect.
+    //
+    // Old design (2026-05-22 spam-fix predecessor): distributionDays ≥ 4
+    // returned CAUTION_DISTRIBUTION unconditionally, BEFORE the stage/plan
+    // checks. Result on 2026-05-22: 93 CAUTION_DISTRIBUTION alerts, of which
+    // 86 had momentum=none (no setup at all) and 78 had RVOL<1.2 (stock not
+    // waking up). The warning fired on dead stocks just because the
+    // market-wide pullback racked up down-days-with-volume across the board.
+    //
+    // New design: only demote BUY/WATCH base actions to CAUTION_DISTRIBUTION.
+    // A stock that would otherwise be PASS stays PASS — no false-positive
+    // "watch out" warning on stocks the trader wasn't going to act on anyway.
+    if (
+        (baseAction === 'BUY' || baseAction === 'WATCH') &&
+        (stock.distributionDays ?? 0) >= 4
+    ) {
+        return 'CAUTION_DISTRIBUTION';
+    }
+
+    return baseAction;
+}
+
+/**
+ * The base action from stage/extension/RVOL, before the distribution-pressure
+ * demotion is applied. Exported only for test usage; production code should
+ * call `determineAction` which layers the demotion on top.
+ */
+function computeBaseAction(
+    stock: StockData,
+    score: number,
+    stage: BreakoutStage | undefined,
+    plan: TradePlan | undefined
+): ActionLabel {
     if (!stage || !plan) return score >= 60 ? 'WATCH' : 'PASS';
 
     if (plan.extensionPct > 10) return 'PASS_TOO_LATE';
