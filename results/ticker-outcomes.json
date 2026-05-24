@@ -1,9 +1,11 @@
 {
-  "generatedAt": "2026-05-23T17:56:29.257Z",
+  "generatedAt": "2026-05-24T10:36:09.951Z",
   "config": {
     "TRAILING_N": 30,
     "BLACKLIST_RATE": 0.1,
     "BLACKLIST_MIN_N": 8,
+    "BLACKLIST_MAX_MEDIAN_PEAK": 0.05,
+    "BLACKLIST_MAX_MEDIAN_NOW": 0,
     "HOT_STREAK_RATE": 0.8,
     "HOT_STREAK_MIN_N": 10
   },
@@ -29,7 +31,7 @@
     "TSM": {
       "recentWinRate": 0,
       "recentAlertsCounted": 24,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "SIMO": {
@@ -101,7 +103,7 @@
     "ASML": {
       "recentWinRate": 0,
       "recentAlertsCounted": 14,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "ONTO": {
@@ -245,7 +247,7 @@
     "KO": {
       "recentWinRate": 0,
       "recentAlertsCounted": 12,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "MNST": {
@@ -263,7 +265,7 @@
     "TAN": {
       "recentWinRate": 0.07142857142857142,
       "recentAlertsCounted": 14,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "NXT": {
@@ -275,13 +277,13 @@
     "GNRC": {
       "recentWinRate": 0,
       "recentAlertsCounted": 19,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "SUN": {
       "recentWinRate": 0,
       "recentAlertsCounted": 30,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "SRE": {
@@ -383,7 +385,7 @@
     "KOG.OL": {
       "recentWinRate": 0.03571428571428571,
       "recentAlertsCounted": 28,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "RR.L": {
@@ -419,7 +421,7 @@
     "CW": {
       "recentWinRate": 0,
       "recentAlertsCounted": 14,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "HII": {
@@ -491,7 +493,7 @@
     "TTE": {
       "recentWinRate": 0,
       "recentAlertsCounted": 30,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "XLE": {
@@ -593,7 +595,7 @@
     "SAE.TA": {
       "recentWinRate": 0,
       "recentAlertsCounted": 20,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "TASE.TA": {
@@ -605,7 +607,7 @@
     "YHNF.TA": {
       "recentWinRate": 0,
       "recentAlertsCounted": 11,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "CAT": {
@@ -857,13 +859,13 @@
     "MSKE.TA": {
       "recentWinRate": 0.07142857142857142,
       "recentAlertsCounted": 14,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "PAZ.TA": {
       "recentWinRate": 0,
       "recentAlertsCounted": 11,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "PHOE.TA": {
@@ -947,7 +949,7 @@
     "VCTR.TA": {
       "recentWinRate": 0,
       "recentAlertsCounted": 12,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "VRDS.TA": {
@@ -1097,7 +1099,7 @@
     "VLY": {
       "recentWinRate": 0,
       "recentAlertsCounted": 8,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "SOLS": {
@@ -1127,7 +1129,7 @@
     "NVMI": {
       "recentWinRate": 0,
       "recentAlertsCounted": 14,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "AMKR": {
@@ -1139,13 +1141,13 @@
     "AMZN": {
       "recentWinRate": 0.05,
       "recentAlertsCounted": 20,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "MS": {
       "recentWinRate": 0,
       "recentAlertsCounted": 12,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "AMD": {
@@ -1199,7 +1201,7 @@
     "NXPI": {
       "recentWinRate": 0,
       "recentAlertsCounted": 17,
-      "blacklisted": true,
+      "blacklisted": false,
       "hotStreak": false
     },
     "APH": {

@@ -22,8 +22,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const RESULTS_DIR = path.join(PROJECT_ROOT, 'results');
 
-const BLACKLIST_RATE = 0.10;   // < 10% win rate → blacklist
+const BLACKLIST_RATE = 0.10;   // < 10% win rate → eligible for blacklist
 const BLACKLIST_MIN_N = 8;
+const BLACKLIST_MAX_MEDIAN_PEAK = 0.05;  // medPeak21d < +5% AND...
+const BLACKLIST_MAX_MEDIAN_NOW = 0;      // medForwardNow ≤ 0% (only truly losing/flat tickers — slow grinders like TSM +1.7%, ASML +7% survive)
 const HOT_STREAK_RATE = 0.80;  // ≥ 80% win rate → hot streak
 const HOT_STREAK_MIN_N = 10;
 const TRAILING_N = 30;         // only count last N alerts per ticker
@@ -34,6 +36,12 @@ interface FlagWithOutcome {
     isWin: boolean;
     outcome: string;
     peak21d: number | null;
+    forwardNow: number | null;
+}
+
+function median(nums: number[]): number {
+    const sorted = [...nums].sort((a, b) => a - b);
+    return sorted.length === 0 ? 0 : sorted[Math.floor(sorted.length / 2)]!;
 }
 
 const files = fs.readdirSync(RESULTS_DIR)
@@ -65,7 +73,18 @@ for (const [ticker, arr] of byTicker) {
     const slice = arr.slice(0, TRAILING_N);
     const wins = slice.filter((x) => x.isWin).length;
     const rate = wins / slice.length;
-    const blacklisted = rate < BLACKLIST_RATE && slice.length >= BLACKLIST_MIN_N;
+    const medPeak = median(slice.map((x) => x.peak21d ?? 0));
+    const medNow = median(slice.map((x) => x.forwardNow ?? 0));
+
+    // Refined blacklist criteria (2026-05-23): low win-rate ALONE is not
+    // enough — mega-caps and slow grinders (TSM/ASML/SUN/KO) have 0% win
+    // by the +10% peak threshold but still gain money long-term (+7% now).
+    // Require both: low single-event peaks AND no long-term drift.
+    const blacklisted =
+        rate < BLACKLIST_RATE &&
+        slice.length >= BLACKLIST_MIN_N &&
+        medPeak < BLACKLIST_MAX_MEDIAN_PEAK &&
+        medNow <= BLACKLIST_MAX_MEDIAN_NOW;
     const hotStreak = rate >= HOT_STREAK_RATE && slice.length >= HOT_STREAK_MIN_N;
     if (blacklisted) blacklistedCount++;
     if (hotStreak) hotStreakCount++;
@@ -79,7 +98,11 @@ for (const [ticker, arr] of byTicker) {
 
 const out = {
     generatedAt: new Date().toISOString(),
-    config: { TRAILING_N, BLACKLIST_RATE, BLACKLIST_MIN_N, HOT_STREAK_RATE, HOT_STREAK_MIN_N },
+    config: {
+        TRAILING_N, BLACKLIST_RATE, BLACKLIST_MIN_N,
+        BLACKLIST_MAX_MEDIAN_PEAK, BLACKLIST_MAX_MEDIAN_NOW,
+        HOT_STREAK_RATE, HOT_STREAK_MIN_N,
+    },
     perTicker,
 };
 const outPath = path.join(RESULTS_DIR, 'ticker-outcomes.json');
