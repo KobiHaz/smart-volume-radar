@@ -5,7 +5,7 @@
 
 import { loadWatchlist, validateConfig, config, getSectorForTicker, fetchAndCacheWatchlist, getInvalidTickersFromWatchlist, getIndexSkippedFromWatchlist } from './config/index.js';
 import { classifyTickersWithGroq } from './services/llmSummary.js';
-import { fetchAllStocksAsOfDate, fetchMarketRegime, fetchSpy63dReturn } from './services/marketData.js';
+import { fetchAllStocksAsOfDate, fetchMarketRegime, fetchSpy63dReturn, fetchMarketHealth } from './services/marketData.js';
 import { evaluateMomentumSetup } from './utils/setup.js';
 import { applyChampionScore } from './utils/championScore.js';
 import { buildTickerStats, getTickerStats } from './utils/tickerStats.js';
@@ -121,6 +121,11 @@ async function main(): Promise<void> {
         // Market regime (bull/bear) from SPY vs SMA200 — scoped to scanDate so backtests stay honest.
         const marketRegime = await fetchMarketRegime(scanDate);
         logger.info(`🧭 Market regime: ${marketRegime.toUpperCase()} (SPY vs SMA200)`);
+        // ChampionScan-style 3-point market-health banner (display-only, gates nothing).
+        const marketHealth = await fetchMarketHealth(scanDate);
+        if (marketHealth) {
+            logger.info(`🩺 Market health: ${marketHealth.label} (${marketHealth.score}/3)`);
+        }
         const { stocks, failedTickers } = await fetchAllStocksAsOfDate(tickers, scanDate);
 
         // BUG FIX 2026-05-22 (TD-1): fetchAllStocks doesn't populate `sector` —
@@ -366,6 +371,7 @@ async function main(): Promise<void> {
             },
             graduations,
             monitorMetaByTicker,
+            marketHealth,
         });
 
         // JSON history keeps the legacy 3-path + silent set so backtest scripts still see them.

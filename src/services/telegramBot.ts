@@ -13,6 +13,7 @@ import { formatRVOL, formatPriceChange } from '../utils/formatters.js';
 // so the daily LLM commentary block never actually got sent. See decisions-log.md.
 // `classifyTickersWithGroq` (the ticker-type utility) is still imported separately in index.ts.
 import type { MonitorUpdateSummary } from './monitorTracker.js';
+import type { MarketHealth } from './marketData.js';
 
 const TELEGRAM_MAX_LENGTH = 4096;
 /** Delay between sends to avoid Telegram rate limit (429) when sending many chunks */
@@ -92,7 +93,8 @@ function formatReportHeader(
     bearish: number,
     regime: 'bull' | 'bear' | undefined,
     actionCounts: { buy: number; watch: number; caution: number },
-    topSectors?: Array<{ sector: string; rank: number; median63d: number }>
+    topSectors?: Array<{ sector: string; rank: number; median63d: number }>,
+    marketHealth?: MarketHealth | null
 ): string {
     const regimeBadge =
         regime === 'bear' ? ' | 🐻 Bear (SPY<SMA200)' : regime === 'bull' ? ' | 🐂 Bull' : '';
@@ -110,9 +112,23 @@ function formatReportHeader(
         sectorLine = `🏭 Top sectors: ${fmt}\n`;
     }
 
+    // Market-health banner (ChampionScan-style) — display-only, gates nothing.
+    let healthLine = '';
+    if (marketHealth) {
+        const bits = [
+            `${marketHealth.aboveSma200 ? '✓' : '✗'} trend`,
+            `${marketHealth.rvolActive ? '✓' : '✗'} vol`,
+            `${marketHealth.momentumUp ? '✓' : '✗'} mom`,
+        ].join(' · ');
+        healthLine =
+            `🩺 <b>Market Health:</b> ${marketHealth.emoji} ${marketHealth.label} ` +
+            `(${marketHealth.score}/3) <i>(${bits})</i>\n`;
+    }
+
     return (
         `🛰 <b>SMART VOLUME RADAR</b>\n` +
         `📅 <code>${date}</code>${regimeBadge}\n` +
+        healthLine +
         actionLine +
         sectorLine +
         `🎭 Sentiment: ${bullish} 🟢 | ${bearish} 🔴\n` +
@@ -450,7 +466,8 @@ export function formatDailyReport(
     _volumeWithoutPrice: StockData[],
     _failedTickers: string[] = [],
     graduations?: GraduationInfo[],
-    monitorMetaByTicker?: Map<string, MonitorMeta>
+    monitorMetaByTicker?: Map<string, MonitorMeta>,
+    marketHealth?: MarketHealth | null
 ): string {
     const gradSection = formatGraduationSection(graduations);
     if (topSignals.length === 0) {
@@ -508,7 +525,7 @@ export function formatDailyReport(
     }
     topSectors.sort((a, b) => a.rank - b.rank);
 
-    let message = formatReportHeader(date, bullish, bearish, regime, actionCounts, topSectors);
+    let message = formatReportHeader(date, bullish, bearish, regime, actionCounts, topSectors, marketHealth);
     if (gradSection) {
         message = gradSection + message;
     }
@@ -683,6 +700,8 @@ export interface ReportScope {
     graduations?: GraduationInfo[];
     /** Per-ticker monitor metadata (🆕/🔁N markers) — keyed by uppercase ticker. */
     monitorMetaByTicker?: Map<string, MonitorMeta>;
+    /** SPY-derived market-health banner (display-only). Omitted when fetch failed. */
+    marketHealth?: MarketHealth | null;
 }
 
 /**
@@ -775,7 +794,8 @@ export async function sendDailyReport(
         volumeWithoutPrice,
         failedTickers,
         scope?.graduations,
-        scope?.monitorMetaByTicker
+        scope?.monitorMetaByTicker,
+        scope?.marketHealth
     );
     const chunks = chunkMessage(report);
 

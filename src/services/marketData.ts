@@ -331,6 +331,64 @@ export async function fetchSpy63dReturn(asOfDate?: string): Promise<number | nul
 }
 
 /**
+ * Market-health composite (ChampionScan-style "Market Health Status" banner).
+ * Three independent SPY checks, each worth 1 point:
+ *   1. SPY ≥ its SMA200      → primary trend intact
+ *   2. SPY RVOL > 1.0        → broad participation / volume active
+ *   3. SPY 21-day return > 0 → short-window momentum positive
+ *      (the plan called for a 5-day return; return21d is the shortest window the
+ *       pipeline already computes — same directional intent, no extra fetch).
+ *
+ * Score → label: 3 → 🟢 Strong, 2 → 🟡 Neutral, 0-1 → 🔴 Weak.
+ * Display-only: this never gates any signal. Fail-open — any fetch problem
+ * returns null and the report simply omits the banner rather than guessing.
+ */
+export interface MarketHealth {
+    score: 0 | 1 | 2 | 3;
+    label: 'Strong' | 'Neutral' | 'Weak';
+    emoji: '🟢' | '🟡' | '🔴';
+    aboveSma200: boolean;
+    rvolActive: boolean;
+    momentumUp: boolean;
+    /** Mirrors fetchMarketRegime for convenience (aboveSma200 ? bull : bear). */
+    regime: 'bull' | 'bear';
+}
+
+export async function fetchMarketHealth(asOfDate?: string): Promise<MarketHealth | null> {
+    try {
+        const spy = asOfDate
+            ? await fetchYahooChartAsOfDate('SPY', asOfDate)
+            : await fetchFromYahooChart('SPY');
+        if (!spy || !spy.sma200 || spy.sma200 <= 0 || spy.lastPrice == null) return null;
+
+        const aboveSma200 = spy.lastPrice >= spy.sma200;
+        const rvolActive = (spy.projectedRvol ?? spy.rvol ?? 0) > 1.0;
+        const shortReturn = spy.return21d ?? spy.return63d ?? 0;
+        const momentumUp = shortReturn > 0;
+
+        const score = (Number(aboveSma200) + Number(rvolActive) + Number(momentumUp)) as 0 | 1 | 2 | 3;
+        const { label, emoji } =
+            score >= 3
+                ? ({ label: 'Strong', emoji: '🟢' } as const)
+                : score === 2
+                    ? ({ label: 'Neutral', emoji: '🟡' } as const)
+                    : ({ label: 'Weak', emoji: '🔴' } as const);
+
+        return {
+            score,
+            label,
+            emoji,
+            aboveSma200,
+            rvolActive,
+            momentumUp,
+            regime: aboveSma200 ? 'bull' : 'bear',
+        };
+    } catch {
+        return null;
+    }
+}
+
+/**
  * Direct fetch from Yahoo Finance chart API
  * Uses 5y range for price history; 52w high and consolidation use last 252 days
  */
