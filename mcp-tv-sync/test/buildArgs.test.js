@@ -49,3 +49,48 @@ test('WATCHLISTS lists the four canonical lists', () => {
     'Lean Radar - Near',
   ]);
 });
+
+const {
+  buildReadArgs, buildAddArgs, buildRemoveArgs,
+} = require('../src/buildArgs.js');
+
+test('buildArgs appends --file when file set', () => {
+  assert.deepEqual(buildArgs({ file: '/tmp/x.txt' }), ['--file', '/tmp/x.txt']);
+});
+
+test('buildArgs appends --prune-after-days when set', () => {
+  assert.deepEqual(buildArgs({ pruneAfterDays: 21 }), ['--prune-after-days', '21']);
+});
+
+test('buildArgs rejects non-integer pruneAfterDays', () => {
+  assert.throws(() => buildArgs({ pruneAfterDays: -1 }), /invalid pruneAfterDays/i);
+  assert.throws(() => buildArgs({ pruneAfterDays: 1.5 }), /invalid pruneAfterDays/i);
+});
+
+test('buildReadArgs maps to --read NAME', () => {
+  assert.deepEqual(buildReadArgs({ watchlist: 'Lean Radar - Near' }), ['--read', 'Lean Radar - Near']);
+});
+
+test('buildReadArgs rejects invalid/missing watchlist', () => {
+  assert.throws(() => buildReadArgs({ watchlist: 'Nope' }), /invalid watchlist/i);
+  assert.throws(() => buildReadArgs({}), /invalid watchlist/i);
+});
+
+test('buildAddArgs maps to --add NAME --symbols CSV (trimmed, upper)', () => {
+  assert.deepEqual(
+    buildAddArgs({ watchlist: 'Smart Radar - WATCH', symbols: [' nvda ', 'tsla'] }),
+    ['--add', 'Smart Radar - WATCH', '--symbols', 'NVDA,TSLA']
+  );
+});
+
+test('buildRemoveArgs maps to --remove NAME --symbols CSV', () => {
+  assert.deepEqual(
+    buildRemoveArgs({ watchlist: 'Lean Radar - Near', symbols: ['CAT'] }),
+    ['--remove', 'Lean Radar - Near', '--symbols', 'CAT']
+  );
+});
+
+test('add/remove reject empty symbols', () => {
+  assert.throws(() => buildAddArgs({ watchlist: 'Lean Radar - Near', symbols: [] }), /non-empty/i);
+  assert.throws(() => buildRemoveArgs({ watchlist: 'Lean Radar - Near', symbols: ['  '] }), /non-empty/i);
+});

@@ -8,11 +8,23 @@ const WATCHLISTS = [
   'Lean Radar - Near',
 ];
 
+function assertWatchlist(name) {
+  if (!WATCHLISTS.includes(name)) throw new Error(`invalid watchlist: ${name}`);
+}
+
+/** Normalize a symbols array → trimmed, upper-cased, non-empty. Throws if empty. */
+function normalizeSymbols(symbols) {
+  const cleaned = (Array.isArray(symbols) ? symbols : [])
+    .map((s) => String(s).trim().toUpperCase())
+    .filter((s) => s.length > 0);
+  if (cleaned.length === 0) throw new Error('symbols must be a non-empty array');
+  return cleaned;
+}
+
 /**
- * Map tv_sync tool params to `npm run tv-sync -- <flags>` arguments.
- * Pure function. Returns an argv array (no shell quoting — spawn handles that).
- * @param {{dryRun?:boolean, replace?:boolean, headed?:boolean, watchlist?:string}} params
- * @returns {string[]}
+ * Map tv_sync params to `npm run tv-sync -- <flags>`. Pure. Returns argv array.
+ * @param {{dryRun?:boolean, replace?:boolean, headed?:boolean, watchlist?:string,
+ *          file?:string, pruneAfterDays?:number}} params
  */
 function buildArgs(params = {}) {
   const args = [];
@@ -20,12 +32,35 @@ function buildArgs(params = {}) {
   if (params.replace) args.push('--replace');
   if (params.headed) args.push('--headed');
   if (params.watchlist != null && params.watchlist !== '') {
-    if (!WATCHLISTS.includes(params.watchlist)) {
-      throw new Error(`invalid watchlist: ${params.watchlist}`);
-    }
+    assertWatchlist(params.watchlist);
     args.push('--watchlist', params.watchlist);
+  }
+  if (params.file != null && params.file !== '') {
+    args.push('--file', String(params.file));
+  }
+  if (params.pruneAfterDays != null) {
+    const n = Number(params.pruneAfterDays);
+    if (!Number.isInteger(n) || n < 0) {
+      throw new Error(`invalid pruneAfterDays: ${params.pruneAfterDays}`);
+    }
+    args.push('--prune-after-days', String(n));
   }
   return args;
 }
 
-module.exports = { buildArgs, WATCHLISTS };
+function buildReadArgs(params = {}) {
+  assertWatchlist(params.watchlist);
+  return ['--read', params.watchlist];
+}
+
+function buildAddArgs(params = {}) {
+  assertWatchlist(params.watchlist);
+  return ['--add', params.watchlist, '--symbols', normalizeSymbols(params.symbols).join(',')];
+}
+
+function buildRemoveArgs(params = {}) {
+  assertWatchlist(params.watchlist);
+  return ['--remove', params.watchlist, '--symbols', normalizeSymbols(params.symbols).join(',')];
+}
+
+module.exports = { buildArgs, buildReadArgs, buildAddArgs, buildRemoveArgs, WATCHLISTS };
