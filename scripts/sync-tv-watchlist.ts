@@ -946,6 +946,7 @@ async function main() {
                 code = await runGranular(page);
             } finally {
                 await context.close().catch(() => {});
+                await browser?.close().catch(() => {});
             }
             process.exit(code);
         }

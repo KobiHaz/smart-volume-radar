@@ -110,8 +110,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [{ type: 'text', text: `${request.params.name} failed (${why}). flags: [${flags.join(' ')}]\n--- stdout ---\n${tail(result.stdout)}\n--- stderr ---\n${tail(result.stderr)}` }],
       };
     }
+    const failedAll =
+      (Array.isArray(parsed.added) && parsed.added.length === 0 && Array.isArray(parsed.failed) && parsed.failed.length > 0) ||
+      (Array.isArray(parsed.removed) && parsed.removed.length === 0 && Array.isArray(parsed.notFound) && parsed.notFound.length > 0);
     return {
-      isError: result.exitCode !== 0 || parsed.error != null,
+      isError: result.exitCode !== 0 || parsed.error != null || failedAll,
       content: [{ type: 'text', text: JSON.stringify(parsed, null, 2) }],
     };
   }
