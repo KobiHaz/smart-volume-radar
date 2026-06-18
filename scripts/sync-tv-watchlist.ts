@@ -787,6 +787,28 @@ function resolveTargetFile(t: SyncTarget): string | null {
     return null;
 }
 
+// ─── Resolve the single SyncTarget for --watchlist / --file mode ────
+// Without an explicit --file, the file + workflow come from the matching
+// DEFAULT_TARGETS entry by name (DRY) — so e.g. "Lean Radar - Near" loads
+// tv-near-latest.txt, not the tv-smart-buy default. An explicit --file
+// overrides the path verbatim (workflow still taken from the matched entry,
+// falling back to a name heuristic for unknown names).
+function resolveSingleListTask(): SyncTarget {
+    const match = DEFAULT_TARGETS.find((t) => t.name === WATCHLIST_NAME_OVERRIDE);
+    const workflowFor = (): SyncTarget['workflow'] =>
+        match?.workflow ??
+        (WATCHLIST_NAME_OVERRIDE.toLowerCase().startsWith('lean')
+            ? 'Lean Radar - Daily Scan'
+            : 'Smart Volume Radar - Daily Scan');
+
+    if (WATCHLIST_FILE_EXPLICIT) {
+        return { file: WATCHLIST_FILE_OVERRIDE, name: WATCHLIST_NAME_OVERRIDE, workflow: workflowFor() };
+    }
+    if (match) return match;
+    log(`⚠️ Unknown watchlist "${WATCHLIST_NAME_OVERRIDE}" and no --file; using default ${path.basename(WATCHLIST_FILE_OVERRIDE)}`);
+    return { file: WATCHLIST_FILE_OVERRIDE, name: WATCHLIST_NAME_OVERRIDE, workflow: workflowFor() };
+}
+
 // ─── Main ───────────────────────────────────────────────────────────
 async function main() {
     const mode = SINGLE_LIST_MODE
@@ -855,17 +877,7 @@ async function main() {
         }
 
         const tasks: SyncTarget[] = SINGLE_LIST_MODE
-            ? [
-                  {
-                      file: WATCHLIST_FILE_OVERRIDE,
-                      name: WATCHLIST_NAME_OVERRIDE,
-                      // Single-list mode: if --file is explicit, don't try artifact.
-                      // Otherwise pick the workflow by name heuristic.
-                      workflow: WATCHLIST_NAME_OVERRIDE.toLowerCase().startsWith('lean')
-                          ? 'Lean Radar - Daily Scan'
-                          : 'Smart Volume Radar - Daily Scan',
-                  },
-              ]
+            ? [resolveSingleListTask()]
             : DEFAULT_TARGETS;
 
         for (const t of tasks) {
