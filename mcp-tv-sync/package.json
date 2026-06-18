@@ -1,0 +1,17 @@
+{
+  "name": "svr-tv-sync-mcp",
+  "version": "1.0.0",
+  "description": "Local MCP wrapper around the Smart Volume Radar TradingView sync (npm run tv-sync).",
+  "main": "index.js",
+  "type": "commonjs",
+  "bin": {
+    "svr-tv-sync-mcp": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}
