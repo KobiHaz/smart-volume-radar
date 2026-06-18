@@ -7,6 +7,7 @@
  */
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const { spawn } = require('child_process');
 const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
@@ -18,9 +19,10 @@ const { buildArgs, WATCHLISTS } = require('./src/buildArgs.js');
 
 // Repo root is the parent of this MCP package directory.
 const REPO_DIR = path.resolve(__dirname, '..');
-const STATE_PATH = path.join(process.env.HOME, 'telegram-mcp', 'data', 'tv-state.json');
+const STATE_PATH = path.join(os.homedir(), 'telegram-mcp', 'data', 'tv-state.json');
 const TIMEOUT_MS = Number(process.env.TV_SYNC_TIMEOUT_MS) || 35 * 60 * 1000;
 const MAX_OUTPUT_TAIL = 4000; // chars returned from each stream
+const MAX_BUFFER = 1_000_000; // cap each stream's retained bytes (~1MB)
 
 function tail(str, n = MAX_OUTPUT_TAIL) {
   return str.length > n ? str.slice(-n) : str;
@@ -42,17 +44,30 @@ function runTvSync(flags) {
     let stderr = '';
     let timedOut = false;
 
+    let settled = false;
+    const settle = (result) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(result);
+    };
+
     const timer = setTimeout(() => {
       timedOut = true;
       child.kill('SIGKILL');
     }, TIMEOUT_MS);
 
-    child.stdout.on('data', (d) => { stdout += d.toString(); });
-    child.stderr.on('data', (d) => { stderr += d.toString(); });
+    child.stdout.on('data', (d) => {
+      stdout += d.toString();
+      if (stdout.length > MAX_BUFFER) stdout = stdout.slice(-MAX_BUFFER);
+    });
+    child.stderr.on('data', (d) => {
+      stderr += d.toString();
+      if (stderr.length > MAX_BUFFER) stderr = stderr.slice(-MAX_BUFFER);
+    });
 
     child.on('close', (code) => {
-      clearTimeout(timer);
-      resolve({
+      settle({
         exitCode: code,
         timedOut,
         stdout,
@@ -63,8 +78,7 @@ function runTvSync(flags) {
     });
 
     child.on('error', (err) => {
-      clearTimeout(timer);
-      resolve({
+      settle({
         exitCode: -1,
         timedOut,
         stdout,
@@ -145,4 +159,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 (async () => {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-})();
+})().catch((err) => {
+  process.stderr.write(`svr-tv-sync failed to start: ${err.message}\n`);
+  process.exit(1);
+});

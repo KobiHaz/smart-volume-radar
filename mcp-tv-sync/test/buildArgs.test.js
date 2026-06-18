@@ -32,6 +32,11 @@ test('flags combine in stable order: dry-run, replace, headed, watchlist', () =>
   );
 });
 
+test('null or empty watchlist is treated as absent (runs all lists)', () => {
+  assert.deepEqual(buildArgs({ watchlist: null }), []);
+  assert.deepEqual(buildArgs({ watchlist: '' }), []);
+});
+
 test('invalid watchlist throws', () => {
   assert.throws(() => buildArgs({ watchlist: 'Nope' }), /invalid watchlist/i);
 });

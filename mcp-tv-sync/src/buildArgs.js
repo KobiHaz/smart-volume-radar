@@ -19,7 +19,7 @@ function buildArgs(params = {}) {
   if (params.dryRun) args.push('--dry-run');
   if (params.replace) args.push('--replace');
   if (params.headed) args.push('--headed');
-  if (params.watchlist !== undefined) {
+  if (params.watchlist != null && params.watchlist !== '') {
     if (!WATCHLISTS.includes(params.watchlist)) {
       throw new Error(`invalid watchlist: ${params.watchlist}`);
     }
