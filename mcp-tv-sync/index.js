@@ -135,6 +135,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     } catch (err) {
       return failMsg(`could not read screenshot file ${parsed.path}: ${err.message}`);
     }
+    fs.unlink(parsed.path, () => {});
     const caption = `TradingView ${parsed.symbol}${parsed.interval ? ' @ ' + parsed.interval : ''} — ${parsed.path}`;
     return {
       isError: result.exitCode !== 0,
@@ -143,6 +144,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         { type: 'text', text: caption },
       ],
     };
+  }
+
+  if (spec.kind !== 'sync') {
+    throw new Error(`Unhandled kind '${spec.kind}' for tool ${request.params.name}`);
   }
 
   // tv_sync — full/single sync summary.
