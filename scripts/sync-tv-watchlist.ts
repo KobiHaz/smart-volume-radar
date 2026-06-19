@@ -896,9 +896,31 @@ function tvInterval(raw: string): string {
     return map[s] ?? s;
 }
 
+// Candidate selectors for the main chart area (the center layout region,
+// excluding the right watchlist panel and the left drawing toolbar). Fallback
+// chain because TradingView renames classes; first match with a sane box wins.
+const CHART_AREA_SELECTORS = [
+    '.layout__area--center',
+    'div[class*="layout__area--center"]',
+    '.chart-gui-wrapper',
+    'table.chart-markup-table',
+];
+async function chartClip(
+    page: Page
+): Promise<{ x: number; y: number; width: number; height: number } | null> {
+    for (const sel of CHART_AREA_SELECTORS) {
+        const el = await page.$(sel).catch(() => null);
+        if (!el) continue;
+        const box = await el.boundingBox().catch(() => null);
+        if (box && box.width > 200 && box.height > 200) return box;
+    }
+    return null;
+}
+
 // Assumes `page` is already logged in (caller runs navigation + login check
-// first). Navigates to the symbol on the saved layout, screenshots to a temp
-// PNG, and prints one JSON object to stdout.
+// first). Navigates to the symbol on the saved layout, screenshots just the
+// chart area (watchlist panel excluded) to a temp PNG, and prints one JSON
+// object to stdout.
 async function runScreenshot(page: Page): Promise<number> {
     let url = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(SCREENSHOT_SYMBOL)}`;
     if (SCREENSHOT_INTERVAL) url += `&interval=${encodeURIComponent(tvInterval(SCREENSHOT_INTERVAL))}`;
@@ -907,8 +929,10 @@ async function runScreenshot(page: Page): Promise<number> {
     await dismissPopups(page);
     const safe = SCREENSHOT_SYMBOL.replace(/[^a-zA-Z0-9]/g, '_');
     const out = path.join(os.tmpdir(), `svr-tv-shot-${safe}-${Date.now()}.png`);
-    await page.screenshot({ path: out, fullPage: false });
-    log(`📸 Screenshot saved: ${out}`);
+    const clip = await chartClip(page);
+    if (!clip) log('  (chart-area selector not found — full-viewport screenshot)');
+    await page.screenshot({ path: out, fullPage: false, ...(clip ? { clip } : {}) });
+    log(`📸 Screenshot saved: ${out}${clip ? ' (chart-only)' : ' (full viewport)'}`);
     console.log(JSON.stringify({
         mode: 'screenshot',
         symbol: SCREENSHOT_SYMBOL,
