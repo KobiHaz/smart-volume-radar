@@ -201,6 +201,21 @@ describe('qualifiesAsHealthyPullback', () => {
         ).toBeNull();
     });
 
+    it('passes at -26% (within widened -27 floor)', () => {
+        const r = qualifiesAsHealthyPullback(
+            makeStock({ pctFromAth: -26, lastPrice: 100, sma200: 90 })
+        );
+        expect(r).toEqual({ pctFromAth: -26 });
+    });
+
+    it('rejects just past the -27 floor (-28%)', () => {
+        expect(
+            qualifiesAsHealthyPullback(
+                makeStock({ pctFromAth: -28, lastPrice: 100, sma200: 90 })
+            )
+        ).toBeNull();
+    });
+
     it('rejects when too deep (-30%)', () => {
         expect(
             qualifiesAsHealthyPullback(

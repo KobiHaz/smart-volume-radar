@@ -14,7 +14,7 @@
  *      - RVOL ≥ 5.0 = "extreme" (gets a special tag)
  *
  *   3. HEALTHY PULLBACK (Stage 2 buy zone)
- *      - −25% ≤ pctFromAth ≤ −15%
+ *      - −27% ≤ pctFromAth ≤ −15%
  *      - lastPrice > SMA200 (filter out falling knives)
  *
  * Each detector also exposes a near-miss variant for the Silent Watchlist.
@@ -33,7 +33,11 @@ export const CONSOLIDATION_WINDOWS = [
 export const BREAKOUT_MIN_RVOL = 1.5;
 export const HIGH_VOLUME_RVOL = 3.0;
 export const EXTREME_VOLUME_RVOL = 5.0;
-export const PULLBACK_MIN_PCT = -25;
+// Floor widened -25 → -27 (2026-06-19): 5y backtest + ticker cluster-bootstrap
+// showed extending to -27 costs 0 win-rate and <1pp newHigh-within-63d, holding
+// in both bull and chop regimes. Captures slightly-deeper dips (e.g. OPCE at -26%)
+// without diluting signal quality. Do not widen past -28 (newHigh cost compounds).
+export const PULLBACK_MIN_PCT = -27;
 export const PULLBACK_MAX_PCT = -15;
 
 // Near-miss bands for Silent Watchlist
