@@ -69,7 +69,8 @@ const TOOL_DEFINITIONS = [
       type: 'object',
       properties: {
         symbol: { type: 'string', description: 'TradingView symbol, e.g. "NVDA", "AAPL", or exchange-qualified "TASE:RMLI".' },
-        interval: { type: 'string', description: 'Optional timeframe, e.g. "1D","1W","4H","60". Defaults to the saved layout\'s timeframe.' },
+        interval: { type: 'string', description: 'Optional single timeframe, e.g. "1D","1W","4H","60". Defaults to the saved layout\'s timeframe.' },
+        intervals: { type: 'array', items: { type: 'string' }, maxItems: 4, description: 'Optional multiple timeframes, e.g. ["1D","1W"]. Returns one chart image per timeframe (max 4). Takes precedence over `interval`.' },
       },
       required: ['symbol'],
       additionalProperties: false,

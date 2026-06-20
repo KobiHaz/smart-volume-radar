@@ -126,24 +126,26 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       content: [{ type: 'text', text: `${request.params.name} failed (${why}). flags: [${flags.join(' ')}]\n--- stdout ---\n${tail(result.stdout)}\n--- stderr ---\n${tail(result.stderr)}` }],
     });
     if (result.timedOut) return failMsg(`timed out after ${minutes} min`);
-    if (parsed === null || parsed.error != null || !parsed.path) {
-      return failMsg(parsed && parsed.error ? parsed.error : 'no screenshot path in result');
+    if (parsed === null || parsed.error != null || !Array.isArray(parsed.shots) || parsed.shots.length === 0) {
+      return failMsg(parsed && parsed.error ? parsed.error : 'no screenshots in result');
     }
-    let data;
-    try {
-      data = fs.readFileSync(parsed.path).toString('base64');
-    } catch (err) {
-      return failMsg(`could not read screenshot file ${parsed.path}: ${err.message}`);
+    const content = [];
+    let imageCount = 0;
+    for (const shot of parsed.shots) {
+      let data;
+      try {
+        data = fs.readFileSync(shot.path).toString('base64');
+      } catch (_) {
+        content.push({ type: 'text', text: `[warning] could not read screenshot for ${shot.interval || 'default'}` });
+        continue;
+      }
+      fs.unlink(shot.path, () => {});
+      content.push({ type: 'image', data, mimeType: 'image/png' });
+      content.push({ type: 'text', text: `TradingView ${parsed.symbol} @ ${shot.interval || 'default'}` });
+      imageCount++;
     }
-    fs.unlink(parsed.path, () => {});
-    const caption = `TradingView ${parsed.symbol}${parsed.interval ? ' @ ' + parsed.interval : ''} — ${parsed.path}`;
-    return {
-      isError: result.exitCode !== 0,
-      content: [
-        { type: 'image', data, mimeType: 'image/png' },
-        { type: 'text', text: caption },
-      ],
-    };
+    if (imageCount === 0) return failMsg('no readable screenshot files');
+    return { isError: result.exitCode !== 0, content };
   }
 
   if (spec.kind !== 'sync') {

@@ -94,6 +94,7 @@ const GRANULAR_MODE = !!(READ_LIST || ADD_LIST || REMOVE_LIST);
 // saved chart layout, capture a PNG, print its path as JSON.
 const SCREENSHOT_SYMBOL = arg('screenshot', '');
 const SCREENSHOT_INTERVAL = arg('interval', '');
+const SCREENSHOT_INTERVALS = arg('intervals', '');
 const SCREENSHOT_MODE = !!SCREENSHOT_SYMBOL;
 
 function historyPathFor(watchlistName: string): string {
@@ -917,28 +918,53 @@ async function chartClip(
     return null;
 }
 
-// Assumes `page` is already logged in (caller runs navigation + login check
-// first). Navigates to the symbol on the saved layout, screenshots just the
-// chart area (watchlist panel excluded) to a temp PNG, and prints one JSON
-// object to stdout.
-async function runScreenshot(page: Page): Promise<number> {
+// Resolve the ordered list of timeframes to capture. --intervals (CSV) wins,
+// then a single --interval, else [null] (the saved layout's default TF).
+// Capped at MAX_SHOTS so one call can't spawn unbounded browser navigations.
+const MAX_SHOTS = 4;
+function resolveScreenshotIntervals(): Array<string | null> {
+    if (SCREENSHOT_INTERVALS) {
+        const list = SCREENSHOT_INTERVALS.split(',').map((s) => s.trim()).filter((s) => s.length > 0);
+        if (list.length > MAX_SHOTS) {
+            log(`  (capping screenshot to first ${MAX_SHOTS} of ${list.length} timeframes)`);
+        }
+        if (list.length > 0) return list.slice(0, MAX_SHOTS);
+    }
+    if (SCREENSHOT_INTERVAL) return [SCREENSHOT_INTERVAL];
+    return [null];
+}
+
+// Capture one chart-only screenshot for `interval` (null = saved-layout default).
+// Assumes `page` is already logged in. Returns the temp PNG path.
+async function captureChart(page: Page, interval: string | null): Promise<string> {
     let url = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(SCREENSHOT_SYMBOL)}`;
-    if (SCREENSHOT_INTERVAL) url += `&interval=${encodeURIComponent(tvInterval(SCREENSHOT_INTERVAL))}`;
+    if (interval) url += `&interval=${encodeURIComponent(tvInterval(interval))}`;
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(6000);
     await dismissPopups(page);
     const safe = SCREENSHOT_SYMBOL.replace(/[^a-zA-Z0-9]/g, '_');
-    const out = path.join(os.tmpdir(), `svr-tv-shot-${safe}-${Date.now()}.png`);
+    const tf = interval ? interval.replace(/[^a-zA-Z0-9]/g, '') : 'def';
+    const out = path.join(os.tmpdir(), `svr-tv-shot-${safe}-${tf}-${Date.now()}.png`);
     const clip = await chartClip(page);
     if (!clip) log('  (chart-area selector not found — full-viewport screenshot)');
     await page.screenshot({ path: out, fullPage: false, ...(clip ? { clip } : {}) });
     log(`📸 Screenshot saved: ${out}${clip ? ' (chart-only)' : ' (full viewport)'}`);
-    console.log(JSON.stringify({
-        mode: 'screenshot',
-        symbol: SCREENSHOT_SYMBOL,
-        interval: SCREENSHOT_INTERVAL || null,
-        path: out,
-    }));
+    return out;
+}
+
+// Capture every resolved timeframe and print one JSON object with a `shots` array.
+async function runScreenshot(page: Page): Promise<number> {
+    const intervals = resolveScreenshotIntervals();
+    const shots: Array<{ interval: string | null; path: string }> = [];
+    for (const iv of intervals) {
+        try {
+            const out = await captureChart(page, iv);
+            shots.push({ interval: iv, path: out });
+        } catch (err) {
+            log(`  ⚠️ screenshot failed for interval ${iv ?? 'default'}: ${(err as Error).message}`);
+        }
+    }
+    console.log(JSON.stringify({ mode: 'screenshot', symbol: SCREENSHOT_SYMBOL, shots }));
     return 0;
 }
 
