@@ -82,6 +82,12 @@ const WATCHLIST_FILE_OVERRIDE = arg('file', path.join(PROJECT_ROOT, 'results', '
 
 const PRUNE_AFTER_DAYS = parseInt(arg('prune-after-days', '14'), 10);
 
+// ── Stall hardening: bounded timeouts so one hung action can't block the run ──
+const NAV_TIMEOUT_MS = 45000;             // page.goto / navigation
+const DEFAULT_ACTION_TIMEOUT_MS = 20000;  // default per Playwright action
+const PER_LIST_TIMEOUT_MS = Number(process.env.TV_PER_LIST_TIMEOUT_MS) || 3 * 60 * 1000; // cap per watchlist (×2 attempts)
+const SCROLL_DEADLINE_MS = 30000;         // readCurrentSymbols scroll loop
+
 // Granular single-operation modes (used by the MCP tools). Each opens one
 // list, performs one operation, prints a JSON result to stdout, and exits.
 const READ_LIST = arg('read', '');
@@ -520,7 +526,12 @@ async function readCurrentSymbols(page: Page): Promise<string[]> {
         const step = Math.max(100, clientHeight - 30);
         let pos = 0;
         let stagnant = 0;
+        const scrollDeadline = Date.now() + SCROLL_DEADLINE_MS;
         while (pos < scrollHeight + step) {
+            if (Date.now() > scrollDeadline) {
+                log(`  ⚠️ watchlist scroll exceeded ${Math.round(SCROLL_DEADLINE_MS / 1000)}s — using partial read`);
+                break;
+            }
             await container.evaluate((el, p) => {
                 (el as HTMLElement).scrollTop = p;
             }, pos);
@@ -942,7 +953,7 @@ function resolveScreenshotIntervals(): Array<string | null> {
 async function captureChart(page: Page, interval: string | null): Promise<string> {
     let url = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(SCREENSHOT_SYMBOL)}`;
     if (interval) url += `&interval=${encodeURIComponent(tvInterval(interval))}`;
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: NAV_TIMEOUT_MS });
     await page.waitForTimeout(6000);
     await dismissPopups(page);
     const safe = SCREENSHOT_SYMBOL.replace(/[^a-zA-Z0-9]/g, '_');
@@ -1004,11 +1015,14 @@ async function main() {
             });
         }
         const page = context.pages()[0] ?? (await context.newPage());
+        page.setDefaultTimeout(DEFAULT_ACTION_TIMEOUT_MS);
+        page.setDefaultNavigationTimeout(NAV_TIMEOUT_MS);
 
         if (LOGIN_MODE) {
             log('Opening TradingView for one-time login...');
             await page.goto('https://www.tradingview.com/#signin', {
                 waitUntil: 'domcontentloaded',
+                timeout: NAV_TIMEOUT_MS,
             });
             log(
                 '⌛ Browser is now open. Log into TradingView, then close the browser window when done.'
@@ -1027,6 +1041,7 @@ async function main() {
 
         await page.goto('https://www.tradingview.com/chart/', {
             waitUntil: 'domcontentloaded',
+            timeout: NAV_TIMEOUT_MS,
         });
         await page.waitForTimeout(5000);
         await dismissPopups(page);
@@ -1089,7 +1104,21 @@ async function main() {
                 log(`📭 "${t.name}" target is empty — clearing TV list via staleness only`);
             }
             log(`📂 ${t.name} ← ${resolvedFile}`);
-            await syncWatchlist(page, target, t.name);
+            // Bound each list: on timeout OR error, retry once, then skip and
+            // continue — a single stalled/failed list must not abort the run.
+            const runList = () =>
+                tryWithin(PER_LIST_TIMEOUT_MS, async () => {
+                    await syncWatchlist(page, target, t.name);
+                    return true;
+                });
+            let listOk = await runList();
+            if (listOk === null) {
+                log(`  ⚠️ "${t.name}" timed out/failed — retrying once...`);
+                listOk = await runList();
+            }
+            if (listOk === null) {
+                log(`  ⚠️ "${t.name}" timed out/failed twice — skipping.`);
+            }
         }
 
         const screenshotPath = path.join(
