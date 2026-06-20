@@ -49,6 +49,14 @@ test('formatDeepDive includes key fields for a found stock', () => {
   assert.match(out, /hot-streak/);        // flag shown
 });
 
+test('formatDeepDive includes monitor status when entry present', () => {
+  const stock = { ticker: 'NVDA', momentum: null, tradePlan: null };
+  const out = formatDeepDive({ symbol: 'NVDA', stock, scanDate: '2026-06-15',
+    monitorEntry: { status: 'graduated', firstAlertDate: '2026-05-01' } });
+  assert.match(out, /Monitor: graduated/);
+  assert.match(out, /since 2026-05-01/);
+});
+
 test('formatDeepDive returns a clean note when stock is missing', () => {
   const out = formatDeepDive({ symbol: 'ZZZZ', stock: null, scanDate: '2026-06-15' });
   assert.match(out, /ZZZZ/);

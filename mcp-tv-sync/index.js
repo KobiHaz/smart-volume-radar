@@ -123,6 +123,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const result = await runTvSync(flags);
   const minutes = (result.durationMs / 60000).toFixed(1);
 
+  const screenshotFailText = (why) =>
+    `${request.params.name} failed (${why}). flags: [${flags.join(' ')}]\n--- stdout ---\n${tail(result.stdout)}\n--- stderr ---\n${tail(result.stderr)}`;
+
   if (spec.kind === 'granular') {
     const parsed = result.timedOut ? null : parseGranularResult(result.stdout);
     if (parsed === null) {
@@ -143,16 +146,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   if (spec.kind === 'image') {
     const parsed = result.timedOut ? null : parseGranularResult(result.stdout);
-    const failMsg = (why) => ({
-      isError: true,
-      content: [{ type: 'text', text: `${request.params.name} failed (${why}). flags: [${flags.join(' ')}]\n--- stdout ---\n${tail(result.stdout)}\n--- stderr ---\n${tail(result.stderr)}` }],
-    });
-    if (result.timedOut) return failMsg(`timed out after ${minutes} min`);
+    if (result.timedOut) return { isError: true, content: [{ type: 'text', text: screenshotFailText(`timed out after ${minutes} min`) }] };
     if (parsed === null || parsed.error != null || !Array.isArray(parsed.shots) || parsed.shots.length === 0) {
-      return failMsg(parsed && parsed.error ? parsed.error : 'no screenshots in result');
+      return { isError: true, content: [{ type: 'text', text: screenshotFailText(parsed && parsed.error ? parsed.error : 'no screenshots in result') }] };
     }
     const { blocks, imageCount } = shotsToContent(parsed);
-    if (imageCount === 0) return failMsg('no readable screenshot files');
+    if (imageCount === 0) return { isError: true, content: [{ type: 'text', text: screenshotFailText('no readable screenshot files') }] };
     return { isError: result.exitCode !== 0, content: blocks };
   }
 
@@ -170,20 +169,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         monitorEntry: radar.loadMonitorEntry(REPO_DIR, symbol),
       });
     } catch (err) {
+      process.stderr.write(`[deepdive] radar load failed: ${err.stack || err.message}\n`);
       radarBlock = `Radar state unavailable: ${err.message}`;
     }
 
     const parsed = result.timedOut ? null : parseGranularResult(result.stdout);
-    const failMsg = (why) => ({
+    const deepFail = (why) => ({
       isError: true,
-      content: [{ type: 'text', text: `${request.params.name} failed (${why}). flags: [${flags.join(' ')}]\n--- stdout ---\n${tail(result.stdout)}\n--- stderr ---\n${tail(result.stderr)}` }],
+      content: [
+        { type: 'text', text: radarBlock },
+        { type: 'text', text: screenshotFailText(why) },
+      ],
     });
-    if (result.timedOut) return failMsg(`timed out after ${minutes} min`);
+    if (result.timedOut) return deepFail(`timed out after ${minutes} min`);
     if (parsed === null || parsed.error != null || !Array.isArray(parsed.shots) || parsed.shots.length === 0) {
-      return failMsg(parsed && parsed.error ? parsed.error : 'no screenshots in result');
+      return deepFail(parsed && parsed.error ? parsed.error : 'no screenshots in result');
     }
     const { blocks, imageCount } = shotsToContent(parsed);
-    if (imageCount === 0) return failMsg('no readable screenshot files');
+    if (imageCount === 0) return deepFail('no readable screenshot files');
     return { isError: result.exitCode !== 0, content: [{ type: 'text', text: radarBlock }, ...blocks] };
   }
 

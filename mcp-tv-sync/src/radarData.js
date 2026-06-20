@@ -40,7 +40,7 @@ function normalizeTicker(s) {
   let t = String(s).trim().toUpperCase();
   const colon = t.indexOf(':');
   if (colon >= 0) t = t.slice(colon + 1);
-  return t.replace(/\.(TA|TW|T)$/, '');
+  return t.replace(/\.(TA|TW|T)$/, ''); // .TA=Tel Aviv, .TW=Taiwan, .T=Tokyo
 }
 
 function findStock(snapshot, symbol) {
@@ -86,7 +86,7 @@ function formatDeepDive({ symbol, stock, scanDate, leanBuckets = [], monitorEntr
     (stock.entryGrade ? ` · Entry grade: ${stock.entryGrade}` : ''));
   lines.push(`• Sector: ${stock.sector ?? '—'} (rank ${stock.sectorRank ?? '—'})`);
   const m = stock.momentum;
-  if (m && m.criteria) {
+  if (m && m.criteria && typeof m.criteria === 'object' && !Array.isArray(m.criteria)) {
     const entries = Object.entries(m.criteria);
     const passed = entries.filter(([, v]) => v).map(([k]) => k);
     const failed = entries.filter(([, v]) => !v).map(([k]) => k);
