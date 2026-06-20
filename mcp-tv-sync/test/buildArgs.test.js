@@ -116,3 +116,34 @@ test('buildScreenshotArgs throws on empty/missing symbol', () => {
   assert.throws(() => buildScreenshotArgs({ symbol: '   ' }), /symbol is required/i);
   assert.throws(() => buildScreenshotArgs({}), /symbol is required/i);
 });
+
+test('buildScreenshotArgs with intervals array emits --intervals CSV', () => {
+  assert.deepEqual(
+    buildScreenshotArgs({ symbol: 'NVDA', intervals: ['1D', '1W'] }),
+    ['--screenshot', 'NVDA', '--intervals', '1D,1W']
+  );
+});
+
+test('buildScreenshotArgs intervals trims and drops empties', () => {
+  assert.deepEqual(
+    buildScreenshotArgs({ symbol: 'NVDA', intervals: [' 1D ', '', '4H'] }),
+    ['--screenshot', 'NVDA', '--intervals', '1D,4H']
+  );
+});
+
+test('buildScreenshotArgs intervals takes precedence over interval', () => {
+  assert.deepEqual(
+    buildScreenshotArgs({ symbol: 'NVDA', interval: '1W', intervals: ['1D'] }),
+    ['--screenshot', 'NVDA', '--intervals', '1D']
+  );
+});
+
+test('buildScreenshotArgs empty/all-blank intervals falls back to nothing-or-interval', () => {
+  // empty array -> ignored, no interval given -> just the symbol
+  assert.deepEqual(buildScreenshotArgs({ symbol: 'NVDA', intervals: [] }), ['--screenshot', 'NVDA']);
+  // all-blank array -> ignored, interval used
+  assert.deepEqual(
+    buildScreenshotArgs({ symbol: 'NVDA', interval: '1W', intervals: ['  '] }),
+    ['--screenshot', 'NVDA', '--interval', '1W']
+  );
+});

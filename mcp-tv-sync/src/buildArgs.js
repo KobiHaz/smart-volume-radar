@@ -67,7 +67,12 @@ function buildScreenshotArgs(params = {}) {
   const symbol = params.symbol == null ? '' : String(params.symbol).trim();
   if (symbol === '') throw new Error('symbol is required');
   const args = ['--screenshot', symbol];
-  if (params.interval != null && params.interval !== '') {
+  const list = Array.isArray(params.intervals)
+    ? params.intervals.map((s) => String(s).trim()).filter((s) => s.length > 0)
+    : [];
+  if (list.length > 0) {
+    args.push('--intervals', list.join(','));
+  } else if (params.interval != null && params.interval !== '') {
     args.push('--interval', String(params.interval));
   }
   return args;
