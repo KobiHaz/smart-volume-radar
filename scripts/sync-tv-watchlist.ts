@@ -96,6 +96,9 @@ const SCREENSHOT_SYMBOL = arg('screenshot', '');
 const SCREENSHOT_INTERVAL = arg('interval', '');
 const SCREENSHOT_INTERVALS = arg('intervals', '');
 const SCREENSHOT_MODE = !!SCREENSHOT_SYMBOL;
+// Session-health check (tv_session_status MCP tool): report whether the saved
+// profile is still logged in, as JSON, without erroring on logged-out.
+const SESSION_STATUS_MODE = has('session-status');
 
 function historyPathFor(watchlistName: string): string {
     const safe = watchlistName.replace(/[^a-zA-Z0-9-]/g, '_');
@@ -1027,6 +1030,14 @@ async function main() {
         });
         await page.waitForTimeout(5000);
         await dismissPopups(page);
+
+        if (SESSION_STATUS_MODE) {
+            const loggedIn = await isLoggedIn(page);
+            console.log(JSON.stringify({ mode: 'session-status', loggedIn, profileDir: PROFILE_DIR }));
+            await context.close().catch(() => {});
+            await browser?.close().catch(() => {});
+            process.exit(0);
+        }
 
         if (!(await isLoggedIn(page))) {
             throw new Error(

@@ -1,6 +1,6 @@
 'use strict';
 const {
-  buildArgs, buildReadArgs, buildAddArgs, buildRemoveArgs, buildScreenshotArgs, WATCHLISTS,
+  buildArgs, buildReadArgs, buildAddArgs, buildRemoveArgs, buildScreenshotArgs, buildSessionStatusArgs, WATCHLISTS,
 } = require('./buildArgs.js');
 
 const WL_REQUIRED = { type: 'string', enum: WATCHLISTS, description: 'Which watchlist to operate on.' };
@@ -92,6 +92,13 @@ const TOOL_DEFINITIONS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'tv_session_status',
+    description:
+      'Check whether the local TradingView session (saved Chromium profile) is still logged in. ' +
+      'Returns { loggedIn, profileDir }. If loggedIn is false, run `npm run tv-sync -- --login` once to re-authenticate.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+  },
 ];
 
 // name -> how to build its flags and what kind of result it returns.
@@ -102,6 +109,7 @@ const TOOL_SPECS = {
   tv_remove_symbols: { build: buildRemoveArgs, kind: 'granular' },
   tv_screenshot: { build: buildScreenshotArgs, kind: 'image' },
   tv_deep_dive: { build: buildScreenshotArgs, kind: 'deepdive' },
+  tv_session_status: { build: buildSessionStatusArgs, kind: 'granular' },
 };
 
 module.exports = { TOOL_DEFINITIONS, TOOL_SPECS };

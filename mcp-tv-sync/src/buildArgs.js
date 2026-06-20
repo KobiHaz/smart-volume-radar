@@ -78,4 +78,8 @@ function buildScreenshotArgs(params = {}) {
   return args;
 }
 
-module.exports = { buildArgs, buildReadArgs, buildAddArgs, buildRemoveArgs, buildScreenshotArgs, WATCHLISTS };
+function buildSessionStatusArgs() {
+  return ['--session-status'];
+}
+
+module.exports = { buildArgs, buildReadArgs, buildAddArgs, buildRemoveArgs, buildScreenshotArgs, buildSessionStatusArgs, WATCHLISTS };

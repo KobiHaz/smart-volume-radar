@@ -147,3 +147,9 @@ test('buildScreenshotArgs empty/all-blank intervals falls back to nothing-or-int
     ['--screenshot', 'NVDA', '--interval', '1W']
   );
 });
+
+const { buildSessionStatusArgs } = require('../src/buildArgs.js');
+
+test('buildSessionStatusArgs maps to --session-status with no params', () => {
+  assert.deepEqual(buildSessionStatusArgs(), ['--session-status']);
+});
