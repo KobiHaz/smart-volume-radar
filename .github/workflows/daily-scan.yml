@@ -39,8 +39,10 @@ jobs:
         id: scan
         env:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          # Telegram CHAT_ID intentionally omitted: the daily channel is now Lean-only.
+          # Without TELEGRAM_CHAT_ID, sendDailyReport logs a preview but does NOT send.
+          # The Smart scan still runs fully (artifacts, monitor-list commit-back, sync).
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
           # Groq is used only for ticker classification (STOCK/INDEX/ETF/BOND/OTHER)
@@ -104,7 +106,8 @@ jobs:
         continue-on-error: true
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # CHAT_ID omitted on purpose — Smart no longer posts to the Lean-only channel.
+          # Guard below is false without it, so this notice is skipped (see GitHub Actions logs).
         run: |
           if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
             MSG="🔧 Run issues detected (invalid tickers / fetch failures). Jules invoked to fix. Check GitHub Actions."
@@ -158,7 +161,8 @@ jobs:
         if: failure()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # CHAT_ID omitted on purpose — Smart no longer posts to the Lean-only channel.
+          # Failure visibility is via GitHub Actions (and GitHub's default failure email).
         run: |
           if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
             curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
