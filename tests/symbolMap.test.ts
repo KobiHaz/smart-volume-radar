@@ -1,9 +1,10 @@
 import { tvToYahoo } from '../src/services/symbolMap';
 
 describe('tvToYahoo', () => {
-    it('strips US exchange prefixes', () => {
+    it('strips US exchange prefixes (incl. OTC)', () => {
         expect(tvToYahoo('NASDAQ:NVDA')).toBe('NVDA');
         expect(tvToYahoo('NYSE:XOM')).toBe('XOM');
+        expect(tvToYahoo('OTC:SAFRF')).toBe('SAFRF');
     });
 
     it('converts US class shares to Yahoo dash form', () => {

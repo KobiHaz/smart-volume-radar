@@ -36,8 +36,8 @@ const PREFIX_TO_SUFFIX: Record<string, string> = {
     WSE: '.WA', // Warsaw
 };
 
-/** US exchanges → bare Yahoo ticker (no suffix). */
-const US_EXCHANGES = new Set(['NASDAQ', 'NYSE', 'AMEX', 'ARCA', 'NYSEARCA', 'BATS', 'CBOE']);
+/** US exchanges → bare Yahoo ticker (no suffix). OTC/Pink tickers exist on Yahoo as-is. */
+const US_EXCHANGES = new Set(['NASDAQ', 'NYSE', 'AMEX', 'ARCA', 'NYSEARCA', 'BATS', 'CBOE', 'OTC']);
 
 /**
  * EURONEXT collapses Paris/Amsterdam/Brussels/Lisbon under one TradingView prefix, so it
@@ -55,6 +55,8 @@ const EURONEXT_OVERRIDES: Record<string, string> = {
     SOI: '.PA', // Soitec — Paris
     NXI: '.PA', // Nexity — Paris
     EXA: '.PA', // Exosens — Paris
+    EXENS: '.PA', // Exosens (full ticker) — Paris
+    DSY: '.PA', // Dassault Systèmes — Paris
     AIR: '.PA',
     MC: '.PA',
     OR: '.PA',
