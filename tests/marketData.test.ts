@@ -194,6 +194,28 @@ describe('fetchAllStocks', () => {
         delete process.env.TWELVE_DATA_API_KEY;
     });
 
+    it('falls back to BA.L when BA..L fails (typo fallback)', async () => {
+        // 1. Yahoo Chart BA..L -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 2. Yahoo Chart BA--L (dot-to-dash fallback) -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 3. Twelve Data BA..L -> 404 (assuming TWELVE_DATA_API_KEY is not set for this test)
+        // 4. Yahoo Chart BA.L (typo fallback) -> success
+        mockFetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve(createYahooChartResponse('BA.L')),
+        });
+
+        const { stocks, failedTickers } = await fetchAllStocks(['BA..L']);
+        expect(stocks).toHaveLength(1);
+        expect(stocks[0].ticker).toBe('BA.L');
+        expect(failedTickers).toHaveLength(0);
+        // Calls: Yahoo(BA..L), Yahoo(BA--L), Yahoo(BA.L)
+        // (Twelve data skipped because API key is missing)
+        expect(mockFetch).toHaveBeenCalledTimes(3);
+        expect(mockFetch).toHaveBeenNthCalledWith(3, expect.stringContaining('BA.L'), expect.any(Object));
+    });
+
     it('falls back from dot to dash for Twelve Data (e.g. BRK.B -> BRK-B)', async () => {
         process.env.TWELVE_DATA_API_KEY = 'test-key';
 

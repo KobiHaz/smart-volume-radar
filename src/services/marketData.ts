@@ -28,6 +28,8 @@ import { marketSessionMinutesElapsed, projectedRvol as computeProjectedRvol } fr
 /** Common ticker typos and their correct symbols */
 const COMMON_TYPO_FALLBACKS: Record<string, string> = {
     'COBE': 'CBOE',
+    'BA..L': 'BA.L',
+    'RR..L': 'RR.L',
 };
 
 /** Options for parseYahooChartResult (e.g. replay mode skips Twelve Data) */

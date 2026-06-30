@@ -98,11 +98,11 @@ describe('parseWatchlistCsv', () => {
         const longBase = 'A'.repeat(50);
         const longSuffix = 'B'.repeat(15);
         const longTicker = `${longBase}.${longSuffix}`;
-        const csv = `Symbol,Sector\n000660.KS,Tech\n8035.T,Tech\nBA.L,Ind\nBRK-B,Fin\n^TNX,Yield\nTABANKS5.TA,Fin\nVERY-LONG-TICKER-NAME.SUFFIX,Other\nCOBE,Other\nBT.A.L,Ind\nLONGER-TICKER-NAME-UP-TO-30-CHARS.US,Tech\nAAPL.O-Q,Tech\n${longTicker},Long`;
+        const csv = `Symbol,Sector\n000660.KS,Tech\n8035.T,Tech\nBA.L,Ind\nBRK-B,Fin\n^TNX,Yield\nTABANKS5.TA,Fin\nVERY-LONG-TICKER-NAME.SUFFIX,Other\nCOBE,Other\nBT.A.L,Ind\nLONGER-TICKER-NAME-UP-TO-30-CHARS.US,Tech\nAAPL.O-Q,Tech\nSOXX/AMEX:IGV,Ind\nBA..L,Ind\n${longTicker},Long`;
         const result = parseWatchlistCsv(csv);
         expect(result.indexSkipped).toContain('^TNX');
         expect(result.indexSkipped).toContain('TABANKS5.TA');
-        expect(result.tickers).toHaveLength(10);
+        expect(result.tickers).toHaveLength(12);
         expect(result.tickers[0].symbol).toBe('000660.KS');
         expect(result.tickers[1].symbol).toBe('8035.T');
         expect(result.tickers[2].symbol).toBe('BA.L');
@@ -112,7 +112,9 @@ describe('parseWatchlistCsv', () => {
         expect(result.tickers[6].symbol).toBe('BT.A.L');
         expect(result.tickers[7].symbol).toBe('LONGER-TICKER-NAME-UP-TO-30-CHARS.US');
         expect(result.tickers[8].symbol).toBe('AAPL.O-Q');
-        expect(result.tickers[9].symbol).toBe(longTicker);
+        expect(result.tickers[9].symbol).toBe('SOXX/AMEX:IGV');
+        expect(result.tickers[10].symbol).toBe('BA..L');
+        expect(result.tickers[11].symbol).toBe(longTicker);
         expect(result.invalidSkipped).toHaveLength(0);
     });
 });
@@ -125,6 +127,9 @@ describe('isIndex', () => {
     it('returns true for known TASE indices', () => {
         expect(isIndex('TABANKS5.TA')).toBe(true);
         expect(isIndex('TA25.TA')).toBe(true);
+        expect(isIndex('TACONSTRUCTION.TA')).toBe(true);
+        expect(isIndex('TASME60.TA')).toBe(true);
+        expect(isIndex('TAINSURANCEPLUS.TA')).toBe(true);
     });
     it('returns false for stocks', () => {
         expect(isIndex('AAPL')).toBe(false);

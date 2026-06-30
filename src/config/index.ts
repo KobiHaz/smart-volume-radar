@@ -72,8 +72,8 @@ export const config = {
     } as const,
 } as const;
 
-/** Valid ticker: optional ^, 1-50 alphanumeric chars/dashes/underscores, multiple .XXXXXX exchange suffixes (e.g. BT.A.L) */
-const TICKER_REGEX = /^\^?[A-Za-z0-9_-]{1,50}(\.[A-Za-z0-9_-]{1,15})*$/;
+/** Valid ticker: optional ^, 1-50 alphanumeric chars/dashes/underscores, multiple exchange suffixes (e.g. BT.A.L, SOXX/AMEX:IGV, BA..L) */
+const TICKER_REGEX = /^\^?[A-Za-z0-9_-]{1,50}([./:]{1,3}[A-Za-z0-9_-]{0,20})*$/;
 
 /**
  * Validate ticker symbol format (prevents URL injection)
@@ -161,6 +161,9 @@ const KNOWN_INDEX_SYMBOLS = new Set([
     'TA75.TA',
     'TA90.TA',
     'TA100.TA',
+    'TACONSTRUCTION.TA',
+    'TASME60.TA',
+    'TAINSURANCEPLUS.TA',
 ].map((s) => s.toUpperCase()));
 
 /** Detect if symbol is an index (not supported – no volume for RVOL). Skip and report, do not trigger Jules. */
