@@ -30,6 +30,7 @@ const COMMON_TYPO_FALLBACKS: Record<string, string> = {
     'COBE': 'CBOE',
     'BA..L': 'BA.L',
     'RR..L': 'RR.L',
+    'BASF.MI': 'BAS.MI',
 };
 
 /** Options for parseYahooChartResult (e.g. replay mode skips Twelve Data) */

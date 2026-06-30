@@ -102,7 +102,8 @@ describe('parseWatchlistCsv', () => {
         const result = parseWatchlistCsv(csv);
         expect(result.indexSkipped).toContain('^TNX');
         expect(result.indexSkipped).toContain('TABANKS5.TA');
-        expect(result.tickers).toHaveLength(12);
+        expect(result.indexSkipped).toContain('SOXX/AMEX:IGV');
+        expect(result.tickers).toHaveLength(11); // 14 total lines - 2 indices (^TNX, TABANKS5.TA) - 1 index (SOXX/AMEX:IGV) = 11
         expect(result.tickers[0].symbol).toBe('000660.KS');
         expect(result.tickers[1].symbol).toBe('8035.T');
         expect(result.tickers[2].symbol).toBe('BA.L');
@@ -112,9 +113,8 @@ describe('parseWatchlistCsv', () => {
         expect(result.tickers[6].symbol).toBe('BT.A.L');
         expect(result.tickers[7].symbol).toBe('LONGER-TICKER-NAME-UP-TO-30-CHARS.US');
         expect(result.tickers[8].symbol).toBe('AAPL.O-Q');
-        expect(result.tickers[9].symbol).toBe('SOXX/AMEX:IGV');
-        expect(result.tickers[10].symbol).toBe('BA..L');
-        expect(result.tickers[11].symbol).toBe(longTicker);
+        expect(result.tickers[9].symbol).toBe('BA..L');
+        expect(result.tickers[10].symbol).toBe(longTicker);
         expect(result.invalidSkipped).toHaveLength(0);
     });
 });
