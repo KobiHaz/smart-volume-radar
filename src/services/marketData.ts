@@ -26,11 +26,11 @@ import {
 import { marketSessionMinutesElapsed, projectedRvol as computeProjectedRvol } from './rvolCalculator.js';
 
 /** Common ticker typos and their correct symbols */
-const COMMON_TYPO_FALLBACKS: Record<string, string> = {
-    'COBE': 'CBOE',
-    'BA..L': 'BA.L',
-    'RR..L': 'RR.L',
-    'BASF.MI': 'BAS.MI',
+const COMMON_TYPO_FALLBACKS: Record<string, string[]> = {
+    'COBE': ['CBOE'],
+    'BA..L': ['BA.L'],
+    'RR..L': ['RR.L'],
+    'BASF.MI': ['BAS.MI', 'BAS.DE'],
 };
 
 /** Options for parseYahooChartResult (e.g. replay mode skips Twelve Data) */
@@ -246,6 +246,7 @@ export async function fetchYahooChartAsOfDate(
     isFallback = false,
     attempt = 1
 ): Promise<StockData | null> {
+    const MAX_ATTEMPTS = 3;
     try {
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=5y`;
         const response = await fetch(url, {
@@ -256,8 +257,14 @@ export async function fetchYahooChartAsOfDate(
         });
 
         if (!response.ok) {
-            if (response.status === 429) {
-                logger.warn(`⚠️ Yahoo Chart (asOfDate) API rate limited for ${ticker}`);
+            if (response.status === 429 || response.status >= 500) {
+                if (attempt < MAX_ATTEMPTS) {
+                    const delay = attempt * 500;
+                    logger.warn(`⚠️ Yahoo Chart (asOfDate) API ${response.status} for ${ticker}, retrying in ${delay}ms... (attempt ${attempt}/${MAX_ATTEMPTS})`);
+                    await new Promise((resolve) => setTimeout(resolve, delay));
+                    return fetchYahooChartAsOfDate(ticker, asOfDate, isFallback, attempt + 1);
+                }
+                logger.warn(`❌ Yahoo Chart (asOfDate) API ${response.status} for ${ticker} after ${MAX_ATTEMPTS} attempts`);
             } else if (response.status === 404) {
                 if (!isFallback && ticker.includes('.')) {
                     const fallbackTicker = ticker.replace(/\./g, '-');
@@ -266,11 +273,6 @@ export async function fetchYahooChartAsOfDate(
                 }
                 logger.warn(`❌ Ticker not found on Yahoo Chart (asOfDate): ${ticker}`);
             } else {
-                if (attempt === 1) {
-                    logger.warn(`⚠️ Yahoo Chart (asOfDate) API error ${response.status} for ${ticker}, retrying...`);
-                    await new Promise((resolve) => setTimeout(resolve, 500));
-                    return fetchYahooChartAsOfDate(ticker, asOfDate, isFallback, attempt + 1);
-                }
                 logger.warn(`❌ Yahoo Chart (asOfDate) API error ${response.status} for ${ticker}`);
             }
             return null;
@@ -329,12 +331,13 @@ export async function fetchYahooChartAsOfDate(
 
         return parseYahooChartResult(sliced as YahooChartResult, ticker, { skipTwelveData: true });
     } catch (error) {
-        if (attempt === 1) {
-            logger.warn(`⚠️ Chart (asOfDate) fetch failed for ${ticker} (${(error as Error).message}), retrying...`);
-            await new Promise((resolve) => setTimeout(resolve, 500));
+        if (attempt < MAX_ATTEMPTS) {
+            const delay = attempt * 500;
+            logger.warn(`⚠️ Chart (asOfDate) fetch failed for ${ticker} (${(error as Error).message}), retrying in ${delay}ms... (attempt ${attempt}/${MAX_ATTEMPTS})`);
+            await new Promise((resolve) => setTimeout(resolve, delay));
             return fetchYahooChartAsOfDate(ticker, asOfDate, isFallback, attempt + 1);
         }
-        logger.error(`❌ Chart (asOfDate) fetch failed for ${ticker}:`, (error as Error).message);
+        logger.error(`❌ Chart (asOfDate) fetch failed for ${ticker} after ${MAX_ATTEMPTS} attempts:`, (error as Error).message);
         return null;
     }
 }
@@ -445,6 +448,7 @@ export async function fetchMarketHealth(asOfDate?: string): Promise<MarketHealth
  * Uses 5y range for price history; 52w high and consolidation use last 252 days
  */
 async function fetchFromYahooChart(ticker: string, isFallback = false, attempt = 1): Promise<StockData | null> {
+    const MAX_ATTEMPTS = 3;
     try {
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=5y`;
 
@@ -456,8 +460,14 @@ async function fetchFromYahooChart(ticker: string, isFallback = false, attempt =
         });
 
         if (!response.ok) {
-            if (response.status === 429) {
-                logger.warn(`⚠️ Yahoo Chart API rate limited for ${ticker}`);
+            if (response.status === 429 || response.status >= 500) {
+                if (attempt < MAX_ATTEMPTS) {
+                    const delay = attempt * 500;
+                    logger.warn(`⚠️ Yahoo Chart API ${response.status} for ${ticker}, retrying in ${delay}ms... (attempt ${attempt}/${MAX_ATTEMPTS})`);
+                    await new Promise((resolve) => setTimeout(resolve, delay));
+                    return fetchFromYahooChart(ticker, isFallback, attempt + 1);
+                }
+                logger.warn(`❌ Yahoo Chart API ${response.status} for ${ticker} after ${MAX_ATTEMPTS} attempts`);
             } else if (response.status === 404) {
                 if (!isFallback && ticker.includes('.')) {
                     const fallbackTicker = ticker.replace(/\./g, '-');
@@ -466,11 +476,6 @@ async function fetchFromYahooChart(ticker: string, isFallback = false, attempt =
                 }
                 logger.warn(`❌ Ticker not found on Yahoo Chart: ${ticker}`);
             } else {
-                if (attempt === 1) {
-                    logger.warn(`⚠️ Yahoo Chart API error ${response.status} for ${ticker}, retrying...`);
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    return fetchFromYahooChart(ticker, isFallback, attempt + 1);
-                }
                 logger.warn(`❌ Yahoo Chart API error ${response.status} for ${ticker}`);
             }
             return null;
@@ -491,12 +496,13 @@ async function fetchFromYahooChart(ticker: string, isFallback = false, attempt =
 
         return parseYahooChartResult(result, ticker, { skipTwelveData: false });
     } catch (error) {
-        if (attempt === 1) {
-            logger.warn(`⚠️ Chart fetch failed for ${ticker} (${(error as Error).message}), retrying...`);
-            await new Promise(resolve => setTimeout(resolve, 500));
+        if (attempt < MAX_ATTEMPTS) {
+            const delay = attempt * 500;
+            logger.warn(`⚠️ Chart fetch failed for ${ticker} (${(error as Error).message}), retrying in ${delay}ms... (attempt ${attempt}/${MAX_ATTEMPTS})`);
+            await new Promise((resolve) => setTimeout(resolve, delay));
             return fetchFromYahooChart(ticker, isFallback, attempt + 1);
         }
-        logger.error(`❌ Chart fetch failed for ${ticker}:`, (error as Error).message);
+        logger.error(`❌ Chart fetch failed for ${ticker} after ${MAX_ATTEMPTS} attempts:`, (error as Error).message);
         return null;
     }
 }
@@ -575,14 +581,21 @@ async function fetchIndicatorsFromTwelveData(
 async function fetchFromTwelveData(ticker: string, isFallback = false, attempt = 1): Promise<StockData | null> {
     const apiKey = process.env.TWELVE_DATA_API_KEY;
     if (!apiKey) return null;
+    const MAX_ATTEMPTS = 3;
 
     try {
         const url = `${TWELVE_DATA_BASE}/quote?symbol=${encodeURIComponent(ticker)}&apikey=${apiKey}`;
         const response = await fetch(url);
 
         if (!response.ok) {
-            if (response.status === 429) {
-                logger.warn(`⚠️ Twelve Data API rate limited for ${ticker}`);
+            if (response.status === 429 || response.status >= 500) {
+                if (attempt < MAX_ATTEMPTS) {
+                    const delay = attempt * 500;
+                    logger.warn(`⚠️ Twelve Data API ${response.status} for ${ticker}, retrying in ${delay}ms... (attempt ${attempt}/${MAX_ATTEMPTS})`);
+                    await new Promise((resolve) => setTimeout(resolve, delay));
+                    return fetchFromTwelveData(ticker, isFallback, attempt + 1);
+                }
+                logger.warn(`❌ Twelve Data API ${response.status} for ${ticker} after ${MAX_ATTEMPTS} attempts`);
             } else if (response.status === 404) {
                 if (!isFallback && ticker.includes('.')) {
                     const fallbackTicker = ticker.replace(/\./g, '-');
@@ -591,11 +604,6 @@ async function fetchFromTwelveData(ticker: string, isFallback = false, attempt =
                 }
                 logger.warn(`❌ Ticker not found on Twelve Data: ${ticker}`);
             } else {
-                if (attempt === 1) {
-                    logger.warn(`⚠️ Twelve Data API error ${response.status} for ${ticker}, retrying...`);
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    return fetchFromTwelveData(ticker, isFallback, attempt + 1);
-                }
                 logger.warn(`❌ Twelve Data API error ${response.status} for ${ticker}`);
             }
             return null;
@@ -657,12 +665,13 @@ async function fetchFromTwelveData(ticker: string, isFallback = false, attempt =
             tags,
         };
     } catch (error) {
-        if (attempt === 1) {
-            logger.warn(`⚠️ Twelve Data fetch failed for ${ticker} (${(error as Error).message}), retrying...`);
-            await new Promise(resolve => setTimeout(resolve, 500));
+        if (attempt < MAX_ATTEMPTS) {
+            const delay = attempt * 500;
+            logger.warn(`⚠️ Twelve Data fetch failed for ${ticker} (${(error as Error).message}), retrying in ${delay}ms... (attempt ${attempt}/${MAX_ATTEMPTS})`);
+            await new Promise((resolve) => setTimeout(resolve, delay));
             return fetchFromTwelveData(ticker, isFallback, attempt + 1);
         }
-        logger.error(`❌ Twelve Data fetch failed for ${ticker}:`, (error as Error).message);
+        logger.error(`❌ Twelve Data fetch failed for ${ticker} after ${MAX_ATTEMPTS} attempts:`, (error as Error).message);
         return null;
     }
 }
@@ -694,10 +703,15 @@ export async function fetchAllStocksAsOfDate(
             let successSource = 'Yahoo Chart (asOfDate)';
 
             if (!result && COMMON_TYPO_FALLBACKS[ticker.toUpperCase()]) {
-                const fallbackTicker = COMMON_TYPO_FALLBACKS[ticker.toUpperCase()];
-                logger.info(`🔍 Ticker ${ticker} failed, trying common typo fallback: ${fallbackTicker}`);
-                result = await fetchYahooChartAsOfDate(fallbackTicker, asOfDate);
-                if (result) result.ticker = fallbackTicker;
+                const fallbacks = COMMON_TYPO_FALLBACKS[ticker.toUpperCase()]!;
+                for (const fallbackTicker of fallbacks) {
+                    logger.info(`🔍 Ticker ${ticker} failed, trying common typo fallback: ${fallbackTicker}`);
+                    result = await fetchYahooChartAsOfDate(fallbackTicker, asOfDate);
+                    if (result) {
+                        result.ticker = fallbackTicker;
+                        break;
+                    }
+                }
             }
 
             if (result) {
@@ -758,21 +772,23 @@ export async function fetchAllStocks(tickers: string[]): Promise<FetchAllStocksR
 
         // Try common typo fallback if still no result
         if (!result && COMMON_TYPO_FALLBACKS[ticker.toUpperCase()]) {
-            const fallbackTicker = COMMON_TYPO_FALLBACKS[ticker.toUpperCase()];
-            logger.info(`🔍 Ticker ${ticker} failed, trying common typo fallback: ${fallbackTicker}`);
+            const fallbacks = COMMON_TYPO_FALLBACKS[ticker.toUpperCase()]!;
+            for (const fallbackTicker of fallbacks) {
+                logger.info(`🔍 Ticker ${ticker} failed, trying common typo fallback: ${fallbackTicker}`);
 
-            result = await fetchFromYahooChart(fallbackTicker);
-            successSource = 'Yahoo Chart (Typo Fallback)';
+                result = await fetchFromYahooChart(fallbackTicker);
+                if (result) {
+                    successSource = 'Yahoo Chart (Typo Fallback)';
+                    result.ticker = fallbackTicker;
+                    break;
+                }
 
-            if (!result) {
                 result = await fetchFromTwelveData(fallbackTicker);
-                successSource = 'Twelve Data (Typo Fallback)';
-            }
-
-            if (result) {
-                // Return result but keep original ticker for tracking if preferred,
-                // but here we update it to the correct one so future logic uses the valid symbol.
-                result.ticker = fallbackTicker;
+                if (result) {
+                    successSource = 'Twelve Data (Typo Fallback)';
+                    result.ticker = fallbackTicker;
+                    break;
+                }
             }
         }
 

@@ -216,23 +216,30 @@ describe('fetchAllStocks', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(3, expect.stringContaining('BA.L'), expect.any(Object));
     });
 
-    it('falls back to BAS.MI when BASF.MI fails (typo fallback)', async () => {
+    it('falls back to multiple options (BAS.MI then BAS.DE) when BASF.MI fails', async () => {
         // 1. Yahoo Chart BASF.MI -> 404
         mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
         // 2. Yahoo Chart BASF-MI (dot-to-dash fallback) -> 404
         mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
-        // 3. Yahoo Chart BAS.MI (typo fallback) -> success
+        // 3. Yahoo Chart BAS.MI (typo fallback 1) -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 4. Yahoo Chart BAS-MI (dot-to-dash fallback for fallback 1) -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 5. Yahoo Chart BAS.DE (typo fallback 2) -> success
         mockFetch.mockResolvedValueOnce({
             ok: true,
-            json: () => Promise.resolve(createYahooChartResponse('BAS.MI')),
+            json: () => Promise.resolve(createYahooChartResponse('BAS.DE')),
         });
 
         const { stocks, failedTickers } = await fetchAllStocks(['BASF.MI']);
         expect(stocks).toHaveLength(1);
-        expect(stocks[0].ticker).toBe('BAS.MI');
+        expect(stocks[0].ticker).toBe('BAS.DE');
         expect(failedTickers).toHaveLength(0);
-        expect(mockFetch).toHaveBeenCalledTimes(3);
+        // BASF.MI (404), BASF-MI (404), BAS.MI (404), BAS-MI (404), BAS.DE (200)
+        expect(mockFetch).toHaveBeenCalledTimes(5);
+        expect(mockFetch).toHaveBeenNthCalledWith(1, expect.stringContaining('BASF.MI'), expect.any(Object));
         expect(mockFetch).toHaveBeenNthCalledWith(3, expect.stringContaining('BAS.MI'), expect.any(Object));
+        expect(mockFetch).toHaveBeenNthCalledWith(5, expect.stringContaining('BAS.DE'), expect.any(Object));
     });
 
     it('falls back from dot to dash for Twelve Data (e.g. BRK.B -> BRK-B)', async () => {
@@ -304,13 +311,18 @@ describe('fetchYahooChartAsOfDate', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, expect.stringContaining('EMBR3-SA'), expect.any(Object));
     });
 
-    it('retries on transient errors', async () => {
+    it('retries on transient errors with backoff', async () => {
         // First call fails with 500
         mockFetch.mockResolvedValueOnce({
             ok: false,
             status: 500,
         });
-        // Second call succeeds
+        // Second call fails with 429
+        mockFetch.mockResolvedValueOnce({
+            ok: false,
+            status: 429,
+        });
+        // Third call succeeds
         const response = createYahooChartResponse('AAPL') as any;
         response.chart.result[0].timestamp = [Math.floor(Date.now() / 1000)];
         mockFetch.mockResolvedValueOnce({
@@ -320,6 +332,6 @@ describe('fetchYahooChartAsOfDate', () => {
 
         const stock = await fetchYahooChartAsOfDate('AAPL', '2026-06-30');
         expect(stock).not.toBeNull();
-        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(mockFetch).toHaveBeenCalledTimes(3);
     });
 });
