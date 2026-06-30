@@ -72,8 +72,8 @@ export const config = {
     } as const,
 } as const;
 
-/** Valid ticker: optional ^, 1-50 alphanumeric chars/dashes, multiple .XXXXXX exchange suffixes (e.g. BT.A.L) */
-const TICKER_REGEX = /^\^?[A-Za-z0-9-]{1,50}(\.[A-Za-z0-9-]{1,15})*$/;
+/** Valid ticker: optional ^, 1-50 alphanumeric chars/dashes/underscores, multiple .XXXXXX exchange suffixes (e.g. BT.A.L) */
+const TICKER_REGEX = /^\^?[A-Za-z0-9_-]{1,50}(\.[A-Za-z0-9_-]{1,15})*$/;
 
 /**
  * Validate ticker symbol format (prevents URL injection)
@@ -147,7 +147,20 @@ export interface ParseWatchlistResult {
 
 /** Known index symbols (Yahoo ^, TASE indices). RVOL not applicable – no volume. */
 const KNOWN_INDEX_SYMBOLS = new Set([
-    'TABANKS5.TA', 'TA25.TA', 'TA35.TA', 'TA125.TA', 'TA50.TA', 'TA75.TA', 'TA90.TA', 'TA100.TA',
+    'TA-BANKS.TA',
+    'TA-25.TA',
+    'TA-35.TA',
+    'TA-125.TA',
+    'TA-90.TA',
+    'TA-75.TA',
+    'TABANKS5.TA',
+    'TA25.TA',
+    'TA35.TA',
+    'TA125.TA',
+    'TA50.TA',
+    'TA75.TA',
+    'TA90.TA',
+    'TA100.TA',
 ].map((s) => s.toUpperCase()));
 
 /** Detect if symbol is an index (not supported – no volume for RVOL). Skip and report, do not trigger Jules. */
