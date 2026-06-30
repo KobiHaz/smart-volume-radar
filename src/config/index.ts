@@ -164,6 +164,7 @@ const KNOWN_INDEX_SYMBOLS = new Set([
     'TACONSTRUCTION.TA',
     'TASME60.TA',
     'TAINSURANCEPLUS.TA',
+    'SOXX/AMEX:IGV',
 ].map((s) => s.toUpperCase()));
 
 /** Detect if symbol is an index (not supported – no volume for RVOL). Skip and report, do not trigger Jules. */

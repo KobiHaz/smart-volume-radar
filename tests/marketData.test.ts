@@ -216,6 +216,25 @@ describe('fetchAllStocks', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(3, expect.stringContaining('BA.L'), expect.any(Object));
     });
 
+    it('falls back to BAS.MI when BASF.MI fails (typo fallback)', async () => {
+        // 1. Yahoo Chart BASF.MI -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 2. Yahoo Chart BASF-MI (dot-to-dash fallback) -> 404
+        mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 3. Yahoo Chart BAS.MI (typo fallback) -> success
+        mockFetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve(createYahooChartResponse('BAS.MI')),
+        });
+
+        const { stocks, failedTickers } = await fetchAllStocks(['BASF.MI']);
+        expect(stocks).toHaveLength(1);
+        expect(stocks[0].ticker).toBe('BAS.MI');
+        expect(failedTickers).toHaveLength(0);
+        expect(mockFetch).toHaveBeenCalledTimes(3);
+        expect(mockFetch).toHaveBeenNthCalledWith(3, expect.stringContaining('BAS.MI'), expect.any(Object));
+    });
+
     it('falls back from dot to dash for Twelve Data (e.g. BRK.B -> BRK-B)', async () => {
         process.env.TWELVE_DATA_API_KEY = 'test-key';
 
