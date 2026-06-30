@@ -87,10 +87,12 @@ export function tvToYahoo(tvSymbol: string): string | null {
     if (US_EXCHANGES.has(exchange)) {
         return base.replace(/\./g, '-'); // BRK.B → BRK-B
     }
+    // For suffix exchanges, strip a trailing dot so LSE "BA." → "BA" → "BA.L" (not "BA..L").
+    const suffixBase = base.replace(/\.$/, '');
     if (exchange === 'EURONEXT') {
         const suffix = EURONEXT_OVERRIDES[base.toUpperCase()];
-        return suffix ? `${base}${suffix}` : null;
+        return suffix ? `${suffixBase}${suffix}` : null;
     }
     const suffix = PREFIX_TO_SUFFIX[exchange];
-    return suffix ? `${base}${suffix}` : null;
+    return suffix ? `${suffixBase}${suffix}` : null;
 }

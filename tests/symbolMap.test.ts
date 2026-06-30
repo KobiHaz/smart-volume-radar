@@ -19,6 +19,11 @@ describe('tvToYahoo', () => {
         expect(tvToYahoo('SET:KIOXIA23')).toBe('KIOXIA23.BK');
     });
 
+    it('strips a trailing dot on LSE tickers (BA. → BA.L, not BA..L)', () => {
+        expect(tvToYahoo('LSE:BA.')).toBe('BA.L');
+        expect(tvToYahoo('LSE:RR.')).toBe('RR.L');
+    });
+
     it('resolves known EURONEXT symbols via the override table', () => {
         expect(tvToYahoo('EURONEXT:ASML')).toBe('ASML.AS');
         expect(tvToYahoo('EURONEXT:AIR')).toBe('AIR.PA');
