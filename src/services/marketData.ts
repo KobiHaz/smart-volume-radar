@@ -770,9 +770,13 @@ export async function fetchAllStocksAsOfDate(
             let result = await fetchYahooChartAsOfDate(ticker, asOfDate);
             let successSource = 'Yahoo Chart (asOfDate)';
 
-            // Try Twelve Data as fallback (no asOfDate support; only for today's scan)
-            const todayUtc = new Date().toISOString().slice(0, 10);
-            if (!result && asOfDate === todayUtc) {
+            // Try Twelve Data as fallback (no asOfDate support; only for recent scans)
+            const asOfTs = new Date(asOfDate).getTime();
+            const nowTs = Date.now();
+            const daysDiff = (nowTs - asOfTs) / (1000 * 60 * 60 * 24);
+            const isRecent = daysDiff <= 3; // within 3 days
+
+            if (!result && isRecent) {
                 result = await fetchFromTwelveData(ticker);
                 if (result) successSource = 'Twelve Data (Fallback)';
             }
@@ -790,7 +794,7 @@ export async function fetchAllStocksAsOfDate(
                         break;
                     }
 
-                    if (asOfDate === todayUtc) {
+                    if (isRecent) {
                         result = await fetchFromTwelveData(fallbackTicker);
                         if (result) {
                             successSource = 'Twelve Data (Typo Fallback)';
@@ -815,7 +819,7 @@ export async function fetchAllStocksAsOfDate(
                 logger.info(`✅ ${ticker}: RVOL=${formatRVOL(result.rvol)} (${successSource})`);
                 return { ticker, data: result };
             }
-            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data) as of ${asOfDate}. Check for typos, exchange suffixes (e.g., .L, .SA), or delistings.`);
+            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data) as of ${asOfDate}. Check for typos, exchange suffixes (e.g. .L, .SA, .TA), or format differences (e.g. BRK-B vs BRK.B).`);
             return { ticker, data: null };
         })
     );
@@ -888,7 +892,7 @@ export async function fetchAllStocks(tickers: string[]): Promise<FetchAllStocksR
             logger.info(`✅ ${ticker}: RVOL=${formatRVOL(result.rvol)} (${successSource})`);
             return { ticker, data: result };
         } else {
-            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data). Check for typos (e.g. COBE vs CBOE), if the symbol is delisted, or if it requires a specific exchange suffix (e.g. .L, .TA) or format (e.g. BRK-B vs BRK.B).`);
+            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data). Check for typos (e.g. COBE vs CBOE), exchange suffixes (e.g. .L, .SA, .TA), or format differences (e.g. BRK-B vs BRK.B).`);
             return { ticker, data: null };
         }
     }));

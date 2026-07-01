@@ -313,6 +313,55 @@ describe('fetchAllStocks', () => {
 
         delete process.env.TWELVE_DATA_API_KEY;
     });
+
+    it('allows Twelve Data fallback for recent asOfDate (within 3 days)', async () => {
+        process.env.TWELVE_DATA_API_KEY = 'test-key';
+
+        // Mock current time to be stable for test
+        const originalDateNow = Date.now;
+        const mockNow = new Date('2026-07-01T12:00:00Z').getTime();
+        Date.now = jest.fn(() => mockNow);
+
+        // Yesterday's date
+        const recentDate = '2026-06-30';
+
+        // 1. Yahoo fails x10 (original + dash fallback)
+        for (let i = 0; i < 10; i++) mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+
+        // 2. Twelve Data succeeds
+        mockFetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+                status: 'ok',
+                close: '15.00',
+                volume: '500000',
+                percent_change: '2.5',
+            }),
+        });
+        // Indicators
+        mockFetch.mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({ status: 'ok', values: [] }),
+        });
+
+        const { stocks } = await fetchAllStocksAsOfDate(['EMBR3.SA'], recentDate);
+
+        expect(stocks).toHaveLength(1);
+        expect(stocks[0].ticker).toBe('EMBR3.SA');
+
+        // Verify Twelve Data was called
+        let twelveDataCalled = false;
+        for (let i = 0; i < mockFetch.mock.calls.length; i++) {
+            if (mockFetch.mock.calls[i][0].includes('twelvedata')) {
+                twelveDataCalled = true;
+                break;
+            }
+        }
+        expect(twelveDataCalled).toBe(true);
+
+        Date.now = originalDateNow;
+        delete process.env.TWELVE_DATA_API_KEY;
+    });
 });
 
 describe('fetchYahooChartAsOfDate', () => {
