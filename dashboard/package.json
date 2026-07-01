@@ -1,0 +1,21 @@
+{
+  "name": "lean-dashboard",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "seed": "tsx scripts/seed.ts",
+    "dev": "wrangler pages dev public --d1 DB",
+    "deploy": "wrangler pages deploy public"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240000.0",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "wrangler": "^3.60.0"
+  }
+}
