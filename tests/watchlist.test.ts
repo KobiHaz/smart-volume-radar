@@ -120,12 +120,13 @@ describe('parseWatchlistCsv', () => {
     });
 
     it('accepts specific reported tickers like 000660.KS, 8035.T, and BA.L', () => {
-        const csv = 'Symbol\n000660.KS\n8035.T\nBA.L';
+        const csv = 'Symbol\n000660.KS\n8035.T\nBA.L\nEMBR3';
         const result = parseWatchlistCsv(csv);
-        expect(result.tickers).toHaveLength(3);
+        expect(result.tickers).toHaveLength(4);
         expect(result.tickers[0].symbol).toBe('000660.KS');
         expect(result.tickers[1].symbol).toBe('8035.T');
         expect(result.tickers[2].symbol).toBe('BA.L');
+        expect(result.tickers[3].symbol).toBe('EMBR3');
         expect(result.invalidSkipped).toHaveLength(0);
     });
 });

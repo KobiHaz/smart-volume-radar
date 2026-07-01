@@ -31,7 +31,7 @@ const COMMON_TYPO_FALLBACKS: Record<string, string[]> = {
     'BA..L': ['BA.L'],
     'RR..L': ['RR.L'],
     'BASF.MI': ['BAS.MI', 'BAS.DE'],
-    'EMBR3.SA': ['ERJ'],
+    'EMBR3.SA': ['ERJ', 'EMBR3'],
 };
 
 /** Options for parseYahooChartResult (e.g. replay mode skips Twelve Data) */

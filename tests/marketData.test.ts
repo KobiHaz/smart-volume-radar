@@ -540,6 +540,39 @@ describe('fetchAllStocksAsOfDate', () => {
         delete process.env.TWELVE_DATA_API_KEY;
     });
 
+    it('iterates through multiple common typo fallbacks (e.g., EMBR3.SA -> ERJ -> EMBR3)', async () => {
+        const todayUtc = new Date().toISOString().slice(0, 10);
+
+        // 1. Yahoo(EMBR3.SA)x5 -> 404
+        for (let i = 0; i < 5; i++) mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+        // 2. Yahoo(EMBR3-SA)x5 (fallback) -> 404
+        for (let i = 0; i < 5; i++) mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+
+        // 3. Typo fallback 1: ERJ
+        // Yahoo(ERJ)x5 -> 404
+        for (let i = 0; i < 5; i++) mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+
+        // 4. Typo fallback 2: EMBR3
+        // Yahoo(EMBR3) -> Success
+        const response = createYahooChartResponse('EMBR3') as any;
+        response.chart.result[0].timestamp = [Date.parse(todayUtc + 'T12:00:00Z') / 1000];
+        mockFetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve(response),
+        });
+
+        const { stocks, failedTickers } = await fetchAllStocksAsOfDate(['EMBR3.SA'], todayUtc);
+        expect(stocks).toHaveLength(1);
+        expect(stocks[0].ticker).toBe('EMBR3.SA'); // Mapped back to original
+        expect(failedTickers).toHaveLength(0);
+
+        // Total Yahoo calls: 5 (EMBR3.SA) + 5 (EMBR3-SA) + 5 (ERJ) + 1 (EMBR3) = 16
+        expect(mockFetch).toHaveBeenCalledTimes(16);
+        expect(mockFetch).toHaveBeenNthCalledWith(1, expect.stringContaining('EMBR3.SA'), expect.any(Object));
+        expect(mockFetch).toHaveBeenNthCalledWith(11, expect.stringContaining('ERJ'), expect.any(Object));
+        expect(mockFetch).toHaveBeenNthCalledWith(16, expect.stringContaining('EMBR3'), expect.any(Object));
+    });
+
     it('skips Twelve Data fallback for historical asOfDate', async () => {
         process.env.TWELVE_DATA_API_KEY = 'test-key';
         const historicalDate = '2020-01-01';
@@ -554,9 +587,9 @@ describe('fetchAllStocksAsOfDate', () => {
 
         expect(stocks).toHaveLength(0);
         expect(failedTickers).toContain('EMBR3.SA');
-        // Total Yahoo calls: 10 (EMBR3.SA) + 5 (ERJ) = 15. No Twelve Data calls.
-        expect(mockFetch).toHaveBeenCalledTimes(15);
-        for (let i = 1; i <= 15; i++) {
+        // Total Yahoo calls: 10 (EMBR3.SA) + 5 (ERJ) + 5 (EMBR3) = 20. No Twelve Data calls.
+        expect(mockFetch).toHaveBeenCalledTimes(20);
+        for (let i = 1; i <= 20; i++) {
             expect(mockFetch.mock.calls[i-1][0]).not.toContain('twelvedata');
         }
 
