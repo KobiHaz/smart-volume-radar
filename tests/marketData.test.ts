@@ -362,6 +362,30 @@ describe('fetchAllStocks', () => {
         Date.now = originalDateNow;
         delete process.env.TWELVE_DATA_API_KEY;
     });
+
+    it('logs enhanced warning with .T and .KS suffixes when fetchAllStocks fails', async () => {
+        mockFetch.mockResolvedValue({ ok: false, status: 404 });
+        const warnSpy = jest.spyOn(logger, 'warn');
+
+        await fetchAllStocks(['FAIL']);
+
+        expect(warnSpy).toHaveBeenCalledWith(
+            expect.stringContaining('exchange suffixes (e.g. .L, .SA, .TA, .T, .KS)')
+        );
+        warnSpy.mockRestore();
+    });
+
+    it('logs enhanced warning with .T and .KS suffixes when fetchAllStocksAsOfDate fails', async () => {
+        mockFetch.mockResolvedValue({ ok: false, status: 404 });
+        const warnSpy = jest.spyOn(logger, 'warn');
+
+        await fetchAllStocksAsOfDate(['FAIL'], '2026-06-30');
+
+        expect(warnSpy).toHaveBeenCalledWith(
+            expect.stringContaining('exchange suffixes (e.g. .L, .SA, .TA, .T, .KS)')
+        );
+        warnSpy.mockRestore();
+    });
 });
 
 describe('fetchYahooChartAsOfDate', () => {

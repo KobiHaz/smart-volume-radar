@@ -819,7 +819,7 @@ export async function fetchAllStocksAsOfDate(
                 logger.info(`✅ ${ticker}: RVOL=${formatRVOL(result.rvol)} (${successSource})`);
                 return { ticker, data: result };
             }
-            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data) as of ${asOfDate}. Check for typos, exchange suffixes (e.g. .L, .SA, .TA), or format differences (e.g. BRK-B vs BRK.B).`);
+            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data) as of ${asOfDate}. Check for typos, exchange suffixes (e.g. .L, .SA, .TA, .T, .KS), or format differences (e.g. BRK-B vs BRK.B).`);
             return { ticker, data: null };
         })
     );
@@ -892,7 +892,7 @@ export async function fetchAllStocks(tickers: string[]): Promise<FetchAllStocksR
             logger.info(`✅ ${ticker}: RVOL=${formatRVOL(result.rvol)} (${successSource})`);
             return { ticker, data: result };
         } else {
-            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data). Check for typos (e.g. COBE vs CBOE), exchange suffixes (e.g. .L, .SA, .TA), or format differences (e.g. BRK-B vs BRK.B).`);
+            logger.warn(`❌ ${ticker}: No data from any source (Yahoo or Twelve Data). Check for typos (e.g. COBE vs CBOE), exchange suffixes (e.g. .L, .SA, .TA, .T, .KS), or format differences (e.g. BRK-B vs BRK.B).`);
             return { ticker, data: null };
         }
     }));
