@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🪶 Lean Radar Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+  <header>
+    <h1>🪶 Lean Radar</h1>
+    <div id="day-picker"></div>
+  </header>
+  <section id="cards"></section>
+  <section id="chart-wrap"><canvas id="dist-chart" height="90"></canvas></section>
+  <section id="controls">
+    <input id="search" placeholder="חיפוש טיקר…">
+    <select id="f-region"><option value="">כל האזורים</option><option>US</option><option>TASE</option><option>Foreign</option></select>
+    <select id="f-signal"><option value="">כל הסיגנלים</option><option>breakout</option><option>highVolume</option><option>pullback</option><option>nearBreakout</option><option>nearHighVol</option><option>nearPullback</option></select>
+    <label><input type="checkbox" id="f-stage2"> Stage2 בלבד</label>
+  </section>
+  <table id="grid"><thead></thead><tbody></tbody></table>
+  <aside id="deepdive" hidden></aside>
+  <script src="app.js"></script>
+</body>
+</html>

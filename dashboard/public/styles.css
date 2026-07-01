@@ -1,0 +1,17 @@
+:root{--ink:#1a1a1a;--line:#e2e2e2;--head:#1F3864;--accent:#0b6;}
+*{box-sizing:border-box}
+body{direction:rtl;font-family:Arial,"Arial Hebrew",sans-serif;color:var(--ink);margin:0;padding:16px;background:#fafafa}
+header{display:flex;justify-content:space-between;align-items:center}
+#cards{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;text-align:center;min-width:90px}
+.card .big{font-size:1.5rem;font-weight:700;display:block}
+.card small{color:#666}
+#controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+#controls input,#controls select{padding:6px 8px;border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;background:#fff;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;cursor:default}
+th{background:var(--head);color:#fff;cursor:pointer;position:sticky;top:0}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:#eef}
+#deepdive{position:fixed;inset-inline-end:0;top:0;height:100%;width:320px;background:#fff;border-inline-start:2px solid var(--head);padding:18px;overflow:auto;box-shadow:-4px 0 12px rgba(0,0,0,.08)}
+#chart-wrap{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;margin:10px 0}
