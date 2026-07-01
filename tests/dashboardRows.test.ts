@@ -1,5 +1,6 @@
 import { regionOf, isETFSector } from '../src/lean/dashboardRows.js';
 import { scoreRow } from '../src/lean/dashboardRows.js';
+import { rowsFromLeanResult } from '../src/lean/dashboardRows.js';
 
 const base = {
   scanDate: '2026-06-29', ticker: 'X', region: 'US' as const, sector: 'Semis',
@@ -43,5 +44,35 @@ describe('scoreRow', () => {
     const s = scoreRow({ ...base, signal: 'pullback', rvol: 0, sector: 'ETF - US' });
     // 40 + 0 + 0 - 12 = 28
     expect(s).toBe(28);
+  });
+});
+
+function stub(ticker: string, over: any = {}) {
+  return { ticker, sector: 'Semis', rvol: 2, pctFromAth: -20, priceChange: 1,
+           lastPrice: 100, sma50: 110, sma200: 90, ...over };
+}
+
+describe('rowsFromLeanResult', () => {
+  it('maps each category to a Row with the right signal + dist_pivot', () => {
+    const result: any = {
+      consolidationBreakouts: [{ stock: stub('MNST', { lastPrice: 120, sma50: 100, sma200: 90 }), signal: { window: '1M', windowHigh: 119 } }],
+      highVolume: [{ stock: stub('CTRA'), signal: { level: 'extreme' } }],
+      pullbacks: [{ stock: stub('ARM'), signal: { pctFromAth: -22 } }],
+      nearConsolidation: [{ stock: stub('REG'), signal: { window: '1M', windowHigh: 81, distanceToPivotPct: 0.6 } }],
+      nearVolume: [{ stock: stub('FOO'), signal: { rvol: 2.7 } }],
+      nearPullback: [{ stock: stub('BAR'), signal: { pctFromAth: -13 } }],
+    };
+    const rows = rowsFromLeanResult('2026-06-29', result);
+    const by = Object.fromEntries(rows.map((r) => [r.ticker, r]));
+    expect(by.MNST.signal).toBe('breakout');
+    expect(by.MNST.distPivot).toBe(0);
+    expect(by.MNST.stage2).toBe(1);            // 120>100>90
+    expect(by.CTRA.signal).toBe('highVolume');
+    expect(by.REG.signal).toBe('nearBreakout');
+    expect(by.REG.distPivot).toBe(0.6);
+    expect(by.FOO.signal).toBe('nearHighVol');
+    expect(by.BAR.signal).toBe('nearPullback');
+    expect(by.ARM.scanDate).toBe('2026-06-29');
+    expect(typeof by.ARM.score).toBe('number');
   });
 });
