@@ -7,6 +7,10 @@ describe('buildSignalsQuery', () => {
     expect(q.sql).toMatch(/scan_date = \(SELECT MAX\(scan_date\) FROM lean_signals\)/);
     expect(q.params).toEqual([]);
   });
+  it('selects the signals + signal_count columns', () => {
+    const q = buildSignalsQuery({});
+    expect(q.sql).toMatch(/signals,signal_count/);
+  });
   it('filters by date range', () => {
     const q = buildSignalsQuery({ from: '2026-06-01', to: '2026-06-29' });
     expect(q.sql).toMatch(/scan_date BETWEEN \? AND \?/);

@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS lean_signals (
   region      TEXT,
   sector      TEXT,
   signal      TEXT NOT NULL,
+  signals       TEXT,
+  signal_count  INTEGER,
   rvol        REAL,
   ath_pct     REAL,
   day_pct     REAL,
