@@ -28,6 +28,7 @@ import {
     qualifiesAsVolumeNearMiss,
     qualifiesAsHealthyPullback,
     qualifiesAsPullbackNearMiss,
+    passesLeaderGate,
 } from './lean/signals.js';
 import { formatLeanReport, type LeanScanResult } from './lean/format.js';
 import { attachGraduated } from './lean/graduates.js';
@@ -161,7 +162,7 @@ async function main(): Promise<void> {
                 if (nearV) result.nearVolume.push({ stock, signal: nearV });
             }
             const pb = qualifiesAsHealthyPullback(stock);
-            if (pb) {
+            if (pb && ohlc && passesLeaderGate(stock, ohlc.closes)) {
                 result.pullbacks.push({ stock, signal: pb });
             } else {
                 const nearP = qualifiesAsPullbackNearMiss(stock);

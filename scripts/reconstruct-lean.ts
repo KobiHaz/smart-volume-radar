@@ -37,6 +37,7 @@ import {
     qualifiesAsVolumeNearMiss,
     qualifiesAsHealthyPullback,
     qualifiesAsPullbackNearMiss,
+    passesLeaderGate,
     isStage2,
 } from '../src/lean/signals.js';
 import type { StockData } from '../src/types/index.js';
@@ -183,7 +184,8 @@ async function main() {
             const nearBreakout = breakout ? null : detectConsolidationNearMiss(stock, closes, highs, lows);
             const highVol = qualifiesAsHighVolume(stock);
             const nearHighVol = highVol ? null : qualifiesAsVolumeNearMiss(stock);
-            const pullback = qualifiesAsHealthyPullback(stock);
+            const rawPb = qualifiesAsHealthyPullback(stock);
+            const pullback = rawPb && passesLeaderGate(stock, closes) ? rawPb : null;
             const nearPullback = pullback ? null : qualifiesAsPullbackNearMiss(stock);
 
             // Collect ALL matched signals for this (ticker, day).

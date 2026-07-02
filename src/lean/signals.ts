@@ -33,7 +33,7 @@ export const CONSOLIDATION_WINDOWS = [
 export const BREAKOUT_MIN_RVOL = 1.5;
 export const HIGH_VOLUME_RVOL = 3.0;
 export const EXTREME_VOLUME_RVOL = 5.0;
-export const PULLBACK_MIN_PCT = -25;
+export const PULLBACK_MIN_PCT = -30; // deepened per 2026-07-02 signal-efficacy study
 export const PULLBACK_MAX_PCT = -15;
 
 // Near-miss bands for Silent Watchlist
@@ -87,6 +87,26 @@ export function isStage2(stock: StockData): boolean {
         stock.lastPrice > stock.sma50 &&
         stock.sma50 > stock.sma200
     );
+}
+
+// ─── Momentum-leader gate (2026-07-02 study: pullback + Stage2 + RS + volume) ──
+export const LEADER_RVOL_MIN = 1.2;
+export const LEADER_MOM63_MIN = 20; // % 63-trading-day momentum (relative strength)
+
+/** 63-trading-day price momentum in %, or null if history too short. */
+export function momentum63(closes: number[]): number | null {
+    if (closes.length < 64) return null;
+    const now = closes[closes.length - 1]!;
+    const then = closes[closes.length - 1 - 63]!;
+    return then > 0 ? (now / then - 1) * 100 : null;
+}
+
+/** Momentum-leader quality gate: Stage 2 uptrend + volume + strong 63d RS. */
+export function passesLeaderGate(stock: StockData, closes: number[]): boolean {
+    if (!isStage2(stock)) return false;
+    if ((stock.rvol ?? 0) < LEADER_RVOL_MIN) return false;
+    const m = momentum63(closes);
+    return m != null && m >= LEADER_MOM63_MIN;
 }
 
 // ─── Window range helper ──────────────────────────────────────────────
