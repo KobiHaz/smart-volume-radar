@@ -18,6 +18,24 @@
       <span class="brand-name">Lean Radar</span>
     </div>
 
+    <!-- View tabs -->
+    <nav class="header-tabs" role="tablist" aria-label="תפריט ראשי">
+      <button
+        class="header-tab header-tab--active"
+        id="tab-signals"
+        role="tab"
+        aria-selected="true"
+        aria-controls="view-signals"
+      >📡 סיגנלים</button>
+      <button
+        class="header-tab"
+        id="tab-explainer"
+        role="tab"
+        aria-selected="false"
+        aria-controls="view-explainer"
+      >❓ איך זה עובד</button>
+    </nav>
+
     <!-- Date picker control group -->
     <div class="date-picker-group">
       <button
@@ -71,8 +89,9 @@
   </header>
 
   <!-- ════════════════════════════════════════
-       SUMMARY SECTION: cards + chart
+       SIGNALS VIEW (default)
   ════════════════════════════════════════ -->
+  <div id="view-signals" role="tabpanel" aria-labelledby="tab-signals">
   <main>
     <section class="summary-section" aria-label="סיכום יומי">
       <div class="summary-cards" id="cards" role="list"></div>
@@ -118,6 +137,10 @@
         <input type="checkbox" id="f-grad">
         <span>🎓 Grad בלבד</span>
       </label>
+      <label class="ctrl-checkbox" for="f-near">
+        <input type="checkbox" id="f-near">
+        <span>⏳ הצג רשימת מעקב שקטה</span>
+      </label>
       <span class="ctrl-count" id="row-count" aria-live="polite" aria-atomic="true"></span>
     </section>
 
@@ -139,6 +162,165 @@
     <!-- loading / empty states -->
     <div class="state-msg" id="state-msg" hidden></div>
   </main>
+  </div><!-- /view-signals -->
+
+  <!-- ════════════════════════════════════════
+       HOW IT WORKS VIEW
+  ════════════════════════════════════════ -->
+  <div id="view-explainer" role="tabpanel" aria-labelledby="tab-explainer" hidden>
+    <article class="explainer" aria-label="איך זה עובד">
+
+      <header class="explainer-hero">
+        <h1 class="explainer-title">איך Lean Radar עובד?</h1>
+        <p class="explainer-subtitle">מקור הדאטה, הלוגיקה מאחורי כל סיגנל, הציון, ותובנות חוצות-ימים — הכל כאן.</p>
+      </header>
+
+      <!-- Pipeline -->
+      <section class="explainer-section" aria-labelledby="ex-pipeline">
+        <h2 class="explainer-h2" id="ex-pipeline">🔄 מקור הדאטה והצינור</h2>
+        <p class="explainer-prose">
+          <strong>Yahoo Finance</strong> (נרות יומיים) ← <strong>GitHub Actions</strong> מריץ את ה-Lean Radar כל יום מסחר
+          ← כותב את הסיגנלים ל-<strong>Cloudflare D1</strong> ← הדאשבורד קורא משם בזמן אמת.
+        </p>
+      </section>
+
+      <!-- Signals -->
+      <section class="explainer-section" aria-labelledby="ex-signals">
+        <h2 class="explainer-h2" id="ex-signals">📡 הסיגנלים</h2>
+        <div class="explainer-cards">
+
+          <div class="explainer-card explainer-card--pullback">
+            <div class="explainer-card-head">
+              <span class="explainer-card-icon" aria-hidden="true">📉</span>
+              <h3 class="explainer-card-title">Pullback — הסיגנל המרכזי</h3>
+              <span class="explainer-card-badge">Alpha</span>
+            </div>
+            <p class="explainer-card-body">
+              מנייה שירדה <strong>15–30%</strong> מהשיא אך נשארה במגמת-עלייה, ועברה את "שער מוביל המומנטום":
+            </p>
+            <ul class="explainer-card-list">
+              <li><strong>Stage 2</strong> — מחיר &gt; SMA50 &gt; SMA200</li>
+              <li><strong>מומנטום 3 חודשים</strong> מעל +20% (RS / עוצמה יחסית)</li>
+              <li><strong>RVOL</strong> מעל 1.2</li>
+            </ul>
+            <p class="explainer-card-note">כלומר: מוביל שוק שנח לרגע. ~2–10 ביום.</p>
+          </div>
+
+          <div class="explainer-card explainer-card--highvol">
+            <div class="explainer-card-head">
+              <span class="explainer-card-icon" aria-hidden="true">🔥</span>
+              <h3 class="explainer-card-title">High Volume</h3>
+            </div>
+            <p class="explainer-card-body">
+              מחזור חריג: <strong>RVOL ≥ 3</strong>, קיצוני <strong>≥ 5</strong>.
+              "משהו קורה" — לא תמיד ברור מה, אבל שווה לשים לב.
+            </p>
+          </div>
+
+          <div class="explainer-card explainer-card--breakout">
+            <div class="explainer-card-head">
+              <span class="explainer-card-icon" aria-hidden="true">📈</span>
+              <h3 class="explainer-card-title">Breakout</h3>
+              <span class="explainer-card-badge explainer-card-badge--warn">Edge שלילי</span>
+            </div>
+            <p class="explainer-card-body">
+              פריצת בסיס. במחקר הגיבוי, לסיגנל זה יש <strong>edge שלילי</strong> — תשואה מתחת ל-baseline,
+              וכמעט אף פעם לא מהלך גדול. מוצג במשקל נמוך בציון.
+            </p>
+          </div>
+
+          <div class="explainer-card explainer-card--near">
+            <div class="explainer-card-head">
+              <span class="explainer-card-icon" aria-hidden="true">⏳</span>
+              <h3 class="explainer-card-title">Near — רשימת מעקב שקטה</h3>
+            </div>
+            <p class="explainer-card-body">
+              כמעט-סיגנל: המנייה קרובה לסף אך לא עברה אותו עדיין.
+              <strong>מוסתר כברירת מחדל</strong> — פחות actionable, נועד למעקב בלבד.
+              ניתן להציג דרך הצ'קבוקס בסרגל הסינון.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Score -->
+      <section class="explainer-section" aria-labelledby="ex-score">
+        <h2 class="explainer-h2" id="ex-score">🎯 ציון ה-Confluence</h2>
+        <p class="explainer-prose">הציון מורכב ממספר רכיבים:</p>
+        <div class="explainer-score-grid">
+          <div class="explainer-score-item explainer-score-item--pos">
+            <span class="explainer-score-label">בסיס לפי סיגנל</span>
+            <span class="explainer-score-detail">Pullback 50 · High Vol 35 · Breakout 12 (לפי מחקר התשואות)</span>
+          </div>
+          <div class="explainer-score-item explainer-score-item--pos">
+            <span class="explainer-score-label">נפח + Stage 2 + קרבה לפיבוט</span>
+            <span class="explainer-score-detail">בונוסים לאיכות הסיגנל</span>
+          </div>
+          <div class="explainer-score-item explainer-score-item--pos">
+            <span class="explainer-score-label">בונוס Confluence</span>
+            <span class="explainer-score-detail">+12 לכל סיגנל נוסף שהמנייה עונה עליו</span>
+          </div>
+          <div class="explainer-score-item explainer-score-item--neg">
+            <span class="explainer-score-label">ענישה</span>
+            <span class="explainer-score-detail">Climax (נפח גבוה ביום יורד) · ETF · ירידה עמוקה מדי</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cross-day insights -->
+      <section class="explainer-section" aria-labelledby="ex-crossday">
+        <h2 class="explainer-h2" id="ex-crossday">📅 תובנות חוצות-ימים</h2>
+        <div class="explainer-cards explainer-cards--row">
+          <div class="explainer-insight-card">
+            <span class="explainer-insight-icon" aria-hidden="true">🎓</span>
+            <div>
+              <strong>Graduation</strong>
+              <p>מנייה שעברה מ"כמעט-סיגנל" לסיגנל אמיתי ביום הבא — הקוהורט האיכותי. גבול זהב בטבלה.</p>
+            </div>
+          </div>
+          <div class="explainer-insight-card">
+            <span class="explainer-insight-icon" aria-hidden="true">📅</span>
+            <div>
+              <strong>Streak</strong>
+              <p>כמה ימים ברצף המנייה מופיעה על הראדאר — מנייה עקבית היא סיגנל בפני עצמו.</p>
+            </div>
+          </div>
+          <div class="explainer-insight-card">
+            <span class="explainer-insight-icon" aria-hidden="true">📈</span>
+            <div>
+              <strong>Score Momentum</strong>
+              <p>שינוי הציון מול אתמול (▲/▼). מנייה שציונה עולה מיום ליום שווה תשומת-לב.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Research calibration -->
+      <section class="explainer-section" aria-labelledby="ex-research">
+        <h2 class="explainer-h2" id="ex-research">🔬 הכיול — למה זה ככה?</h2>
+        <p class="explainer-prose">
+          מחקר על <strong>401 מניות</strong> (שנתיים, 130k+ תצפיות) מדד תשואה עתידית אחרי כל סיגנל:
+        </p>
+        <div class="explainer-research-grid">
+          <div class="explainer-research-card explainer-research-card--win">
+            <div class="explainer-research-header">📉 Pullback</div>
+            <div class="explainer-research-stat">+12% חציון</div>
+            <div class="explainer-research-detail">ל-3 חודשים · 77% הצלחה · פי-3 מעל ה-baseline</div>
+          </div>
+          <div class="explainer-research-card explainer-research-card--lose">
+            <div class="explainer-research-header">📈 Breakout</div>
+            <div class="explainer-research-stat">Edge שלילי</div>
+            <div class="explainer-research-detail">מתחת ל-baseline · כמעט אף מהלך גדול · אומת Out-of-Sample</div>
+          </div>
+        </div>
+        <p class="explainer-prose explainer-prose--note">
+          לכן: שער מוביל-מומנטום על ה-pullback, והורדת משקל ה-breakout בציון.
+        </p>
+      </section>
+
+    </article>
+  </div><!-- /view-explainer -->
 
   <!-- ════════════════════════════════════════
        DEEP-DIVE PANEL

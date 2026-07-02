@@ -52,6 +52,8 @@ let chart = null;
 /** Calendar view state: which month/year the popover is currently showing */
 let calViewYear  = 0;
 let calViewMonth = 0; // 0-11
+/** Whether to include near-* rows (silent watchlist). Off by default. */
+let showNear = false;
 
 /* ─── DOM helpers ─────────────────────────────────────────────────────────── */
 
@@ -465,6 +467,15 @@ function renderChart() {
 
 /* ─── Filtering / sorting ─────────────────────────────────────────────────── */
 
+/**
+ * Returns true if the row's primary signal is a "near" (silent watchlist) tier.
+ * @param {object} r
+ * @returns {boolean}
+ */
+function isNearRow(r) {
+  return (r.signal || '').startsWith('near');
+}
+
 function visibleRows() {
   const q    = ($('#search').value || '').trim().toUpperCase();
   const reg  = $('#f-region').value;
@@ -473,6 +484,11 @@ function visibleRows() {
   const grad = $('#f-grad').checked;
 
   const filtered = allRows.filter((r) => {
+    // Near-tier filter: hide near-* rows unless showNear is on OR the user
+    // explicitly selected a near signal from the dropdown.
+    const nearExplicit = sig.startsWith('near');
+    if (!showNear && !nearExplicit && isNearRow(r)) return false;
+
     if (q    && !(r.ticker || '').toUpperCase().includes(q)) return false;
     if (reg  && r.region !== reg)   return false;
     if (sig  && r.signal !== sig)   return false;
@@ -519,7 +535,10 @@ function renderTable() {
   renderHead();
 
   const vr = visibleRows();
-  $('#row-count').textContent = `${vr.length} שורות`;
+  const total = allRows.length;
+  $('#row-count').textContent = vr.length === total
+    ? `${vr.length} שורות`
+    : `${vr.length} מוצגות מתוך ${total}`;
   showState(vr.length === 0 ? 'אין תוצאות לסינון הנוכחי' : null);
 
   /* — desktop table — */
@@ -745,6 +764,24 @@ function updateHeaderMeta() {
   $('#header-meta').textContent = `${s.total} סיגנלים · Score≥70: ${s.score70 ?? 0}`;
 }
 
+/* ─── Tab switching ───────────────────────────────────────────────────────── */
+
+/**
+ * Switch between the signals view and the explainer view.
+ * @param {'signals'|'explainer'} name
+ */
+function switchTab(name) {
+  const tabs  = ['signals', 'explainer'];
+  for (const t of tabs) {
+    const btn  = $(`#tab-${t}`);
+    const view = $(`#view-${t}`);
+    const active = t === name;
+    btn.classList.toggle('header-tab--active', active);
+    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    view.hidden = !active;
+  }
+}
+
 /* ─── Boot ────────────────────────────────────────────────────────────────── */
 
 async function boot() {
@@ -752,6 +789,16 @@ async function boot() {
   ['#search', '#f-region', '#f-signal', '#f-stage2', '#f-grad'].forEach((sel) =>
     $(sel).addEventListener('input', renderTable)
   );
+
+  // Near-tier watchlist toggle
+  $('#f-near').addEventListener('change', () => {
+    showNear = $('#f-near').checked;
+    renderTable();
+  });
+
+  // Tab navigation: signals ↔ explainer
+  $('#tab-signals').addEventListener('click', () => switchTab('signals'));
+  $('#tab-explainer').addEventListener('click', () => switchTab('explainer'));
 
   // Calendar popover — open/close
   $('#btn-date-picker').addEventListener('click', (e) => {
