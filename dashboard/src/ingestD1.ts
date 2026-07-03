@@ -9,7 +9,8 @@ export interface Batch { sql: string; params: unknown[]; }
 
 const COLS = '(scan_date,ticker,region,sector,signal,signals,signal_count,rvol,ath_pct,day_pct,stage2,dist_pivot,score,price)';
 
-export function buildUpsertBatches(rows: Row[], batchSize = 100): Batch[] {
+// batchSize 7: D1 caps at 100 bound params/query; 14 cols × 7 = 98.
+export function buildUpsertBatches(rows: Row[], batchSize = 7): Batch[] {
   const batches: Batch[] = [];
   for (let i = 0; i < rows.length; i += batchSize) {
     const slice = rows.slice(i, i + batchSize);
