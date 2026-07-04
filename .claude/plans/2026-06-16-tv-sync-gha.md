@@ -79,7 +79,7 @@ In the `"scripts"` block, add after the existing `"tv-sync"` line:
 - [ ] **Step 3: Run the export and set the secret**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 npx tsx scripts/export-tv-cookies.ts | pbcopy
 ```
 
@@ -97,7 +97,7 @@ Expected output: `TV_COOKIES  Updated <today>`
 - [ ] **Step 4: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add scripts/export-tv-cookies.ts package.json
 git commit -m "feat: add export-tv-cookies helper for GHA secret setup"
 ```
@@ -192,7 +192,7 @@ Replace with:
 - [ ] **Step 4: Verify TypeScript compiles**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 npx tsc --noEmit
 ```
 
@@ -315,7 +315,7 @@ jobs:
 - [ ] **Step 2: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add .github/workflows/tv-sync.yml
 git commit -m "feat: add tv-sync GitHub Actions workflow (replaces LaunchAgent)"
 ```
@@ -327,7 +327,7 @@ git commit -m "feat: add tv-sync GitHub Actions workflow (replaces LaunchAgent)"
 - [ ] **Step 1: Push to origin**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git push origin main
 ```
 
@@ -376,7 +376,7 @@ Keep the plist file (don't delete) — reload with `launchctl load` if you ever 
 >
 > **Interim workaround:** Run `git pull` in the smart-volume-radar repo on the Mac periodically — the health-check will pick up the committed `results/tv-state.json` if you symlink it:
 > ```bash
-> ln -sf ~/Documents/Claude/Projects/smart-volume-radar-engine/results/tv-state.json \
+> ln -sf ~/smart-volume-radar-engine/results/tv-state.json \
 >        ~/telegram-mcp/data/tv-state.json
 > ```
 

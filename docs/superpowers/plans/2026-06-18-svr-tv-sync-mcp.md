@@ -8,7 +8,7 @@
 
 **Tech Stack:** Node.js 24 (CommonJS), `@modelcontextprotocol/sdk` ^1.29 (low-level `Server` API, mirroring `~/telegram-mcp`), Node built-in test runner (`node --test`).
 
-All paths below are relative to the repo root: `~/Documents/Claude/Projects/smart-volume-radar-engine`.
+All paths below are relative to the repo root: `~/smart-volume-radar-engine`.
 
 ---
 
@@ -59,13 +59,13 @@ Create `mcp-tv-sync/package.json`:
 
 - [ ] **Step 2: Install dependencies**
 
-Run: `cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync && npm install`
+Run: `cd ~/smart-volume-radar-engine/mcp-tv-sync && npm install`
 Expected: creates `node_modules/` and `package-lock.json`, exits 0.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/package.json mcp-tv-sync/package-lock.json
 git commit -m "chore(tv-sync-mcp): scaffold MCP package"
 ```
@@ -133,7 +133,7 @@ test('WATCHLISTS lists the four canonical lists', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync && npm test`
+Run: `cd ~/smart-volume-radar-engine/mcp-tv-sync && npm test`
 Expected: FAIL — `Cannot find module '../src/buildArgs.js'`.
 
 - [ ] **Step 3: Write minimal implementation**
@@ -176,13 +176,13 @@ module.exports = { buildArgs, WATCHLISTS };
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync && npm test`
+Run: `cd ~/smart-volume-radar-engine/mcp-tv-sync && npm test`
 Expected: PASS — all 8 tests pass.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/src/buildArgs.js mcp-tv-sync/test/buildArgs.test.js
 git commit -m "feat(tv-sync-mcp): pure buildArgs param->flag mapping with tests"
 ```
@@ -355,7 +355,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 Run:
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync
+cd ~/smart-volume-radar-engine/mcp-tv-sync
 printf '%s\n%s\n' \
   '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}' \
   '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
@@ -366,7 +366,7 @@ Expected: two JSON-RPC response lines on stdout; the second contains `"name":"tv
 - [ ] **Step 3: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/index.js
 git commit -m "feat(tv-sync-mcp): stdio server exposing tv_sync tool with outer timeout"
 ```
@@ -416,7 +416,7 @@ This writes a `.mcp.json` entry in the repo. Reload Claude Code to pick it up.
 
 Run:
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 claude mcp add svr-tv-sync --scope project -- node mcp-tv-sync/index.js
 claude mcp list
 ```
@@ -425,7 +425,7 @@ Expected: `claude mcp list` shows `svr-tv-sync`. A `.mcp.json` appears in the re
 - [ ] **Step 3: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/README.md .mcp.json
 git commit -m "docs(tv-sync-mcp): README + project-scoped registration"
 ```
@@ -440,7 +440,7 @@ This is the acceptance gate from the spec — proves the MCP behaves like today.
 
 Run:
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 npm run tv-sync -- --dry-run 2>&1 | tee /tmp/tv-baseline.txt
 ```
 Expected: completes, prints the per-watchlist add/remove diff, exits 0. Note the diff lines.

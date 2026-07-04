@@ -8,7 +8,7 @@
 
 **Tech Stack:** Node.js 24 (CommonJS), `@modelcontextprotocol/sdk` ^1.29, `node --test`.
 
-Repo root: `~/Documents/Claude/Projects/smart-volume-radar-engine`. Branch: `feat/tv-deep-dive`.
+Repo root: `~/smart-volume-radar-engine`. Branch: `feat/tv-deep-dive`.
 
 ---
 
@@ -92,7 +92,7 @@ test('formatDeepDive returns a clean note when stock is missing', () => {
 
 - [ ] **Step 2: Run tests — verify they fail**
 
-Run: `cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync && npm test`
+Run: `cd ~/smart-volume-radar-engine/mcp-tv-sync && npm test`
 Expected: FAIL — `Cannot find module '../src/radarData.js'`.
 
 - [ ] **Step 3: Create `mcp-tv-sync/src/radarData.js`**
@@ -218,13 +218,13 @@ module.exports = {
 
 - [ ] **Step 4: Run tests — verify all pass**
 
-Run: `cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync && npm test`
+Run: `cd ~/smart-volume-radar-engine/mcp-tv-sync && npm test`
 Expected: PASS — existing buildArgs tests plus the new radarData tests.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/src/radarData.js mcp-tv-sync/test/radarData.test.js
 git commit -m "feat(tv-sync-mcp): radarData module — load snapshots + format radar state"
 ```
@@ -357,7 +357,7 @@ In `mcp-tv-sync/index.js`, immediately AFTER the `if (spec.kind === 'image') { .
 
 Run:
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync
+cd ~/smart-volume-radar-engine/mcp-tv-sync
 npm test
 printf '%s\n%s\n' \
   '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}' \
@@ -369,7 +369,7 @@ Expected: `npm test` passes (all buildArgs + radarData tests); tools/list shows 
 - [ ] **Step 6: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/src/tools.js mcp-tv-sync/index.js
 git commit -m "feat(tv-sync-mcp): tv_deep_dive tool (chart + radar state); shotsToContent helper"
 ```

@@ -36,7 +36,7 @@ timeout/retry (see memory `tv-sync-stall-incident`).
 ## Architecture
 
 A small **stdio MCP server** living inside the repo at
-`~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync/`, with its own
+`~/smart-volume-radar-engine/mcp-tv-sync/`, with its own
 `package.json` so its `@modelcontextprotocol/sdk` dependency stays isolated from
 the main project's deps. It mirrors the existing `~/telegram-mcp` conventions:
 CommonJS, `index.js` entry, `@modelcontextprotocol/sdk` ^1.29.

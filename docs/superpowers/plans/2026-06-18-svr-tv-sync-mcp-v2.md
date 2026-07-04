@@ -8,7 +8,7 @@
 
 **Tech Stack:** Node.js 24 (CommonJS), `@modelcontextprotocol/sdk` ^1.29, `node --test`; the script is TypeScript run via `tsx`.
 
-Repo root: `~/Documents/Claude/Projects/smart-volume-radar-engine`. Branch: `feat/tv-sync-mcp-v2`.
+Repo root: `~/smart-volume-radar-engine`. Branch: `feat/tv-sync-mcp-v2`.
 
 ---
 
@@ -84,7 +84,7 @@ test('add/remove reject empty symbols', () => {
 
 - [ ] **Step 2: Run tests — verify they fail**
 
-Run: `cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync && npm test`
+Run: `cd ~/smart-volume-radar-engine/mcp-tv-sync && npm test`
 Expected: FAIL — `buildReadArgs is not a function` (and the file/prune assertions fail).
 
 - [ ] **Step 3: Rewrite `src/buildArgs.js`**
@@ -162,13 +162,13 @@ module.exports = { buildArgs, buildReadArgs, buildAddArgs, buildRemoveArgs, WATC
 
 - [ ] **Step 4: Run tests — verify all pass**
 
-Run: `cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync && npm test`
+Run: `cd ~/smart-volume-radar-engine/mcp-tv-sync && npm test`
 Expected: PASS — the original v1 tests plus the new ones (19 total).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/src/buildArgs.js mcp-tv-sync/test/buildArgs.test.js
 git commit -m "feat(tv-sync-mcp): arg-builders for read/add/remove + file/prune-after-days"
 ```
@@ -314,7 +314,7 @@ Insert the granular branch BETWEEN the `}` closing the `isLoggedIn` check and th
 
 Run:
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 npm run tv-sync -- --read "Lean Radar - Near" 2>/dev/null
 ```
 Expected: a single JSON line on stdout, e.g.
@@ -324,7 +324,7 @@ No TypeScript errors. (stderr carries the verbose log; `2>/dev/null` hides it.)
 - [ ] **Step 5: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add scripts/sync-tv-watchlist.ts
 git commit -m "feat(tv-sync): --read/--add/--remove granular modes emitting JSON on stdout"
 ```
@@ -567,7 +567,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 Run:
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync
+cd ~/smart-volume-radar-engine/mcp-tv-sync
 npm test
 printf '%s\n%s\n' \
   '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}' \
@@ -579,7 +579,7 @@ Expected: `npm test` passes; tools/list returns four tools — `tv_sync`, `tv_re
 - [ ] **Step 4: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/src/tools.js mcp-tv-sync/index.js
 git commit -m "feat(tv-sync-mcp): 4-tool surface (read/add/remove + extended tv_sync) via tools.js dispatch"
 ```

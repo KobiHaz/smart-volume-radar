@@ -3,7 +3,7 @@
 ## Context
 Add a **Stage 2 Momentum Breakout** scoring layer to the scanner (Intel / AMKR / MXL pattern). The existing tag system (SMA21 Touch / Pullback 15% / 1M Breakout) and entry-path system (green / pullback / sma21) keep working unchanged — momentum is an **additive orthogonal scoring layer**. Telegram and stored results are extended, not replaced.
 
-**Project root:** `~/Documents/Claude/Projects/smart-volume-radar-engine`
+**Project root:** `~/smart-volume-radar-engine`
 
 ## Discovery findings that shaped this plan
 - `setup.ts` did not previously exist — we are creating it.

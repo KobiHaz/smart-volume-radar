@@ -35,14 +35,14 @@ If the request is ambiguous, ask ONE clarifying question. Otherwise proceed.
 ### 1. Locate data
 ```bash
 # Smart Radar scan snapshots
-ls ~/Documents/Claude/Projects/smart-volume-radar-engine/results/scan-*.json | sort | tail -90
+ls ~/smart-volume-radar-engine/results/scan-*.json | sort | tail -90
 
 # Lean Radar snapshots (if testing Lean changes)
-ls ~/Documents/Claude/Projects/smart-volume-radar-engine/results/lean-*.json | sort | tail -90
+ls ~/smart-volume-radar-engine/results/lean-*.json | sort | tail -90
 
 # Monitor list (alert state machine — contains every Full/Recovery/Close firing
 # across history with their resolved status + outcome price)
-cat ~/Documents/Claude/Projects/smart-volume-radar-engine/results/monitor-list.json
+cat ~/smart-volume-radar-engine/results/monitor-list.json
 ```
 
 ### 2. Pick the right analysis script for the change

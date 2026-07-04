@@ -34,7 +34,7 @@ launch Claude from:
 
 ```bash
 claude mcp add svr-tv-sync --scope project -- \
-  node /Users/kobihazout/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync/index.js
+  node /Users/kobihazout/smart-volume-radar-engine/mcp-tv-sync/index.js
 ```
 
 `--scope project` writes a `.mcp.json` entry scoped to the current project.

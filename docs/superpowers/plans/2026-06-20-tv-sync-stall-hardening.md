@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript via `tsx`, Playwright ^1.60.
 
-Repo root: `~/Documents/Claude/Projects/smart-volume-radar-engine`. Branch: `feat/tv-sync-stall-hardening`. All edits in `scripts/sync-tv-watchlist.ts`.
+Repo root: `~/smart-volume-radar-engine`. Branch: `feat/tv-sync-stall-hardening`. All edits in `scripts/sync-tv-watchlist.ts`.
 
 ---
 
@@ -138,7 +138,7 @@ Replace with:
 
 Run:
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 npm run tv-sync -- --dry-run 2>&1 | grep -E "SYNCING|to add|stale|Target|Error|error TS|timed out|skipping" | head -40
 ```
 Expected: no TypeScript errors; the four lists scan and print their normal diffs exactly as before (no "timed out/skipping" lines under normal load). This proves no regression.
@@ -146,7 +146,7 @@ Expected: no TypeScript errors; the four lists scan and print their normal diffs
 - [ ] **Step 7: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add scripts/sync-tv-watchlist.ts
 git commit -m "feat(tv-sync): stall hardening — explicit timeouts, per-list bounded retry, scroll deadline"
 ```
@@ -161,7 +161,7 @@ Prove the retry/skip path fires and the run still completes.
 
 Run (1-second per-list cap forces every list to "time out"):
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 TV_PER_LIST_TIMEOUT_MS=1000 npm run tv-sync -- --dry-run 2>&1 | grep -E "SYNCING|retrying once|skipping|Screenshot saved|Error" | head -40
 ```
 Expected: each list logs `⚠️ "<name>" timed out/failed — retrying once...` then `⚠️ "<name>" timed out/failed twice — skipping.`, the loop proceeds through all four lists, and the run reaches the end (screenshot saved) and exits 0 — i.e. a per-list stall no longer hangs or aborts the run.

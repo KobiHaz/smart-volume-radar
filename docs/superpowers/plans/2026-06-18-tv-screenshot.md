@@ -8,7 +8,7 @@
 
 **Tech Stack:** Node.js 24 (CommonJS), `@modelcontextprotocol/sdk` ^1.29, `node --test`; the script is TypeScript via `tsx` with Playwright.
 
-Repo root: `~/Documents/Claude/Projects/smart-volume-radar-engine`. Branch: `feat/tv-screenshot`.
+Repo root: `~/smart-volume-radar-engine`. Branch: `feat/tv-screenshot`.
 
 ---
 
@@ -61,7 +61,7 @@ test('buildScreenshotArgs throws on empty/missing symbol', () => {
 
 - [ ] **Step 2: Run tests — verify they fail**
 
-Run: `cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync && npm test`
+Run: `cd ~/smart-volume-radar-engine/mcp-tv-sync && npm test`
 Expected: FAIL — `buildScreenshotArgs is not a function`.
 
 - [ ] **Step 3: Add the builder + export**
@@ -94,13 +94,13 @@ module.exports = { buildArgs, buildReadArgs, buildAddArgs, buildRemoveArgs, buil
 
 - [ ] **Step 4: Run tests — verify all pass**
 
-Run: `cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync && npm test`
+Run: `cd ~/smart-volume-radar-engine/mcp-tv-sync && npm test`
 Expected: PASS — the existing tests plus the 4 new ones (21 total).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/src/buildArgs.js mcp-tv-sync/test/buildArgs.test.js
 git commit -m "feat(tv-sync-mcp): buildScreenshotArgs for tv_screenshot tool"
 ```
@@ -236,7 +236,7 @@ Insert the screenshot branch BETWEEN the granular branch's closing `}` and the `
 
 Run:
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 npm run tv-sync -- --screenshot "NVDA" 2>/dev/null
 ```
 Expected: one JSON line on stdout like
@@ -250,7 +250,7 @@ Expected: a PNG file, tens-to-hundreds of KB. (This is a read-only browser nav +
 - [ ] **Step 5: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add scripts/sync-tv-watchlist.ts
 git commit -m "feat(tv-sync): --screenshot mode captures a symbol's chart to a temp PNG"
 ```
@@ -439,7 +439,7 @@ Replace that whole block with (adds the `image` kind; granular logic unchanged b
 
 Run:
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine/mcp-tv-sync
+cd ~/smart-volume-radar-engine/mcp-tv-sync
 npm test
 printf '%s\n%s\n' \
   '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}' \
@@ -451,7 +451,7 @@ Expected: `npm test` passes (21 tests); tools/list returns five tools including 
 - [ ] **Step 4: Commit**
 
 ```bash
-cd ~/Documents/Claude/Projects/smart-volume-radar-engine
+cd ~/smart-volume-radar-engine
 git add mcp-tv-sync/src/tools.js mcp-tv-sync/index.js
 git commit -m "feat(tv-sync-mcp): tv_screenshot tool returning chart PNG as image content"
 ```
