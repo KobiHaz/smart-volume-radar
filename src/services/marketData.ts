@@ -557,6 +557,12 @@ interface TwelveDataIndicatorResponse {
     values?: Array<{ rsi?: string; sma?: string; datetime?: string }>;
 }
 
+/** Twelve Data time_series (OHLCV history) response. */
+interface TwelveDataTimeSeriesResponse {
+    status?: string;
+    values?: Array<{ datetime?: string; close?: string }>;
+}
+
 /** Twelve Data quote/price response. Includes both success + error variants. */
 interface TwelveDataQuoteResponse {
     status?: 'ok' | 'error';
@@ -606,6 +612,33 @@ async function fetchIndicatorsFromTwelveData(
         // Silently fall back to calculated values
     }
     return result;
+}
+
+/**
+ * Fetch the trailing daily close series from Twelve Data (up to ~1 year).
+ * Returned ascending (oldest → newest) so the last element is the most recent
+ * close, matching the Yahoo `closes` convention. Used to compute a CLOSE-BASED
+ * 52-week high — the same definition as the primary Yahoo path — rather than
+ * relying on the provider's intraday `fifty_two_week.high`. Returns [] on failure.
+ */
+async function fetchClosesFromTwelveData(
+    ticker: string,
+    apiKey: string
+): Promise<number[]> {
+    try {
+        const encodedTicker = encodeURIComponent(ticker);
+        const res = await fetch(
+            `${TWELVE_DATA_BASE}/time_series?symbol=${encodedTicker}&interval=1day&outputsize=252&order=ASC&apikey=${apiKey}`
+        );
+        const data = (await res.json()) as TwelveDataTimeSeriesResponse;
+        if (data?.status !== 'ok' || !Array.isArray(data.values)) return [];
+        return data.values
+            .map((v) => parseFloat(v.close ?? ''))
+            .filter((c) => Number.isFinite(c) && c > 0);
+    } catch {
+        // Silently fall back — caller treats [] as "no close-based ATH available".
+        return [];
+    }
 }
 
 /**
@@ -698,23 +731,29 @@ async function fetchFromTwelveData(ticker: string, isFallback = false, attempt =
         const volume = parseFloat(data.volume ?? '') || 0;
         const avgVolume = parseFloat(data.average_volume ?? '') || parseFloat(data.volume ?? '') || 1;
         const lastPrice = parseFloat(data.close ?? '') || 0;
-        const fiftyTwoWeek = data.fifty_two_week;
-        const high52w = fiftyTwoWeek?.high != null ? parseFloat(fiftyTwoWeek.high) : undefined;
 
-        let rsi: number | undefined;
-        let sma21: number | undefined;
-        const indicators = await fetchIndicatorsFromTwelveData(ticker, apiKey);
-        rsi = indicators.rsi;
-        sma21 = indicators.sma21;
+        const [indicators, closes] = await Promise.all([
+            fetchIndicatorsFromTwelveData(ticker, apiKey),
+            fetchClosesFromTwelveData(ticker, apiKey),
+        ]);
+        const rsi = indicators.rsi;
+        const sma21 = indicators.sma21;
 
-        const ath = high52w;
-        const pctFromAth = ath != null && ath > 0 ? ((lastPrice - ath) / ath) * 100 : undefined;
+        // CLOSE-BASED 52w high — same definition as the Yahoo path. We deliberately
+        // ignore the provider's `fifty_two_week.high` (an intraday extreme), because
+        // a close-based reference filters intraday wick spikes that never held and
+        // matches the O'Neil/Minervini pattern-detection convention used everywhere
+        // else in the engine (SMA, tightness, daysSinceLastHigh). If history is
+        // unavailable we leave ATH undefined rather than emit an inconsistent value.
+        const athData = calculate52wHighAndConsolidation(closes);
+        const ath = athData?.ath;
+        const pctFromAth = athData?.pctFromAth;
         const tags = computeNewlogicTags({
             sma21,
             lastClose: lastPrice,
             sma21TouchThresholdPct: config.sma21TouchThresholdPct,
             pctFromAth,
-            closes: [], // Twelve Data quote has no history; only Pullback 15% can apply
+            closes, // close history (may be []); enables the same close-based tags as the Yahoo path
         });
 
         return {

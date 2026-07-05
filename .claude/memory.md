@@ -11,11 +11,13 @@ Decisions, resolved issues, and active context across sessions.
 | Mar 2026 | logger only, no console.log | Consistent structured output |
 | Mar 2026 | O(1) sectorMap via Map | Performance for large watchlists |
 | Mar 2026 | Wilder's RSI (not Cutler's) | Matches TradingView standard |
+| Jul 2026 | 52w high (ATH) is CLOSE-based on BOTH data paths | O'Neil/Minervini pattern-detection convention — a close-based high filters intraday wick spikes that never held. Fixed Twelve Data fallback which had used the provider's intraday `fifty_two_week.high` |
 
 ## Resolved Issues
 
 - **Hardening complete:** p-limit, logger, config validation all in place
 - **RSI formula:** Switched from simple average (Cutler) to Wilder's smoothing — more accurate
+- **ATH definition mismatch (Jul 2026):** Yahoo path used `max(closes[-252:])` (close-based) while the Twelve Data fallback used the provider's intraday `fifty_two_week.high` — same stock could show a different `%ATH` depending on which source served it, and the fallback fired `pivotBreakout` off an intraday high. Fixed by fetching `time_series` closes in the fallback and running the same `calculate52wHighAndConsolidation`; `pctFromAth` is now close-based everywhere. If Twelve Data history is unavailable, ATH is left `undefined` rather than emitting an inconsistent value. Note: `pivotBreakout` still confirms on the LIVE price (`lastPrice ≥ ath*0.98`) by design — an intentional timeliness tradeoff, not part of this fix.
 
 ## Active Context
 

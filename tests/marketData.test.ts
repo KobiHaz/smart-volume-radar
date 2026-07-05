@@ -363,6 +363,60 @@ describe('fetchAllStocks', () => {
         delete process.env.TWELVE_DATA_API_KEY;
     });
 
+    it('Twelve Data fallback computes a CLOSE-BASED 52w high, ignoring the provider intraday fifty_two_week.high', async () => {
+        process.env.TWELVE_DATA_API_KEY = 'test-key';
+        const todayUtc = new Date().toISOString().slice(0, 10);
+
+        // Close-based series (ASC, oldest→newest): max close = 95, most recent close = 90.
+        // The provider reports an intraday 52w high of 100 — deliberately higher.
+        const seriesCloses = [
+            ...Array.from({ length: 23 }, () => 85),
+            95, // highest CLOSE in the window
+            90, // most recent close
+        ];
+        const timeSeriesValues = seriesCloses.map((c, i) => ({
+            datetime: `2026-06-${String(i + 1).padStart(2, '0')}`,
+            close: String(c),
+        }));
+
+        // 1. Yahoo fails x10 (original EMBR3.SA + dash EMBR3-SA fallback)
+        for (let i = 0; i < 10; i++) mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+
+        // 2. Twelve Data /quote succeeds — note intraday fifty_two_week.high = 100
+        mockFetch.mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({
+                status: 'ok',
+                close: '90.00',
+                volume: '500000',
+                percent_change: '1.0',
+                fifty_two_week: { high: '100.00' },
+            }),
+        });
+        // 3. Indicators (rsi, sma) — order: rsi, sma
+        mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ status: 'ok', values: [{ rsi: '55' }] }) });
+        mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ status: 'ok', values: [{ sma: '88' }] }) });
+        // 4. time_series (the new close-history fetch)
+        mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ status: 'ok', values: timeSeriesValues }) });
+        // Safety net for any further calls
+        mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({ status: 'ok', values: [] }) });
+
+        const { stocks } = await fetchAllStocksAsOfDate(['EMBR3.SA'], todayUtc);
+
+        expect(stocks).toHaveLength(1);
+        // ATH must be the close-based max (95), NOT the provider intraday high (100).
+        expect(stocks[0].ath).toBe(95);
+        expect(stocks[0].athSource).toBe('52w');
+        // pctFromAth = (90 − 95) / 95 × 100 ≈ -5.26 (close-based), not (90 − 100)/100 = -10.
+        expect(stocks[0].pctFromAth).toBeCloseTo(-5.26, 1);
+
+        // Verify the time_series endpoint was actually queried.
+        const askedTimeSeries = mockFetch.mock.calls.some((c) => String(c[0]).includes('/time_series'));
+        expect(askedTimeSeries).toBe(true);
+
+        delete process.env.TWELVE_DATA_API_KEY;
+    });
+
     it('logs enhanced warning with extended international suffixes when fetchAllStocks fails', async () => {
         mockFetch.mockResolvedValue({ ok: false, status: 404 });
         const warnSpy = jest.spyOn(logger, 'warn');
