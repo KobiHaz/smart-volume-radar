@@ -3,14 +3,18 @@
  * Calculates SMA, RSI, ATH, and consolidation metrics from price history
  */
 
+import { SMA as SMAIndicator, RSI as RSIIndicator } from 'trading-signals';
+
 /**
- * Calculate Simple Moving Average
+ * Calculate Simple Moving Average (delegates to `trading-signals`, verified
+ * byte-identical to the prior hand-rolled implementation).
  */
 export function calculateSMA(prices: number[], periods: number): number | undefined {
     if (prices.length < periods) return undefined;
-    const slice = prices.slice(-periods);
-    const sum = slice.reduce((a, b) => a + b, 0);
-    return sum / periods;
+    const sma = new SMAIndicator(periods);
+    let result: number | null = null;
+    for (const p of prices) result = sma.update(p, false) ?? result;
+    return result ?? undefined;
 }
 
 /** ~21 trading days per month */
@@ -259,35 +263,15 @@ export function calculateAVWAP(
 /**
  * Calculate Relative Strength Index (RSI) using Wilder's Smoothing
  * Matches TradingView and standard charting platforms.
- * First 14 periods: simple average of gains/losses.
- * Thereafter: ((PreviousAvg * 13) + Current) / 14
+ * Delegates to `trading-signals` (its RSI defaults to Wilder/WSMA smoothing —
+ * verified byte-identical to the prior hand-rolled implementation).
  */
 export function calculateRSI(prices: number[], periods: number = 14): number | undefined {
     if (prices.length < periods + 1) return undefined;
-
-    let sumGain = 0;
-    let sumLoss = 0;
-    for (let i = 1; i <= periods && i < prices.length; i++) {
-        const diff = prices[i] - prices[i - 1];
-        sumGain += diff >= 0 ? diff : 0;
-        sumLoss += diff < 0 ? -diff : 0;
-    }
-
-    let avgGain = sumGain / periods;
-    let avgLoss = sumLoss / periods;
-
-    for (let i = periods + 1; i < prices.length; i++) {
-        const diff = prices[i] - prices[i - 1];
-        const gain = diff >= 0 ? diff : 0;
-        const loss = diff < 0 ? -diff : 0;
-        avgGain = (avgGain * (periods - 1) + gain) / periods;
-        avgLoss = (avgLoss * (periods - 1) + loss) / periods;
-    }
-
-    if (avgLoss === 0) return 100;
-
-    const rs = avgGain / avgLoss;
-    return 100 - (100 / (1 + rs));
+    const rsi = new RSIIndicator(periods);
+    let result: number | null = null;
+    for (const p of prices) result = rsi.update(p, false) ?? result;
+    return result ?? undefined;
 }
 
 // ─── ChampionScan Phase 2 Indicators (added 2026-05-07) ───────────────────
@@ -299,6 +283,11 @@ export function calculateRSI(prices: number[], periods: number = 14): number | u
  * Default Bollinger Bands (Bollinger 1980): period=20, mult=2 → ~95% containment under
  * normal distribution. Squeeze (band-width / price < ~5%) = volatility contraction
  * preceding many breakouts (Bollinger Band Squeeze setup).
+ *
+ * Kept as a hand-rolled implementation (not delegated to `trading-signals`):
+ * its `BollingerBands.update()` has an off-by-one — it only emits a result once
+ * `period + 1` samples have been fed (unlike its own `SMA`, which emits at
+ * exactly `period`) — which would break our "defined at exactly N closes" contract.
  */
 export function calculateBollingerBands(
     closes: number[],
@@ -325,6 +314,13 @@ export function calculateBollingerBands(
  *   EMA[i] = price[i]·k + EMA[i-1]·(1-k),  k = 2/(period+1).
  *
  * Returns `undefined` if fewer than `period` closes available.
+ *
+ * Kept as a hand-rolled implementation (not delegated to `trading-signals`):
+ * that library's EMA seeds with the *first price* instead of the SMA of the
+ * first `period` closes, so results diverge from ours on short series (they
+ * only converge after enough iterations for the seed's influence to decay).
+ * SMA/RSI/BollingerBands above use the library since those were verified
+ * byte-identical for all input lengths.
  */
 export function calculateEMA(closes: number[], period: number): number | undefined {
     if (closes.length < period) return undefined;

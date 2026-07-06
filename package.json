@@ -47,6 +47,7 @@
     "fast-xml-parser": "^5.3.4",
     "p-limit": "^7.3.0",
     "rss-parser": "^3.13.0",
+    "trading-signals": "^7.4.3",
     "yahoo-finance2": "3.13.0"
   },
   "devDependencies": {
