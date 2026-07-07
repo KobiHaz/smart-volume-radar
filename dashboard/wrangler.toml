@@ -5,4 +5,4 @@ compatibility_date = "2024-11-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "lean-radar"
-database_id = "9c00a708-2b4f-40c8-85ce-23e3cb9a256c"
+database_id = "393d2493-8bc6-4c8b-aa89-d09fe214f889"
