@@ -713,6 +713,36 @@ td.col-score {
 }
 
 /* ═══════════════════════════════════════════════
+   SHOW-MORE (near tier reveal)
+═══════════════════════════════════════════════ */
+.show-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 14px 0 4px;
+}
+
+.btn-show-more {
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-show-more:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.btn-show-more:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════
    DEEP-DIVE PANEL
 ═══════════════════════════════════════════════ */
 .deepdive {

@@ -476,6 +476,9 @@ function isNearRow(r) {
   return (r.signal || '').startsWith('near');
 }
 
+/** Count of rows hidden ONLY by the near-tier default filter (set by visibleRows). */
+let hiddenNearCount = 0;
+
 function visibleRows() {
   const q    = ($('#search').value || '').trim().toUpperCase();
   const reg  = $('#f-region').value;
@@ -483,17 +486,23 @@ function visibleRows() {
   const s2   = $('#f-stage2').checked;
   const grad = $('#f-grad').checked;
 
-  const filtered = allRows.filter((r) => {
-    // Near-tier filter: hide near-* rows unless showNear is on OR the user
-    // explicitly selected a near signal from the dropdown.
-    const nearExplicit = sig.startsWith('near');
-    if (!showNear && !nearExplicit && isNearRow(r)) return false;
+  hiddenNearCount = 0;
 
+  const filtered = allRows.filter((r) => {
     if (q    && !(r.ticker || '').toUpperCase().includes(q)) return false;
     if (reg  && r.region !== reg)   return false;
     if (sig  && r.signal !== sig)   return false;
     if (s2   && r.stage2 !== 1)     return false;
     if (grad && !r.graduated_from)  return false;
+
+    // Near-tier filter: hide near-* rows unless showNear is on OR the user
+    // explicitly selected a near signal from the dropdown. Counted after the
+    // other filters so the "show more" button reports how many rows it reveals.
+    const nearExplicit = sig.startsWith('near');
+    if (!showNear && !nearExplicit && isNearRow(r)) {
+      hiddenNearCount++;
+      return false;
+    }
     return true;
   });
 
@@ -539,7 +548,8 @@ function renderTable() {
   $('#row-count').textContent = vr.length === total
     ? `${vr.length} שורות`
     : `${vr.length} מוצגות מתוך ${total}`;
-  showState(vr.length === 0 ? 'אין תוצאות לסינון הנוכחי' : null);
+  showState(vr.length === 0 && !hiddenNearCount ? 'אין תוצאות לסינון הנוכחי' : null);
+  renderShowMore();
 
   /* — desktop table — */
   const tbody = $('#grid-body');
@@ -641,6 +651,26 @@ function renderTable() {
     card.addEventListener('click', () => openDeepDive(vr[idx]));
     card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') openDeepDive(vr[idx]); });
   });
+}
+
+/* ─── Show-more (near tier) ───────────────────────────────────────────────── */
+
+/**
+ * Render the "load more" button under the table when near-tier rows are
+ * hidden by the default filter. Clicking it reveals the silent watchlist
+ * (same effect as the #f-near checkbox).
+ */
+function renderShowMore() {
+  const wrap = $('#show-more-wrap');
+  const btn  = $('#btn-show-more');
+  if (!wrap || !btn) return;
+
+  if (hiddenNearCount > 0) {
+    btn.textContent = `⏳ טען עוד ${hiddenNearCount} ניירות — רשימת מעקב שקטה (Near)`;
+    wrap.hidden = false;
+  } else {
+    wrap.hidden = true;
+  }
 }
 
 /* ─── Deep-dive panel ─────────────────────────────────────────────────────── */
@@ -793,6 +823,13 @@ async function boot() {
   // Near-tier watchlist toggle
   $('#f-near').addEventListener('change', () => {
     showNear = $('#f-near').checked;
+    renderTable();
+  });
+
+  // "Load more" button — reveals the near tier, kept in sync with the checkbox
+  $('#btn-show-more').addEventListener('click', () => {
+    showNear = true;
+    $('#f-near').checked = true;
     renderTable();
   });
 
