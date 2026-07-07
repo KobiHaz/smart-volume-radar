@@ -209,6 +209,22 @@ describe('qualifiesAsHealthyPullback', () => {
         ).toBeNull();
     });
 
+    it('rejects a deep pullback below -25% (study: -30..-25 zone is negative EV)', () => {
+        expect(
+            qualifiesAsHealthyPullback(
+                makeStock({ pctFromAth: -27, lastPrice: 100, sma200: 90 })
+            )
+        ).toBeNull();
+    });
+
+    it('accepts a pullback at exactly -25%', () => {
+        expect(
+            qualifiesAsHealthyPullback(
+                makeStock({ pctFromAth: -25, lastPrice: 100, sma200: 90 })
+            )
+        ).toEqual({ pctFromAth: -25 });
+    });
+
     it('rejects when price below SMA200 (falling knife)', () => {
         expect(
             qualifiesAsHealthyPullback(

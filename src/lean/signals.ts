@@ -33,7 +33,10 @@ export const CONSOLIDATION_WINDOWS = [
 export const BREAKOUT_MIN_RVOL = 1.5;
 export const HIGH_VOLUME_RVOL = 3.0;
 export const EXTREME_VOLUME_RVOL = 5.0;
-export const PULLBACK_MIN_PCT = -30; // deepened per 2026-07-02 signal-efficacy study
+// 2026-07-08 precision study (145K-day event-study): the -30..-25 zone is
+// NEGATIVE (-2.42% med21, win 45%) even WITH survivorship bias in its favor.
+// Gold zone is -20..-15 (+6.42% med21, win 65%). Reverts the 2026-07-02 deepening.
+export const PULLBACK_MIN_PCT = -25;
 export const PULLBACK_MAX_PCT = -15;
 
 // Near-miss bands for Silent Watchlist
