@@ -27,6 +27,13 @@ jobs:
     permissions:
       contents: read
       actions: read  # required by dawidd6/action-download-artifact for prior-run lookup
+    # Hoist Cloudflare secrets to job-level env so step `if:` can gate on them.
+    # (The `secrets` context is NOT available in step `if:`, but job `env` IS.)
+    # This keeps the job green until the secrets are configured.
+    env:
+      CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
 
     steps:
       - name: Checkout stable branch
@@ -100,6 +107,27 @@ jobs:
           # Force scan because Sundays-Fridays may be holidays / weekends in TASE.
           FORCE_SCAN: 'true'
         run: npm run start:lean
+
+      # Ingest today's dashboard rows into Cloudflare D1. CF_* come from the
+      # job-level env; the `if:` gate keeps this green until the secrets exist.
+      - name: Ingest dashboard rows to D1
+        if: success() && env.CF_API_TOKEN != ''
+        run: |
+          cd dashboard && npm ci
+          npx tsx scripts/seed.ts ../results
+
+      - name: Telegram dashboard pointer
+        if: success() && env.CF_API_TOKEN != ''
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          DATE=$(ls results/dashboard-*.json | sort | tail -1 | sed 's/.*dashboard-//;s/.json//')
+          HI=$(jq '[.[]|select(.score>=70)]|length' "results/dashboard-${DATE}.json")
+          TOT=$(jq 'length' "results/dashboard-${DATE}.json")
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text=🪶 Lean ${DATE}: ${HI} בשכנוע גבוה · ${TOT} סיגנלים → https://lean-dashboard.pages.dev"
 
       # Persist the full per-run snapshot (lean-{date}.json + raw scan files)
       # as a year-retained artifact for retrospective debugging.
