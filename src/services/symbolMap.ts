@@ -71,7 +71,7 @@ const EURONEXT_OVERRIDES: Record<string, string> = {
  * unlisted EURONEXT, …).
  */
 /** A clean Yahoo ticker: starts alphanumeric, then alphanumerics / dot / dash only. */
-const YAHOO_TICKER = /^[A-Za-z0-9][A-Za-z0-9.\-]*$/;
+const YAHOO_TICKER = /^[A-Za-z0-9][A-Za-z0-9.-]*$/;
 
 export function tvToYahoo(tvSymbol: string): string | null {
     const raw = tvSymbol.trim();
