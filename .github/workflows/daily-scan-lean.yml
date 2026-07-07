@@ -127,7 +127,7 @@ jobs:
           TOT=$(jq 'length' "results/dashboard-${DATE}.json")
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=🪶 Lean ${DATE}: ${HI} בשכנוע גבוה · ${TOT} סיגנלים → https://lean-dashboard.pages.dev"
+            --data-urlencode "text=🪶 Lean ${DATE}: ${HI} בשכנוע גבוה · ${TOT} סיגנלים → https://lean-dashboard-cfg.pages.dev"
 
       # Persist the full per-run snapshot (lean-{date}.json + raw scan files)
       # as a year-retained artifact for retrospective debugging.
