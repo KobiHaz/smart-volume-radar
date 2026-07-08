@@ -32,8 +32,6 @@ import {
     isHvLeader,
     momentum63,
     LEADER_MOM63_MIN,
-    adr20Pct,
-    BREAKOUT_MIN_ADR_PCT,
     qualifiesAsCreep,
 } from './lean/signals.js';
 import { loadRecentSignalTickers } from './lean/signalHistory.js';
@@ -182,10 +180,12 @@ async function main(): Promise<void> {
 
         for (const stock of stocks) {
             const ohlc = ohlcByTicker.get(stock.ticker);
-            // ADR floor: skip the consolidation family for instruments that don't
-            // move (ETF creep — 39% of study breakouts, below-baseline returns).
-            const adr = ohlc ? adr20Pct(ohlc.highs, ohlc.lows, ohlc.closes) : null;
-            if (ohlc && (adr == null || adr >= BREAKOUT_MIN_ADR_PCT)) {
+            // NOTE: an ADR>=2% floor was trialled here and REJECTED by the
+            // criteria-tester validation (2026-07-08): ADR<2 breakouts actually
+            // outperformed (+3.56% vs -0.16% med63) and the floor degraded the
+            // gated nearBreakout tier (+6.10% -> +4.12% med63). ETF de-emphasis
+            // is handled by the isETFSector score penalty instead.
+            if (ohlc) {
                 const consolidation = detectConsolidationBreakout(stock, ohlc.closes, ohlc.highs, ohlc.lows);
                 if (consolidation) {
                     result.consolidationBreakouts.push({ stock, signal: consolidation });

@@ -9,7 +9,6 @@ import {
     qualifiesAsHealthyPullback,
     qualifiesAsPullbackNearMiss,
     isHvLeader,
-    adr20Pct,
     qualifiesAsCreep,
     approxUsdFactor,
 } from '../src/lean/signals';
@@ -224,19 +223,6 @@ describe('approxUsdFactor', () => {
         expect(approxUsdFactor('HGG.TA')).toBeCloseTo(0.0027, 4);
         expect(approxUsdFactor('BA.L')).toBeCloseTo(0.0127, 4);
         expect(approxUsdFactor('NVDA')).toBe(1);
-    });
-});
-
-describe('adr20Pct', () => {
-    it('computes the mean daily range % over the last 20 bars', () => {
-        // 25 bars, every bar high=102, low=98, close=100 → range 4%
-        const closes = Array(25).fill(100);
-        const highs = Array(25).fill(102);
-        const lows = Array(25).fill(98);
-        expect(adr20Pct(highs, lows, closes)).toBeCloseTo(4.0, 5);
-    });
-    it('returns null with fewer than 20 bars', () => {
-        expect(adr20Pct([1, 2], [1, 2], [1, 2])).toBeNull();
     });
 });
 

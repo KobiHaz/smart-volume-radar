@@ -31,29 +31,6 @@ export const CONSOLIDATION_WINDOWS = [
 ] as const;
 
 export const BREAKOUT_MIN_RVOL = 1.5;
-
-// 2026-07-08 study: 39% of confirmed breakouts came from tickers whose median
-// daily move is <0.8% (ETFs, utilities) — and the tier underperforms baseline
-// at 63d (+3.12% vs +4.50%). The tightness windows structurally select
-// low-volatility instruments; an ADR floor re-aims the tier at stocks that move.
-export const BREAKOUT_MIN_ADR_PCT = 2.0;
-
-/** Mean daily range % over the last 20 bars: avg((high−low)/close × 100). */
-export function adr20Pct(highs: number[], lows: number[], closes: number[]): number | null {
-    const n = closes.length;
-    if (n < 20) return null;
-    let sum = 0;
-    let cnt = 0;
-    for (let i = n - 20; i < n; i++) {
-        const h = highs[i];
-        const l = lows[i];
-        const c = closes[i];
-        if (h == null || l == null || c == null || c <= 0) continue;
-        sum += ((h - l) / c) * 100;
-        cnt++;
-    }
-    return cnt > 0 ? sum / cnt : null;
-}
 export const HIGH_VOLUME_RVOL = 3.0;
 export const EXTREME_VOLUME_RVOL = 5.0;
 // 2026-07-08 study: RVOL>=8 events return +0.58% med21 (vs +1.81% for all HV) —
