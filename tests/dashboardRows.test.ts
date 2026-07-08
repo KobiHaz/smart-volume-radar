@@ -33,8 +33,14 @@ describe('scoreRow', () => {
   it('penalizes a high-volume down-day (climax) and deep ATH', () => {
     // RENK-like: highVolume, RVOL 6+, dayPct<0, athPct -52, not stage2
     const s = scoreRow({ ...base, signal: 'highVolume', signals: ['highVolume'], signalCount: 1, rvol: 12, dayPct: -2, athPct: -52, stage2: 0 });
-    // 30 + min(12,6)*5=30 + 0 - 25 (climax) - 20 (deep ATH) = 15
-    expect(s).toBe(15);
+    // 30 + min(12,6)*5=30 + 0 - 25 (down-day climax) - 20 (deep ATH) - 15 (rvol>=8 climax) = 0
+    expect(s).toBe(0);
+  });
+  it('penalizes RVOL >= 8 by 15 (2026-07-08 study: climax RVOL is noise)', () => {
+    const at6 = scoreRow({ ...base, signal: 'highVolume', signals: ['highVolume'], signalCount: 1, rvol: 6, stage2: 1 });
+    const at9 = scoreRow({ ...base, signal: 'highVolume', signals: ['highVolume'], signalCount: 1, rvol: 9, stage2: 1 });
+    // rvol contribution capped at 6*5=30 for both — the only delta is the -15 penalty.
+    expect(at6 - at9).toBe(15);
   });
   it('adds proximity bonus for a near-breakout at the pivot', () => {
     const s = scoreRow({ ...base, signal: 'nearBreakout', signals: ['nearBreakout'], signalCount: 1, rvol: 0, stage2: 1, distPivot: 0 });

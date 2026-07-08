@@ -235,8 +235,10 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
             for (const { stock, signal } of items) {
                 const dir = volumeDirection(stock);
                 const extreme = signal.level === 'extreme' ? '⚡ EXTREME ' : '';
+                // 2026-07-08 study: rvol>=8 = climax/news spike (+0.58% med21) — warn.
+                const climaxTag = signal.climax ? ' ⚠️ קליימקס' : '';
                 const reason =
-                    `${extreme}${dir.emoji} ${dir.label} (${fmtRvol(stock.rvol)})` +
+                    `${extreme}${dir.emoji} ${dir.label} (${fmtRvol(stock.rvol)})${climaxTag}` +
                     buildSecondaryBadges(stock.ticker, 'volume', result);
                 parts.push(stockBlock(stock, reason));
                 renderedTickers.add(stock.ticker);

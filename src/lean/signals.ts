@@ -33,6 +33,9 @@ export const CONSOLIDATION_WINDOWS = [
 export const BREAKOUT_MIN_RVOL = 1.5;
 export const HIGH_VOLUME_RVOL = 3.0;
 export const EXTREME_VOLUME_RVOL = 5.0;
+// 2026-07-08 study: RVOL>=8 events return +0.58% med21 (vs +1.81% for all HV) —
+// climaxes and news spikes. Flagged as a WARNING, never counted as strength.
+export const CLIMAX_RVOL = 8;
 // 2026-07-08 precision study (145K-day event-study): the -30..-25 zone is
 // NEGATIVE (-2.42% med21, win 45%) even WITH survivorship bias in its favor.
 // Gold zone is -20..-15 (+6.42% med21, win 65%). Reverts the 2026-07-02 deepening.
@@ -57,6 +60,10 @@ export interface ConsolidationSignal {
 
 export interface HighVolumeSignal {
     level: 'high' | 'extreme';
+    /** RVOL >= CLIMAX_RVOL — exhaustion/news spike; warn, don't upgrade. */
+    climax: boolean;
+    /** A-tier: Stage2 + mom63>=20 + within -15% of ATH. Set by lean.ts (needs closes). */
+    leader?: boolean;
 }
 
 export interface PullbackSignal {
@@ -209,8 +216,9 @@ export function detectConsolidationNearMiss(
 // ─── 2. High Volume ───────────────────────────────────────────────────
 export function qualifiesAsHighVolume(stock: StockData): HighVolumeSignal | null {
     const rvol = stock.rvol ?? 0;
-    if (rvol >= EXTREME_VOLUME_RVOL) return { level: 'extreme' };
-    if (rvol >= HIGH_VOLUME_RVOL) return { level: 'high' };
+    const climax = rvol >= CLIMAX_RVOL;
+    if (rvol >= EXTREME_VOLUME_RVOL) return { level: 'extreme', climax };
+    if (rvol >= HIGH_VOLUME_RVOL) return { level: 'high', climax };
     return null;
 }
 

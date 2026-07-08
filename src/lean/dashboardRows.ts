@@ -58,6 +58,7 @@ export function scoreRow(r: ScoreInput): number {
   if (r.distPivot != null) s += Math.max(0, 10 - r.distPivot * 4);
   s += (r.signalCount - 1) * 12; // CONFLUENCE BONUS (+12 per extra signal)
   if (r.signals.includes('highVolume') && (r.dayPct || 0) < 0) s -= 25; // climax
+  if ((r.rvol || 0) >= 8) s -= 15; // 2026-07-08 study: rvol>=8 = climax, +0.58% med21
   if (r.athPct != null && r.athPct < -30) s -= 20;
   if (isETFSector(r.sector)) s -= 12;
   return Math.round(s);
@@ -90,7 +91,7 @@ export function rowsFromLeanResult(scanDate: string, result: any): Row[] {
   interface Acc { stock: StockData; signals: Set<SignalKind>; distPivot: number | null; }
   const byTicker = new Map<string, Acc>();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const add = (stock: StockData, signal: SignalKind, distPivot: number | null) => {
     const key = stock.ticker.toUpperCase();
     const acc = byTicker.get(key);
@@ -103,17 +104,17 @@ export function rowsFromLeanResult(scanDate: string, result: any): Row[] {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   for (const e of result.consolidationBreakouts) add(e.stock, 'breakout', 0);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   for (const e of result.highVolume) add(e.stock, 'highVolume', null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   for (const e of result.pullbacks) add(e.stock, 'pullback', null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   for (const e of result.nearConsolidation) add(e.stock, 'nearBreakout', e.signal.distanceToPivotPct);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   for (const e of result.nearVolume) add(e.stock, 'nearHighVol', null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   for (const e of result.nearPullback) add(e.stock, 'nearPullback', null);
 
   const rows: Row[] = [];

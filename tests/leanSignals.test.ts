@@ -159,15 +159,23 @@ describe('detectConsolidationNearMiss', () => {
 
 describe('qualifiesAsHighVolume', () => {
     it('returns "extreme" at RVOL ≥ 5', () => {
-        expect(qualifiesAsHighVolume(makeStock({ rvol: 6.5 }))).toEqual({ level: 'extreme' });
+        expect(qualifiesAsHighVolume(makeStock({ rvol: 6.5 }))).toEqual({ level: 'extreme', climax: false });
     });
 
     it('returns "high" at RVOL between 3 and 5', () => {
-        expect(qualifiesAsHighVolume(makeStock({ rvol: 3.5 }))).toEqual({ level: 'high' });
+        expect(qualifiesAsHighVolume(makeStock({ rvol: 3.5 }))).toEqual({ level: 'high', climax: false });
     });
 
     it('returns null below 3', () => {
         expect(qualifiesAsHighVolume(makeStock({ rvol: 2.9 }))).toBeNull();
+    });
+
+    it('flags climax=true when RVOL >= 8 (study: rvol>=8 med21 is +0.58%, noise)', () => {
+        expect(qualifiesAsHighVolume(makeStock({ rvol: 9 }))).toEqual({ level: 'extreme', climax: true });
+    });
+
+    it('does not flag climax just below 8', () => {
+        expect(qualifiesAsHighVolume(makeStock({ rvol: 7.9 }))).toEqual({ level: 'extreme', climax: false });
     });
 });
 

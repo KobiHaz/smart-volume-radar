@@ -67,21 +67,36 @@ describe('formatLeanReport', () => {
         const r = empty();
         r.highVolume.push({
             stock: stock({ ticker: 'TSLA', rvol: 6.5 }),
-            signal: { level: 'extreme' },
+            signal: { level: 'extreme', climax: false },
         });
         r.highVolume.push({
             stock: stock({ ticker: 'AMD', rvol: 3.5 }),
-            signal: { level: 'high' },
+            signal: { level: 'high', climax: false },
         });
         const out = formatLeanReport('2026-05-09', r);
         expect(out).toContain('נפח גבוה');
         expect(out).toContain('⚡ EXTREME');
         expect(out).toContain('TSLA');
         expect(out).toContain('AMD');
-        // AMD line should have 🔥 not EXTREME
-        const amdLine = out.split('\n').find((l) => l.includes('AMD'))!;
-        expect(amdLine).toContain('🔥');
-        expect(amdLine).not.toContain('EXTREME');
+        // AMD's BLOCK (ticker line + metrics + reason lines) should have 🔥 not EXTREME.
+        // Blocks are multi-line; slice from the AMD ticker line to the next blank line.
+        const lines = out.split('\n');
+        const amdIdx = lines.findIndex((l) => l.includes('AMD'));
+        let end = amdIdx;
+        while (end < lines.length && lines[end].trim() !== '') end++;
+        const amdBlock = lines.slice(amdIdx, end).join('\n');
+        expect(amdBlock).toContain('🔥');
+        expect(amdBlock).not.toContain('EXTREME');
+    });
+
+    it('appends a climax warning when RVOL >= 8', () => {
+        const r = empty();
+        r.highVolume.push({
+            stock: stock({ ticker: 'PUMP', rvol: 9.2 }),
+            signal: { level: 'extreme', climax: true },
+        });
+        const out = formatLeanReport('2026-05-09', r);
+        expect(out).toContain('⚠️ קליימקס');
     });
 
     it('renders Pullback section with pctFromAth', () => {
