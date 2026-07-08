@@ -53,6 +53,8 @@ export interface LeanSnapshot extends SnapshotMeta {
         consolidationBreakouts: Array<{ ticker: string; window: string; baseRangePct: number; windowHigh: number }>;
         highVolume: Array<{ ticker: string; level: 'high' | 'extreme'; rvol: number }>;
         pullbacks: Array<{ ticker: string; pctFromAth: number }>;
+        /** CREEP tier (2026-07-08 study). Also feeds the 21-day dedup in signalHistory. */
+        creep: Array<{ ticker: string; mom63: number; pctFromAth: number }>;
         nearConsolidation: Array<{ ticker: string; window: string; distanceToPivotPct: number }>;
         nearVolume: Array<{ ticker: string; rvol: number }>;
         nearPullback: Array<{ ticker: string; pctFromAth: number }>;

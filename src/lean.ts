@@ -34,6 +34,7 @@ import {
     LEADER_MOM63_MIN,
     adr20Pct,
     BREAKOUT_MIN_ADR_PCT,
+    qualifiesAsCreep,
 } from './lean/signals.js';
 import { loadRecentSignalTickers } from './lean/signalHistory.js';
 import { formatLeanReport, type LeanScanResult } from './lean/format.js';
@@ -144,6 +145,7 @@ async function main(): Promise<void> {
             consolidationBreakouts: [],
             highVolume: [],
             pullbacks: [],
+            creep: [],
             nearConsolidation: [],
             nearVolume: [],
             nearPullback: [],
@@ -153,6 +155,7 @@ async function main(): Promise<void> {
         // +0.89% med21 vs +1.70% for first alerts, at 10x the volume.
         const resultsDir = path.join(__moduleDir, '..', 'results');
         const recentNearBO = loadRecentSignalTickers(resultsDir, scanDate, 'nearConsolidation', 21);
+        const recentCreep = loadRecentSignalTickers(resultsDir, scanDate, 'creep', 21);
 
         for (const stock of stocks) {
             const ohlc = ohlcByTicker.get(stock.ticker);
@@ -190,6 +193,12 @@ async function main(): Promise<void> {
                 const nearP = qualifiesAsPullbackNearMiss(stock);
                 if (nearP) result.nearPullback.push({ stock, signal: nearP });
             }
+            // CREEP tier (2026-07-08 study): quiet Stage-2 leader near highs.
+            // Covers the 58% of explosive moves that launch with no volume anomaly.
+            if (ohlc && !recentCreep.has(stock.ticker)) {
+                const cr = qualifiesAsCreep(stock, ohlc.closes);
+                if (cr) result.creep.push({ stock, signal: cr });
+            }
         }
 
         // Sort each section: best signal first.
@@ -200,6 +209,7 @@ async function main(): Promise<void> {
                 (b.stock.rvol ?? 0) - (a.stock.rvol ?? 0)
         );
         result.pullbacks.sort((a, b) => (a.signal.pctFromAth ?? 0) - (b.signal.pctFromAth ?? 0));
+        result.creep.sort((a, b) => b.signal.mom63 - a.signal.mom63);
         result.nearConsolidation.sort((a, b) => a.signal.distanceToPivotPct - b.signal.distanceToPivotPct);
         result.nearVolume.sort((a, b) => b.signal.rvol - a.signal.rvol);
         result.nearPullback.sort((a, b) => a.signal.pctFromAth - b.signal.pctFromAth);
@@ -283,6 +293,11 @@ async function main(): Promise<void> {
                         })),
                         pullbacks: result.pullbacks.map((r) => ({
                             ticker: r.stock.ticker,
+                            pctFromAth: r.signal.pctFromAth,
+                        })),
+                        creep: result.creep.map((r) => ({
+                            ticker: r.stock.ticker,
+                            mom63: r.signal.mom63,
                             pctFromAth: r.signal.pctFromAth,
                         })),
                         nearConsolidation: result.nearConsolidation.map((r) => ({

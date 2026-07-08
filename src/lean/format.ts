@@ -29,12 +29,15 @@ import type {
     ConsolidationNearMiss,
     VolumeNearMiss,
     PullbackNearMiss,
+    CreepSignal,
 } from './signals.js';
 
 export interface LeanScanResult {
     consolidationBreakouts: Array<{ stock: StockData; signal: ConsolidationSignal }>;
     highVolume: Array<{ stock: StockData; signal: HighVolumeSignal }>;
     pullbacks: Array<{ stock: StockData; signal: PullbackSignal }>;
+    /** CREEP tier (2026-07-08 study): quiet Stage-2 leaders near highs. 63d-horizon position signal. */
+    creep: Array<{ stock: StockData; signal: CreepSignal }>;
     nearConsolidation: Array<{ stock: StockData; signal: ConsolidationNearMiss }>;
     nearVolume: Array<{ stock: StockData; signal: VolumeNearMiss }>;
     nearPullback: Array<{ stock: StockData; signal: PullbackNearMiss }>;
@@ -124,7 +127,7 @@ function stockBlock(stock: StockData, reason: string): string {
  */
 function buildSecondaryBadges(
     ticker: string,
-    primary: 'breakout' | 'volume' | 'pullback',
+    primary: 'breakout' | 'volume' | 'pullback' | 'creep',
     result: LeanScanResult
 ): string {
     const badges: string[] = [];
@@ -155,7 +158,7 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
     parts.push(
         `🪶 <b>LEAN RADAR</b>\n` +
             `📅 <code>${date}</code>\n` +
-            `<i>סדר: 🎓 graduated → 📉 pullback → 📈 breakout → 🔥 volume</i>\n` +
+            `<i>סדר: 🎓 graduated → 📉 pullback → 🐢 creep → 📈 breakout → 🔥 volume</i>\n` +
             `<i>כל מנייה: 📊 RVOL · 📉 ATH% · 🪜 Stage2 · + badge אם תואם כמה</i>\n` +
             `━━━━━━━━━━━━━━━━━━━━━━`
     );
@@ -165,7 +168,8 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
         graduated.length +
         result.consolidationBreakouts.length +
         result.highVolume.length +
-        result.pullbacks.length;
+        result.pullbacks.length +
+        result.creep.length;
     const totalNear =
         result.nearConsolidation.length +
         result.nearVolume.length +
@@ -206,6 +210,23 @@ export function formatLeanReport(date: string, result: LeanScanResult): string {
                 const reason =
                     `📉 Pullback בריא (${fmtPct(signal.pctFromAth)} מ-ATH $${fmtPrice(stock.ath)}, מעל SMA200)` +
                     buildSecondaryBadges(stock.ticker, 'pullback', result);
+                parts.push(stockBlock(stock, reason));
+                renderedTickers.add(stock.ticker);
+            }
+        }
+    }
+
+    // ─── 2b. CREEP — quiet Stage-2 leaders near highs (2026-07-08 study:
+    // covers the 58% of explosive moves that launch with NO volume anomaly;
+    // +13.25% med63 with the $10M liquidity floor). 63-day position signal.
+    if (result.creep.length > 0) {
+        const items = result.creep.filter((r) => !renderedTickers.has(r.stock.ticker));
+        if (items.length > 0) {
+            parts.push(`\n🐢 <b>זחילה שקטה — מוביל על שיא, נפח רדום</b>  ·  ${items.length}\n<i>אופק 63 יום</i>\n━━━━━━━━━━━━━━━━━━━━━━`);
+            for (const { stock, signal } of items) {
+                const reason =
+                    `🐢 mom63 +${signal.mom63.toFixed(0)}% · ${signal.pctFromAth.toFixed(1)}% מהשיא · RVOL רדום` +
+                    buildSecondaryBadges(stock.ticker, 'creep', result);
                 parts.push(stockBlock(stock, reason));
                 renderedTickers.add(stock.ticker);
             }

@@ -18,7 +18,7 @@ export function isETFSector(sector: string | undefined | null): boolean {
 }
 
 export type SignalKind =
-  | 'breakout' | 'highVolume' | 'pullback'
+  | 'breakout' | 'highVolume' | 'pullback' | 'creep'
   | 'nearBreakout' | 'nearHighVol' | 'nearPullback';
 
 export interface Row {
@@ -39,7 +39,7 @@ export interface Row {
 }
 
 const BASE: Record<SignalKind, number> = {
-  pullback: 50, nearPullback: 38, highVolume: 30,
+  pullback: 50, creep: 42, nearPullback: 38, highVolume: 30,
   nearHighVol: 18, breakout: 12, nearBreakout: 8,
 };
 
@@ -110,6 +110,8 @@ export function rowsFromLeanResult(scanDate: string, result: any): Row[] {
   for (const e of result.highVolume) add(e.stock, 'highVolume', null);
    
   for (const e of result.pullbacks) add(e.stock, 'pullback', null);
+  // ?? [] — older snapshots/fixtures predate the creep tier.
+  for (const e of result.creep ?? []) add(e.stock, 'creep', null);
    
   for (const e of result.nearConsolidation) add(e.stock, 'nearBreakout', e.signal.distanceToPivotPct);
    

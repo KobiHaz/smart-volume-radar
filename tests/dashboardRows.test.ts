@@ -96,6 +96,29 @@ describe('rowsFromLeanResult', () => {
     expect(typeof by.ARM.score).toBe('number');
   });
 
+  it('maps creep detections to rows with BASE 42', () => {
+    const result: any = {
+      consolidationBreakouts: [], highVolume: [], pullbacks: [],
+      creep: [{ stock: stub('INTC', { rvol: 0.9, pctFromAth: -3, lastPrice: 120, sma50: 100, sma200: 90 }),
+                signal: { mom63: 47, pctFromAth: -3, avgDollarVolumeUsd: 50_000_000 } }],
+      nearConsolidation: [], nearVolume: [], nearPullback: [],
+    };
+    const rows = rowsFromLeanResult('2026-07-08', result);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].signal).toBe('creep');
+    // BASE 42 + rvol 0.9*5=4.5 + stage2 20 = 66.5 → 67 (rounded)
+    expect(rows[0].score).toBeGreaterThanOrEqual(42);
+  });
+
+  it('tolerates results without a creep section (older snapshots)', () => {
+    const result: any = {
+      consolidationBreakouts: [], highVolume: [],
+      pullbacks: [{ stock: stub('ARM'), signal: { pctFromAth: -22 } }],
+      nearConsolidation: [], nearVolume: [], nearPullback: [],
+    };
+    expect(() => rowsFromLeanResult('2026-07-08', result)).not.toThrow();
+  });
+
   it('groups a ticker matching multiple signals into ONE row (signals ordered by BASE desc)', () => {
     const result: any = {
       consolidationBreakouts: [],

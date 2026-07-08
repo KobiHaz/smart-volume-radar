@@ -32,6 +32,7 @@ const empty = (): LeanScanResult => ({
     consolidationBreakouts: [],
     highVolume: [],
     pullbacks: [],
+    creep: [],
     nearConsolidation: [],
     nearVolume: [],
     nearPullback: [],
@@ -87,6 +88,28 @@ describe('formatLeanReport', () => {
         const amdBlock = lines.slice(amdIdx, end).join('\n');
         expect(amdBlock).toContain('🔥');
         expect(amdBlock).not.toContain('EXTREME');
+    });
+
+    it('renders the CREEP section between pullback and breakout', () => {
+        const r = empty();
+        r.pullbacks.push({
+            stock: stock({ ticker: 'AAPL', pctFromAth: -18, ath: 250, lastPrice: 204 }),
+            signal: { pctFromAth: -18 },
+        });
+        r.creep.push({
+            stock: stock({ ticker: 'INTC', rvol: 0.9, pctFromAth: -3 }),
+            signal: { mom63: 47, pctFromAth: -3, avgDollarVolumeUsd: 50_000_000 },
+        });
+        r.consolidationBreakouts.push({
+            stock: stock({ ticker: 'AMKR', rvol: 2.4 }),
+            signal: { window: '1M', baseRangePct: 8, windowHigh: 35 },
+        });
+        const out = formatLeanReport('2026-07-08', r);
+        expect(out).toContain('זחילה שקטה');
+        expect(out).toContain('mom63 +47%');
+        // Physical order mirrors the legend: pullback → creep → breakout.
+        expect(out.indexOf('Pullback תקין')).toBeLessThan(out.indexOf('זחילה שקטה'));
+        expect(out.indexOf('זחילה שקטה')).toBeLessThan(out.indexOf('פריצת קונסולידציה'));
     });
 
     it('appends a climax warning when RVOL >= 8', () => {
