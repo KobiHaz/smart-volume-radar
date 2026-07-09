@@ -3,12 +3,15 @@ import {
   buildSignalsQuery,
   buildRecentDatesQuery,
   buildHistoryRowsQuery,
+  buildSetupRowsQuery,
+  buildRsDailyQuery,
 } from '../../src/query.js';
 import { enrichRows, type HistoryRow } from '../../src/enrich.js';
+import { mergeSetupRows, type SetupRowD1, type RsDailyRow } from '../../src/mergeSetup.js';
 
 interface Env { DB: D1Database; }
 
-interface DayRow { scan_date: string; ticker: string; score: number; signals: string; [k: string]: unknown; }
+interface DayRow { scan_date: string; ticker: string; score: number; signal: string; signals: string; signal_count: number; rs?: number | null; [k: string]: unknown; }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
   const url = new URL(request.url);
@@ -16,7 +19,19 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
   const to = url.searchParams.get('to') ?? undefined;
   const q = buildSignalsQuery({ from, to });
   const { results } = await env.DB.prepare(q.sql).bind(...q.params).all<DayRow>();
-  const dayRows = (results ?? []) as DayRow[];
+  let dayRows = (results ?? []) as DayRow[];
+
+  // Read-time merge of the Smart pipeline's setup_signals + rs_daily tables.
+  // They may not exist until the first Smart ingest runs — treat errors as empty.
+  try {
+    const sq = buildSetupRowsQuery({ from, to });
+    const setup = await env.DB.prepare(sq.sql).bind(...sq.params).all<SetupRowD1>();
+    const rq = buildRsDailyQuery({ from, to });
+    const rs = await env.DB.prepare(rq.sql).bind(...rq.params).all<RsDailyRow>();
+    dayRows = mergeSetupRows(dayRows, (setup.results ?? []) as SetupRowD1[], (rs.results ?? []) as RsDailyRow[]);
+  } catch {
+    // setup tables absent or query failed — lean rows alone are still correct.
+  }
 
   if (dayRows.length === 0) return Response.json([]);
 

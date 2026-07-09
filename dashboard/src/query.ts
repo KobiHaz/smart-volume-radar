@@ -34,6 +34,45 @@ export function buildHistoryRowsQuery(dates: string[]): Query {
   };
 }
 
+/**
+ * Setup rows written daily by the Smart pipeline into its OWN table
+ * (setup_signals) — merged into lean rows at read time by mergeSetup.ts.
+ * The table may not exist until the first Smart ingest runs: callers must
+ * treat a query error as "no rows".
+ */
+export function buildSetupRowsQuery(p: SignalParams): Query {
+  const SEL = 'SELECT scan_date,ticker,region,sector,sig,rvol,ath_pct,day_pct,stage2,score,price,rs,ingested_at FROM setup_signals';
+  if (p.from && p.to) {
+    return { sql: `${SEL} WHERE scan_date BETWEEN ? AND ?`, params: [p.from, p.to] };
+  }
+  return { sql: `${SEL} WHERE scan_date = (SELECT MAX(scan_date) FROM lean_signals)`, params: [] };
+}
+
+/** RS percentiles for all scanned tickers (rs_daily) — fills rs on lean rows. */
+export function buildRsDailyQuery(p: SignalParams): Query {
+  const SEL = 'SELECT scan_date,ticker,rs FROM rs_daily';
+  if (p.from && p.to) {
+    return { sql: `${SEL} WHERE scan_date BETWEEN ? AND ?`, params: [p.from, p.to] };
+  }
+  return { sql: `${SEL} WHERE scan_date = (SELECT MAX(scan_date) FROM lean_signals)`, params: [] };
+}
+
+/** Per-date setup counts for the summary merge. setup_new = setup rows with
+ *  no lean row that day (added to the day's total). */
+export function buildSetupSummaryQuery(): Query {
+  return {
+    sql: `SELECT scan_date,
+      SUM(sig='setupFull') AS setup_full,
+      SUM(sig!='setupFull') AS setup_other,
+      SUM(NOT EXISTS (SELECT 1 FROM lean_signals ls
+                      WHERE ls.scan_date=setup_signals.scan_date
+                        AND ls.ticker=setup_signals.ticker)) AS setup_new,
+      SUM(rs>=90) AS rs90
+      FROM setup_signals GROUP BY scan_date`,
+    params: [],
+  };
+}
+
 export function buildSummaryQuery(_p: SignalParams): Query {
   return {
     sql: `SELECT scan_date,
