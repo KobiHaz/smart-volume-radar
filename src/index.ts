@@ -242,9 +242,14 @@ async function main(): Promise<void> {
             const aR = actionRank[a.action ?? ''] ?? 99;
             const bR = actionRank[b.action ?? ''] ?? 99;
             if (aR !== bR) return aR - bR;
-            // within same action bucket, higher score first, then higher RVOL
-            const sDiff = (b.championScore ?? 0) - (a.championScore ?? 0);
-            if (Math.abs(sDiff) > 0.5) return sDiff;
+            // Within the same action bucket: RS percentile first, then RVOL.
+            // The 2y score study (2026-07-09, 10,736 episodes) found the weighted
+            // ChampionScore FLAT inside the momentum-gated stream (win63 67.5-71%
+            // across all bands) while RS percentile kept a clean gradient
+            // (RS 90-100: 75.1% / +17.9% med63 vs RS 50-69: 67.9% / +8.3%),
+            // robust in both the trending and the choppy year.
+            const rsDiff = (b.rsPercentile ?? -1) - (a.rsPercentile ?? -1);
+            if (rsDiff !== 0) return rsDiff;
             return (b.rvol ?? 0) - (a.rvol ?? 0);
         });
         const buyCount = actionableStocks.filter((s) => s.action === 'BUY').length;

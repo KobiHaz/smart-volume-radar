@@ -150,11 +150,18 @@ describe('Telegram Formatter (action-based)', () => {
             expect(watchIdx).toBeGreaterThan(buyIdx);
         });
 
-        it('shows the Champion Score next to ticker', () => {
-            const report = formatDailyReport('2026-02-01', [buyStock], []);
+        it('shows RS percentile next to ticker (score removed from header, TD-27)', () => {
+            const report = formatDailyReport('2026-02-01', [{ ...buyStock, rsPercentile: 93 }], []);
             expect(report).toContain('NVDA');
-            expect(report).toContain('87'); // championScore
-            expect(report).toContain('/100');
+            expect(report).toContain('RS 93');
+            expect(report).toContain('🔥'); // RS >= 90 leader flame
+            expect(report).not.toContain('/100'); // weighted score no longer displayed
+        });
+
+        it('no flame below RS 90', () => {
+            const report = formatDailyReport('2026-02-01', [{ ...buyStock, rsPercentile: 74 }], []);
+            expect(report).toContain('RS 74');
+            expect(report).not.toContain('RS 74 🔥');
         });
 
         it('renders the trade plan (buy zone + pivot + stop + risk)', () => {

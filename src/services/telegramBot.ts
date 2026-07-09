@@ -251,7 +251,7 @@ function formatSingleStockBlock(stock: RVOLResult, monitorMeta?: MonitorMeta): s
     const { tvUrl, yahooUrl } = buildStockUrls(stock);
     const persistenceMarker = formatPersistenceMarker(monitorMeta);
 
-    // Header: ticker + persistence + history badges (TD-19/23) + Champion Score + RS percentile + sector
+    // Header: ticker + persistence + history badges (TD-19/23) + RS percentile + sector
     let block = `${statusEmoji} <b><a href="${tvUrl}">${escapeHtml(stock.ticker)}</a></b>${persistenceMarker}`;
     // TD-19: Double BUY badge — strongest signal in our 3-month backtest
     // (82% win, +49% avg peak). Visually unmissable: 🔥 prefix.
@@ -267,11 +267,13 @@ function formatSingleStockBlock(stock: RVOLResult, monitorMeta?: MonitorMeta): s
         const gradeEmoji = stock.entryGrade === 'A+' ? '💎' : stock.entryGrade === 'A' ? '⭐' : '✦';
         block += ` ${gradeEmoji} <b>${stock.entryGrade}</b>`;
     }
-    if (stock.championScore != null) {
-        block += `  <b>${stock.championScore.toFixed(0)}</b><i>/100</i>`;
-    }
+    // RS percentile is the headline ranking metric (TD-27, 2026-07-09): the 2y
+    // score study showed the weighted ChampionScore is flat inside the
+    // momentum-gated stream, while RS keeps a clean win/median gradient.
+    // 🔥 at RS ≥ 90 — that cohort wins 75.1% with +17.9% median at 63d.
     if (stock.rsPercentile != null) {
-        block += `  ·  <b>RS</b> ${stock.rsPercentile}`;
+        block += `  <b>RS ${stock.rsPercentile}</b>`;
+        if (stock.rsPercentile >= 90) block += ' 🔥';
     }
     if (stock.sector) {
         let sectorTag = stock.sector;
@@ -555,14 +557,15 @@ export function formatDailyReport(
 }
 
 /**
- * Render the "Notable but Cautious" tier — compact one-liners for high-score
+ * Render the "Notable but Cautious" tier — compact one-liners for high-RS
  * stocks that don't qualify as actionable today (under distribution or lacking
- * volume confirmation). Two sub-sections, sorted by score descending.
+ * volume confirmation). Two sub-sections, sorted by RS percentile descending.
  */
 // Spam-fix thresholds (2026-05-22) — see decisions-log.
+// Ranking switched score → RS percentile (TD-27, 2026-07-09 score study).
 // Empirical context: cabinet/knowledge/reference/smart-volume-radar-criteria-empirical.md
-const NOTABLE_MAX_PER_BUCKET = 5;        // Cap each sub-section to its top-N by score.
-const NOTABLE_MIN_SCORE = 60;            // Drop low-quality candidates entirely.
+const NOTABLE_MAX_PER_BUCKET = 5;        // Cap each sub-section to its top-N by RS.
+const NOTABLE_MIN_RS = 70;               // Below RS 70 the gated stream is weakest (67.9% / +8.3%).
 const NOTABLE_SKIP_NEGATIVE_SECTOR = true; // Skip stocks whose sector is in 63d-negative.
 
 /** Empirically (60d study) stocks in negative-sector cohorts have:
@@ -579,16 +582,16 @@ function formatNotableSection(
 ): string {
     if (distributionStocks.length === 0 && noVolStocks.length === 0) return '';
 
-    const byScore = (a: RVOLResult, b: RVOLResult): number =>
-        (b.championScore ?? 0) - (a.championScore ?? 0) || (b.rvol ?? 0) - (a.rvol ?? 0);
+    const byRs = (a: RVOLResult, b: RVOLResult): number =>
+        (b.rsPercentile ?? 0) - (a.rsPercentile ?? 0) || (b.rvol ?? 0) - (a.rvol ?? 0);
 
-    /** Quality filter: drop low-score and (optionally) negative-sector candidates,
-     *  then cap to top-N by score. Returns the survivors. */
+    /** Quality filter: drop low-RS and (optionally) negative-sector candidates,
+     *  then cap to top-N by RS. Returns the survivors. */
     const filterBucket = (stocks: RVOLResult[]): RVOLResult[] =>
         stocks
-            .filter((s) => (s.championScore ?? 0) >= NOTABLE_MIN_SCORE)
+            .filter((s) => (s.rsPercentile ?? 0) >= NOTABLE_MIN_RS)
             .filter((s) => !(NOTABLE_SKIP_NEGATIVE_SECTOR && isNegativeSector(s)))
-            .sort(byScore)
+            .sort(byRs)
             .slice(0, NOTABLE_MAX_PER_BUCKET);
 
     const filteredDist = filterBucket(distributionStocks);
@@ -597,12 +600,12 @@ function formatNotableSection(
     if (filteredDist.length === 0 && filteredNoVol.length === 0) return '';
 
     const fmtLine = (s: RVOLResult): string => {
-        const score = (s.championScore ?? 0).toFixed(0);
+        const rs = s.rsPercentile != null ? `RS ${s.rsPercentile}${s.rsPercentile >= 90 ? ' 🔥' : ''}` : 'RS —';
         const stage = s.breakoutStage ?? '?';
         const rvol = (s.rvol ?? 0).toFixed(2);
         const sector = s.sector ? ` · ${escapeHtml(s.sector.slice(0, 20))}` : '';
         const { tvUrl } = buildStockUrls(s);
-        return `  • <a href="${tvUrl}"><b>${escapeHtml(s.ticker)}</b></a> ${score}/100 · ${escapeHtml(stage)} · RVOL ${rvol}x${sector}`;
+        return `  • <a href="${tvUrl}"><b>${escapeHtml(s.ticker)}</b></a> ${rs} · ${escapeHtml(stage)} · RVOL ${rvol}x${sector}`;
     };
 
     // Headline counts reflect what was DROPPED to give honest sense of the broader set.
@@ -613,7 +616,7 @@ function formatNotableSection(
 
     let section = `\n⚠️ <b>NOTABLE BUT CAUTIOUS</b>  ·  ${totalShown} shown`;
     if (totalDropped > 0) section += ` <i>(${totalDropped} filtered out)</i>`;
-    section += `\n<i>top score ≥${NOTABLE_MIN_SCORE}, max ${NOTABLE_MAX_PER_BUCKET} per bucket, neg-sector skipped</i>\n`;
+    section += `\n<i>top RS ≥${NOTABLE_MIN_RS}, max ${NOTABLE_MAX_PER_BUCKET} per bucket, neg-sector skipped</i>\n`;
     section += `━━━━━━━━━━━━━━━━━━━━━━\n`;
 
     if (filteredDist.length > 0) {
