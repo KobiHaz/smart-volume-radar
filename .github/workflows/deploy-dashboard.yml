@@ -3,6 +3,16 @@ name: Deploy Dashboard (Pages)
 # Manual deploy of the radar dashboard (static frontend + Pages Functions)
 # to Cloudflare Pages on Account B. Uses the same CF_* secrets as the lean
 # scan's D1 ingest. Trigger from the Actions tab or `gh workflow run`.
+#
+# --branch=production is REQUIRED (2026-07-09 fix): radar-dashboard is a
+# Direct-Upload Pages project (no Git integration), and its canonical/
+# production branch is the literal string "production" — not tied to any
+# git branch. Without this flag, wrangler auto-detects the actual git
+# branch checked out here (e.g. "stable") and every deploy lands as a
+# PREVIEW (stable.radar-dashboard-c9o.pages.dev), silently never touching
+# the real https://radar-dashboard-c9o.pages.dev/ that the user visits.
+# Verified via the Cloudflare API: canonical_deployment.created_on matched
+# the deploy timestamp only once this flag was added.
 on:
   workflow_dispatch:
 
@@ -21,4 +31,4 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - run: npx wrangler pages deploy public --project-name radar-dashboard --commit-dirty=true
+      - run: npx wrangler pages deploy public --project-name radar-dashboard --commit-dirty=true --branch=production
