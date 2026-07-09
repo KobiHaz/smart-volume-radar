@@ -9,12 +9,17 @@
 /* ─── Constants ──────────────────────────────────────────────────────────── */
 
 const SIGNAL_META = {
-  breakout:     { label: 'Breakout',     icon: '🎯', cls: 'breakout' },
-  highVolume:   { label: 'High Volume',  icon: '🔥', cls: 'highVolume' },
-  pullback:     { label: 'Pullback',     icon: '📉', cls: 'pullback' },
-  nearBreakout: { label: 'Near Break',   icon: '⏳', cls: 'near' },
-  nearHighVol:  { label: 'Near HiVol',   icon: '⏳', cls: 'near' },
-  nearPullback: { label: 'Near Pull',    icon: '⏳', cls: 'near' },
+  breakout:      { label: 'Breakout',     icon: '🎯', cls: 'breakout' },
+  highVolume:    { label: 'High Volume',  icon: '🔥', cls: 'highVolume' },
+  pullback:      { label: 'Pullback',     icon: '📉', cls: 'pullback' },
+  creep:         { label: 'Creep',        icon: '🐢', cls: 'pullback' },
+  nearBreakout:  { label: 'Near Break',   icon: '⏳', cls: 'near' },
+  nearHighVol:   { label: 'Near HiVol',   icon: '⏳', cls: 'near' },
+  nearPullback:  { label: 'Near Pull',    icon: '⏳', cls: 'near' },
+  // Smart-Setup tiers (momentum-gated package, backfilled 2026-07-09)
+  setupFull:     { label: 'Setup Full',   icon: '🎯', cls: 'breakout' },
+  setupClose:    { label: 'Setup Close',  icon: '👀', cls: 'pullback' },
+  setupRecovery: { label: 'Recovery',     icon: '🚀', cls: 'highVolume' },
 };
 
 /** Table column definitions: [key, hebrewLabel, cssClass] */
@@ -27,6 +32,7 @@ const COLS = [
   ['ath_pct',   'ATH%',      'col-mono'],
   ['day_pct',   'יום%',      'col-mono'],
   ['stage2',    'S2',        'col-mono'],
+  ['rs',        'RS',        'col-mono'],
   ['score',     'Score',     'col-score'],
   ['price',     'מחיר',      'col-mono'],
 ];
@@ -586,6 +592,12 @@ function renderTable() {
         case 'stage2':
           inner = r.stage2 ? '<span class="num-up" title="Stage 2">✓</span>' : '';
           break;
+        case 'rs': {
+          // RS percentile — the ranking metric that survived the 2y score study.
+          if (r.rs == null) return `<td class="${cls}" data-v="-1">—</td>`;
+          const flame = r.rs >= 90 ? ' 🔥' : '';
+          return `<td class="${cls}" data-v="${r.rs}"><span class="${r.rs >= 90 ? 'num-up' : ''}">${r.rs}${flame}</span></td>`;
+        }
         case 'score': {
           const bg    = scoreBg(r.score);
           const delta = scoreDeltaHTML(r.score_delta);
@@ -640,7 +652,7 @@ function renderTable() {
           <div class="sc-kv"><span class="sc-k">יום%</span><span class="sc-v ${fmtPctClass(r.day_pct)}">${fmtPct(r.day_pct)}</span></div>
           <div class="sc-kv"><span class="sc-k">ATH%</span><span class="sc-v ${fmtPctClass(r.ath_pct)}">${fmtPct(r.ath_pct)}</span></div>
           <div class="sc-kv"><span class="sc-k">מחיר</span><span class="sc-v">${fmtPrice(r.price)}</span></div>
-          <div class="sc-kv"><span class="sc-k">אזור</span><span class="sc-v">${r.region || ''}</span></div>
+          <div class="sc-kv"><span class="sc-k">RS</span><span class="sc-v ${(r.rs ?? 0) >= 90 ? 'num-up' : ''}">${r.rs != null ? r.rs + (r.rs >= 90 ? ' 🔥' : '') : '—'}</span></div>
           <div class="sc-kv"><span class="sc-k">S2</span><span class="sc-v ${r.stage2 ? 'num-up' : ''}">${r.stage2 ? '✓' : '—'}</span></div>
         </div>
       </div>`;

@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS lean_signals (
   dist_pivot  REAL,
   score       INTEGER,
   price       REAL,
+  rs          INTEGER,
   ingested_at TEXT,
   PRIMARY KEY (scan_date, ticker)
 );

@@ -2,7 +2,7 @@
 export interface Query { sql: string; params: unknown[]; }
 export interface SignalParams { from?: string; to?: string; }
 
-const SELECT = 'SELECT scan_date,ticker,region,sector,signal,signals,signal_count,rvol,ath_pct,day_pct,stage2,dist_pivot,score,price,ingested_at FROM lean_signals';
+const SELECT = 'SELECT scan_date,ticker,region,sector,signal,signals,signal_count,rvol,ath_pct,day_pct,stage2,dist_pivot,score,price,ingested_at,rs FROM lean_signals';
 
 export function buildSignalsQuery(p: SignalParams): Query {
   if (p.from && p.to) {
