@@ -22,6 +22,7 @@ import { RVOLResult, MarketStatus, StockData } from './types/index.js';
 import logger from './utils/logger.js';
 import { formatErrorForTelegram } from './utils/errorHandler.js';
 import { buildStoredScanResult, writeScanResults, writeScanDebug } from './utils/writeScanResults.js';
+import { ingestSetupToD1 } from './utils/setupD1Ingest.js';
 import { writeRadarSnapshot, computeActionDistribution } from './utils/snapshotWriter.js';
 import { writeSmartTradingViewWatchlists } from './services/tradingViewWatchlist.js';
 import { getLastTradingDay } from './utils/tradingDate.js';
@@ -396,6 +397,11 @@ async function main(): Promise<void> {
             resultsDir
         );
         logger.info(`📁 Saved results to ${resultsDir}/scan-${scanDate}.json`);
+
+        // 8.05 Dashboard integration: push the day's Setup signals + RS
+        // percentiles to D1 (own tables — read-merged by the dashboard API).
+        // Soft-fail by design: a D1/network hiccup must not fail the scan.
+        await ingestSetupToD1(stocks, scanDate);
 
         // 8.1 Write TradingView watchlist files (BUY + WATCH) for nightly TV sync.
         // Files land in results/ alongside scan-*.json so the daily-scan GHA

@@ -70,6 +70,12 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           MIN_RVOL: '2.0'
           FORCE_SCAN: 'true'
+          # Dashboard integration: push the day's Setup signals + RS to the
+          # radar-dashboard D1 (Account B — same secrets the lean scan uses).
+          # Missing secrets → the ingest silently skips; it never fails the scan.
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
         run: npm run start
 
       - name: Set artifact name
