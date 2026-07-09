@@ -422,6 +422,143 @@
           לכן: שער מומנטום על ה-Setup וה-pullback · Creep לזוחלים השקטים · RS כעמודת הדירוג ·
           הורדת משקל ה-breakout בציון.
         </p>
+
+        <h3 class="explainer-h3">📊 טבלת הסטטיסטיקות המלאה</h3>
+        <p class="explainer-prose">
+          כל מדד נמדד באפיזודות (dedup 21 יום בין איתותים על אותה מנייה), חלון תשואה של 63 ימי מסחר
+          קדימה. Baseline = תשואת יום אקראי מאותה אוכלוסייה באותה תקופה — כך שה-lift אמין גם כשהמספרים
+          האבסולוטיים מנופחים מהטיית שרידות של הווטצ'ליסט.
+        </p>
+
+        <div class="explainer-table-wrap">
+          <table class="explainer-table">
+            <caption>Momentum Setup — לפני/אחרי החבילה, ווטצ'ליסט, שנתיים (2024-07→2026-07)</caption>
+            <thead>
+              <tr>
+                <th>תקופה</th>
+                <th>Baseline<br><span class="et-sub">win / חציון</span></th>
+                <th>Setup ישן<br><span class="et-sub">win / חציון / hit10</span></th>
+                <th>Setup חדש<br><span class="et-sub">win / חציון / hit10</span></th>
+                <th>אפיזודות</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>שנה 1 <span class="et-sub">(24-25, כולל מפולת המכסים)</span></td>
+                <td>62.9% / +5.9%</td>
+                <td>63.2% / +5.4% / 62.1%</td>
+                <td class="et-good">59.6% / +5.9% / <b>66.9%</b></td>
+                <td>1,792 → 453</td>
+              </tr>
+              <tr>
+                <td>שנה 2 <span class="et-sub">(25-26)</span></td>
+                <td>76.1% / +11.2%</td>
+                <td>78.1% / +11.6% / 75.7%</td>
+                <td class="et-good"><b>78.5% / +16.3% / 81.4%</b></td>
+                <td>1,893 → 869</td>
+              </tr>
+              <tr class="et-total">
+                <td>שנתיים מצטבר</td>
+                <td>68.6% / +8.3%</td>
+                <td>69.9% / +8.3% / 68.4%</td>
+                <td class="et-good"><b>70.7% / +11.4% / 75.5%</b></td>
+                <td><b>3,654 → 1,307 (−64%)</b></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="explainer-table-wrap">
+          <table class="explainer-table">
+            <caption>שכבות ה-Setup בנפרד — ווטצ'ליסט, שנה 2 (המדדים ששימשו לכיול)</caption>
+            <thead>
+              <tr>
+                <th>שכבה</th>
+                <th>win63</th>
+                <th>חציון 63י'</th>
+                <th>hit10</th>
+                <th>אפיזודות/שנה</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>🎯 Setup Full</td>
+                <td class="et-good">78.8%</td>
+                <td class="et-good">+15.7%</td>
+                <td class="et-good">83.2%</td>
+                <td>303</td>
+              </tr>
+              <tr>
+                <td>👀 Setup Close</td>
+                <td class="et-good">78.3%</td>
+                <td class="et-good">+18.9%</td>
+                <td class="et-good">84.6%</td>
+                <td>700</td>
+              </tr>
+              <tr>
+                <td class="et-indent">└ מתוכם: ללא Stage 2 <span class="et-sub">(דפוס ARM/ALAB/MU)</span></td>
+                <td class="et-good"><b>80.3%</b></td>
+                <td class="et-good"><b>+35.6%</b></td>
+                <td class="et-good"><b>95.1%</b></td>
+                <td>91</td>
+              </tr>
+              <tr>
+                <td>🚀 Setup Recovery</td>
+                <td class="et-good">87.5%</td>
+                <td class="et-good">+47.0%</td>
+                <td>—</td>
+                <td>18</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="explainer-table-wrap">
+          <table class="explainer-table">
+            <caption>מחקר הציונים — 10,736 אפיזודות, שנתיים (אחרי החבילה, ווטצ'ליסט)</caption>
+            <thead>
+              <tr>
+                <th>רצועה</th>
+                <th>win63</th>
+                <th>חציון</th>
+                <th>hit10</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Score &lt; 50</td><td>67.5%</td><td>+9.3%</td><td>76.2%</td></tr>
+              <tr><td>Score 50–79</td><td>~70.5%</td><td>+11–12%</td><td>~75%</td></tr>
+              <tr><td>Score 80+</td><td>70.9%</td><td>+11.5%</td><td>77.2%</td></tr>
+              <tr><td>RS 50–69</td><td>67.9%</td><td>+8.3%</td><td>66.0%</td></tr>
+              <tr><td>RS 70–89</td><td>~69%</td><td>~+12%</td><td>~76%</td></tr>
+              <tr class="et-total"><td><b>RS 90–100 🔥</b></td><td class="et-good"><b>75.1%</b></td><td class="et-good"><b>+17.9%</b></td><td class="et-good"><b>87.4%</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="explainer-table-wrap">
+          <table class="explainer-table">
+            <caption>מניות שעשו ‎+100%‎ ומעלה בשנתיים — כיסוי ולכידה (164 מניות, ווטצ'ליסט 105)</caption>
+            <thead>
+              <tr>
+                <th>מדד</th>
+                <th>ערך</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>קיבלו לפחות איתות Setup אחד</td><td class="et-good">98–99%</td></tr>
+              <tr><td>הצלחת האיתותים עליהן (win63)</td><td class="et-good">77.3%</td></tr>
+              <tr><td>חציון תשואה 63 ימים על האיתותים</td><td class="et-good">+17.9%</td></tr>
+              <tr><td>RS≥80 נתפס עד אפיזודה #</td><td>2</td></tr>
+              <tr><td>רווח חציוני מכניסה ב-RS≥80 הראשון עד הסוף</td><td class="et-good"><b>+154%</b></td></tr>
+              <tr><td>ציון-ליבה חציוני באיתות הראשון</td><td>72 <span class="et-sub">(87% ≥ רצועת WATCH)</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="explainer-prose explainer-prose--note">
+          מקור: replay מלא על 599 מניות (Yahoo Finance, אומת מול fetch חי) · שיטה, קוד וקבצי דאטה גולמיים —
+          <code>cabinet/outputs/2026-07-09-setup-success-optimization.html</code>.
+        </p>
       </section>
 
     </article>

@@ -1023,6 +1023,13 @@ td.col-score {
   border-bottom: 1px solid var(--border);
 }
 
+.explainer-h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 22px 0 10px;
+}
+
 .explainer-prose {
   font-size: 0.9rem;
   color: var(--muted);
@@ -1261,6 +1268,81 @@ td.col-score {
   line-height: 1.5;
 }
 
+/* Research statistics tables */
+.explainer-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  background: var(--surface);
+}
+
+.explainer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.explainer-table caption {
+  caption-side: top;
+  text-align: right;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.explainer-table th,
+.explainer-table td {
+  padding: 8px 14px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.explainer-table thead th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.72rem;
+  background: var(--surface2);
+}
+
+.explainer-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.explainer-table tbody tr:hover {
+  background: var(--surface2);
+}
+
+.explainer-table td {
+  font-family: var(--mono);
+  color: var(--text);
+}
+
+.explainer-table .et-sub {
+  font-family: var(--sans);
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.explainer-table .et-good {
+  color: var(--up);
+}
+
+.explainer-table .et-indent {
+  padding-right: 26px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.75rem;
+}
+
+.explainer-table tr.et-total td {
+  background: rgba(63, 185, 80, 0.06);
+  font-weight: 700;
+}
+
 /* Explainer mobile */
 @media (max-width: 640px) {
   .explainer {
@@ -1274,6 +1356,15 @@ td.col-score {
   .explainer-score-grid,
   .explainer-research-grid {
     grid-template-columns: 1fr;
+  }
+
+  .explainer-table {
+    font-size: 0.73rem;
+  }
+
+  .explainer-table th,
+  .explainer-table td {
+    padding: 6px 10px;
   }
 }
 
