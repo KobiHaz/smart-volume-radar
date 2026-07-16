@@ -1,381 +1,436 @@
 {
-  "updatedAt": "2026-07-15",
+  "updatedAt": "2026-07-16",
   "watchlists": {
     "Smart Radar - BUY": [
       {
         "ticker": "MNST",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "EIRL",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "EWO",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "EWI",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "ARF",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "ORON",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "PANW",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "XBI",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "FROG",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "SCOP",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "JETS",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "JPM",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "ABNB",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "ASH",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "WBS",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "GREK",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "CHEF",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "EWP",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "EWN",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "AMD",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "MAS",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "EZJ",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "VLY",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       }
     ],
     "Smart Radar - WATCH": [
       {
         "ticker": "DELL",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "TA-BANKS",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "028260",
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "APH",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "MAXO",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "DIPL",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "FROG",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EFCP",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "ORON",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "DIFI",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "PLUS",
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "3661",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
-        "ticker": "NET",
-        "signalDate": "2026-07-15"
+        "ticker": "MAXO",
+        "signalDate": "2026-07-16"
       },
       {
-        "ticker": "LUV",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "SIMO",
-        "signalDate": "2026-07-15"
+        "ticker": "EZJ",
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "UAL",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
-        "ticker": "LIND",
-        "signalDate": "2026-07-15"
+        "ticker": "OKTA",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "LHA",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "SPEN",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "LUV",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "AER",
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "S",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "SUN",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "MAS",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "IDIN",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "SBUX",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "DDOG",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
-        "ticker": "EWN",
-        "signalDate": "2026-07-15"
+        "ticker": "EAT",
+        "signalDate": "2026-07-16"
       },
       {
-        "ticker": "ASML",
-        "signalDate": "2026-07-15",
-        "exchange": "EURONEXT"
+        "ticker": "PKG",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "DAL",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "PPG",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "SIMO",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "ORL",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "AZRT",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "SCHW",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "LIND",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "MTX",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "DIN",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "SNOW",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "ARKO",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "IFX",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "NET",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "DE",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "XLF",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EWL",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "GCT",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "CAPL",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "PHM",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "PANW",
+        "signalDate": "2026-07-16"
       }
     ],
     "Lean Radar - Breakouts": [
       {
-        "ticker": "VBK",
-        "signalDate": "2026-07-15"
-      },
-      {
         "ticker": "KBE",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       }
     ],
     "Lean Radar - Near": [
       {
         "ticker": "WBS",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "KO",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "NESN",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "VLY",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "MNST",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "KBE",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "REG",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "JPM",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "CL",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "AEP",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "SRE",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "SWX",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "PM",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EWI",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "PAZ",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EWU",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EWP",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "XLI",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "DKSH",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "TMHC",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "VGK",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EWL",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "SPY",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "UPS",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "CAPL",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "IWM",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "TFC",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EWQ",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EWO",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "ACWX",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "IYR",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EWG",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "SCHG",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "VBK",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "VNQ",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EQR",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EIRL",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "AMLP",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "BLND",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "YUM",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "XLU",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "XLRE",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "XLP",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "EWC",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "GREK",
-        "signalDate": "2026-07-15"
-      },
-      {
-        "ticker": "ABNB",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
         "ticker": "PKG",
-        "signalDate": "2026-07-15"
+        "signalDate": "2026-07-16"
       },
       {
-        "ticker": "RTX",
-        "signalDate": "2026-07-15"
+        "ticker": "MNST",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "JPM",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "CL",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "NESN",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "SRE",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "KBE",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "VLY",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "REG",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "UPS",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "AEP",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "KO",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "SWX",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "PM",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "YUM",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "IWM",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "XLI",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EWP",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EIRL",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "CTVA",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EWL",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "CAPL",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EQR",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "SPY",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "ACWX",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "TMHC",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "VBK",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "DKSH",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "IYR",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EWU",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "VNQ",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "XLU",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "TXRH",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "VGK",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "XLP",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EWQ",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EWK",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "EWI",
+        "signalDate": "2026-07-16"
+      },
+      {
+        "ticker": "PAZ",
+        "signalDate": "2026-07-16"
       }
     ]
   }
