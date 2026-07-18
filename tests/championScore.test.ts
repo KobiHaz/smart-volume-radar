@@ -8,6 +8,7 @@ import {
     determineAction,
     applyChampionScore,
     isBBSqueeze,
+    isGoldTierAlert,
 } from '../src/utils/championScore';
 import type { MomentumCriteria, MomentumResult, StockData } from '../src/types';
 
@@ -518,5 +519,47 @@ describe('applyChampionScore (integration)', () => {
         expect(stock.tradePlan).toBeDefined();
         expect(result.score).toBe(stock.championScore);
         expect(result.action).toBe(stock.action);
+    });
+});
+
+describe('isGoldTierAlert (2026-07-17 — 4y-replay validated gate)', () => {
+    const goldStock = (over: Partial<StockData> = {}): StockData =>
+        makeStock({
+            action: 'BUY',
+            momentum: {
+                ...makeMomentum(makeCriteria({ lowRiskEntry: false })),
+                level: 'full',
+            },
+            ...over,
+        });
+
+    it('BUY + full momentum + lowRiskEntry FAILED → gold', () => {
+        expect(isGoldTierAlert(goldStock())).toBe(true);
+    });
+
+    it('WATCH + recovery momentum also qualifies', () => {
+        const s = goldStock({ action: 'WATCH' });
+        s.momentum!.level = 'recovery';
+        expect(isGoldTierAlert(s)).toBe(true);
+    });
+
+    it('CAUTION action never qualifies', () => {
+        expect(isGoldTierAlert(goldStock({ action: 'CAUTION_NO_VOL' }))).toBe(false);
+    });
+
+    it('close/none momentum never qualifies', () => {
+        const s = goldStock();
+        s.momentum!.level = 'close';
+        expect(isGoldTierAlert(s)).toBe(false);
+    });
+
+    it('lowRiskEntry PASSING disqualifies (near-SMA21 flags won only 10-22% in 4y replay)', () => {
+        const s = goldStock();
+        s.momentum!.criteria.lowRiskEntry = true;
+        expect(isGoldTierAlert(s)).toBe(false);
+    });
+
+    it('missing momentum → not gold', () => {
+        expect(isGoldTierAlert(makeStock({ action: 'BUY' }))).toBe(false);
     });
 });

@@ -9,6 +9,7 @@ import logger from '../utils/logger.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
 import { formatTagsForDisplay } from '../utils/tags.js';
 import { formatRVOL, formatPriceChange } from '../utils/formatters.js';
+import { isGoldTierAlert } from '../utils/championScore.js';
 // LLM summary feature removed 2026-05-22 — Gemini API key was missing in production
 // so the daily LLM commentary block never actually got sent. See decisions-log.md.
 // `classifyTickersWithGroq` (the ticker-type utility) is still imported separately in index.ts.
@@ -94,7 +95,8 @@ function formatReportHeader(
     regime: 'bull' | 'bear' | undefined,
     actionCounts: { buy: number; watch: number; caution: number },
     topSectors?: Array<{ sector: string; rank: number; median63d: number }>,
-    marketHealth?: MarketHealth | null
+    marketHealth?: MarketHealth | null,
+    goldCount = 0
 ): string {
     const regimeBadge =
         regime === 'bear' ? ' | 🐻 Bear (SPY<SMA200)' : regime === 'bull' ? ' | 🐂 Bull' : '';
@@ -103,6 +105,15 @@ function formatReportHeader(
     if (actionCounts.caution > 0) actionBits.push(`⚠️ ${actionCounts.caution} CAUTION`);
     if (actionCounts.watch > 0) actionBits.push(`👀 ${actionCounts.watch} WATCH`);
     const actionLine = actionBits.length > 0 ? `${actionBits.join(' | ')}\n` : '';
+
+    // Gold-tier summary with regime-calibrated expectations (4y replay, ±10%/21td:
+    // 57-65% hit in bull folds, 36-41% in bear/transition folds). Shown so the
+    // reader judges alerts against the right base rate for the current tape.
+    const goldLine =
+        goldCount > 0
+            ? `🥇 <b>${goldCount} GOLD</b> — מומנטום מלא + מרחק מ-SMA21 ` +
+              `<i>(היסטורית: ~60% פגיעה ב-Bull, ~38% ב-Bear)</i>\n`
+            : '';
 
     let sectorLine = '';
     if (topSectors && topSectors.length > 0) {
@@ -130,6 +141,7 @@ function formatReportHeader(
         `📅 <code>${date}</code>${regimeBadge}\n` +
         healthLine +
         actionLine +
+        goldLine +
         sectorLine +
         `🎭 Sentiment: ${bullish} 🟢 | ${bearish} 🔴\n` +
         `<i>🟢 BUY = at pivot + volume confirmed | ⚠️ CAUTION = extended or no volume | 👀 WATCH = setup forming</i>\n` +
@@ -261,6 +273,12 @@ function formatSingleStockBlock(stock: RVOLResult, monitorMeta?: MonitorMeta): s
     // TD-23: Hot streak badge — trailing-30 win rate ≥ 80% on this ticker.
     if (stock.isHotStreak) {
         block += ` 🏆 <i>Hot Streak</i>`;
+    }
+    // Gold tier (2026-07-17): BUY/WATCH + full/recovery momentum + extended from
+    // SMA21 (lowRiskEntry failed). The only combination whose lift held in every
+    // yearly fold of the 4-year replay — see isGoldTierAlert.
+    if (isGoldTierAlert(stock)) {
+        block += ` 🥇 <b>GOLD</b>`;
     }
     // TD-25: Entry-quality grade — A+ entries hit all 4 precision dials (~66% win).
     if (stock.entryGrade) {
@@ -529,7 +547,9 @@ export function formatDailyReport(
     }
     topSectors.sort((a, b) => a.rank - b.rank);
 
-    let message = formatReportHeader(date, bullish, bearish, regime, actionCounts, topSectors, marketHealth);
+    const goldCount = topSignals.filter(isGoldTierAlert).length;
+    let message = formatReportHeader(
+        date, bullish, bearish, regime, actionCounts, topSectors, marketHealth, goldCount);
     if (gradSection) {
         message = gradSection + message;
     }

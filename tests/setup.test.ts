@@ -72,6 +72,24 @@ describe('evaluateMomentumSetup — core scenarios', () => {
         expect(r.failures).toContain('bigMoveToday');
     });
 
+    it('lowRiskEntry alone no longer grants Close (removed 2026-07-17, 4y replay Δ≈−26pp)', () => {
+        // Near SMA21 (lowRiskEntry ✓) but far from the 52w high (pivotBreakout ✗):
+        // under the pre-2026-07-17 gate `pivot || lowRisk` this was 'close';
+        // now only pivotBreakout promotes.
+        const r = evaluateMomentumSetup(
+            intelLike({
+                lastPrice: 45,
+                sma21: 44, // ~2.3% away → lowRiskEntry ✓
+                ath: 60, // 45 < 60*0.98 → pivotBreakout ✗
+                rvol: 2.0,
+                projectedRvol: 2.0,
+            })
+        );
+        expect(r.criteria.lowRiskEntry).toBe(true);
+        expect(r.criteria.pivotBreakout).toBe(false);
+        expect(r.level).toBe('none');
+    });
+
     it('Fake breakout (RVOL 0.8) → NONE, rvolPass fails', () => {
         const r = evaluateMomentumSetup(
             intelLike({ rvol: 0.8, projectedRvol: 0.8 })

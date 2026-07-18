@@ -63,7 +63,7 @@ function distFromSma21Pct(price: number | undefined, sma21: number | undefined):
  *
  * Levels:
  *   - 'full'  — all 5 main criteria true AND aboveGapAvwap true.
- *   - 'close' — RVOL ≥ 1.5 AND (pivotBreakout OR lowRiskEntry).
+ *   - 'close' — RVOL ≥ 1.5 AND momentumGate AND pivotBreakout.
  *   - 'none'  — neither.
  *
  * Notes:
@@ -184,9 +184,11 @@ export function evaluateMomentumSetup(
     // radar-criteria-tester subagent: removing it cuts 8 alerts (all outside
     // Semi/AI engines, all below cohort median), bumps median +1.8pp, hit-rate
     // (>10%) +5.9pp. See ~/cabinet/outputs/2026-05-22-svr-criteria-test-drop-lowRiskEntry.md
-    // and decisions-log. The boolean is still computed and used in:
-    //   - Close tier gate (line ~177): `pivotBreakout || lowRiskEntry`
-    //   - highConvictionBypass flag (line ~175): "extended entry" diagnostic
+    // and decisions-log. 2026-07-17: also removed from the Close tier gate
+    // (4y replay confirmed Δ≈−26pp; see comment on the gate below). The boolean
+    // is still computed and used in:
+    //   - highConvictionBypass flag: "extended entry" diagnostic
+    //   - championScore penalty + gold-tier alert gate (requires FAIL)
     const QUALITY: Array<keyof MomentumCriteria> = [
         'tightness',
         'antsAccumulation',
@@ -200,8 +202,9 @@ export function evaluateMomentumSetup(
 
     // Failures list: every criterion currently NOT met (informational, for UI/debug).
     // `lowRiskEntry` is included here even though it's not in the QUALITY gate
-    // anymore (TD-9, 2026-05-22) — it remains a useful diagnostic and is still
-    // consumed by the Close tier + highConvictionBypass flag.
+    // (TD-9, 2026-05-22) nor the Close tier (2026-07-17) anymore — it remains a
+    // useful diagnostic and is still consumed by the highConvictionBypass flag,
+    // the score penalty, and the gold-tier alert gate (which requires it to FAIL).
     const allKeys: Array<keyof MomentumCriteria> = [...MANDATORY, ...QUALITY, 'lowRiskEntry'];
     const failures = allKeys.filter((k) => !criteria[k]);
 
@@ -213,7 +216,7 @@ export function evaluateMomentumSetup(
         // both clean (i.e., the entry isn't from a textbook VCP base). Useful for the
         // trader to know "this is a continuation chase, not a clean breakout entry".
         if (!lowRiskEntry || !tightness) highConvictionBypass = true;
-    } else if (effectiveRvol >= 1.5 && momentumGate && (pivotBreakout || lowRiskEntry)) {
+    } else if (effectiveRvol >= 1.5 && momentumGate && pivotBreakout) {
         // Close gate tightened 2026-07-09 (1y replay + 90d real-scan validation): the old
         // rvol≥1.5 & (pivot|lowRisk) fired 1,674 episodes/yr at +12.0% median; adding
         // momentumGate cuts to 700 (−58%) at +18.9% median / 84.6% hit-rate, stable across
@@ -221,6 +224,13 @@ export function evaluateMomentumSetup(
         // non-Stage-2 cohort (ATH break while SMA200 structure still lags — ARM/ALAB/MU
         // pattern) was the best slice of the whole tier (80.3% win, +35.6% median), and
         // the Recovery tier's RVOL≥2.5 bar does not rescue it (those fired at rvol ~1.9-2.0).
+        //
+        // `lowRiskEntry` REMOVED from this gate 2026-07-17 — its last promoting role.
+        // 4-year production replay (1,008 td, 2022-07→2026-07, 42,131 flags, ±10%/21td):
+        // flags where lowRiskEntry PASSES win 10-22% vs 36%+ when it FAILS (Δ≈−26pp,
+        // n≈7.3k/6.1k), consistent in every yearly fold. Aligned with TD-9 (2026-05-22)
+        // which already dropped it from the Full QUALITY bucket. The boolean is still
+        // computed for diagnostics, the score penalty, and highConvictionBypass.
         level = 'close';
     } else {
         level = 'none';

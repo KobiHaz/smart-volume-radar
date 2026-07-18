@@ -495,6 +495,27 @@ export function applyChampionScore(
     return { score, action, stage };
 }
 
+/**
+ * Gold-tier alert gate — the highest-conviction combination found by the
+ * 4-year production replay (1,008 td, 2022-07→2026-07, 42,131 flags,
+ * metric: touch +10% within 21 td):
+ *
+ *   action BUY/WATCH  AND  momentum level full/recovery  AND  lowRiskEntry FAILED
+ *
+ * Per-fold win rate 41% / 36% / 57% / 65% (bear→bull) vs 20-42% for plain
+ * BUY/WATCH — the lift holds in EVERY yearly fold, ~5 alerts/week.
+ * `!lowRiskEntry` is deliberate: price extended >8% from SMA21 = riding
+ * strength; flags near SMA21 won only 10-22% (see setup.ts, TD-9).
+ */
+export function isGoldTierAlert(stock: StockData): boolean {
+    const level = stock.momentum?.level;
+    return (
+        (stock.action === 'BUY' || stock.action === 'WATCH') &&
+        (level === 'full' || level === 'recovery') &&
+        stock.momentum?.criteria?.lowRiskEntry === false
+    );
+}
+
 /** Hebrew label for the action — used in Telegram blocks. */
 export const ACTION_LABEL_HE: Record<ActionLabel, string> = {
     BUY: 'קנייה — על ה-pivot, נפח מאשר',
