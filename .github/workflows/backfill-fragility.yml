@@ -1,0 +1,26 @@
+name: Backfill Fragility (D1)
+
+# Manual-only: recompute the Purple List fragility series and rewrite the
+# ~250-row backfill in fragility_daily. No Telegram, no scan side effects.
+# The daily scan does this automatically — use this after data fixes or to
+# populate the table without waiting for the next scheduled run.
+on:
+  workflow_dispatch:
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Compute + ingest fragility series
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
+        run: npx tsx scripts/ingest-fragility.ts
