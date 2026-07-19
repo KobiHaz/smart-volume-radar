@@ -58,3 +58,28 @@ describe('buildSummaryQuery', () => {
     expect(q.sql).toMatch(/GROUP BY scan_date/);
   });
 });
+
+describe('buildFragilityQuery', () => {
+  // Imported lazily to keep the existing import block untouched.
+  const { buildFragilityQuery } = require('../src/query.js');
+
+  it('defaults to the full scored series with limit 250, ascending', () => {
+    const q = buildFragilityQuery({});
+    expect(q.sql).toMatch(/FROM fragility_daily WHERE score IS NOT NULL/);
+    expect(q.sql).toMatch(/ORDER BY scan_date ASC LIMIT \?/);
+    expect(q.params).toEqual([250]);
+  });
+
+  it('selects the score, six z components, index, drawdown and canary', () => {
+    const q = buildFragilityQuery({});
+    for (const col of ['score', 'wick10_z', 'pct_above50_z', 'dist20_z', 'ext50_z', 'corr20_z', 'disp10_z', 'index_value', 'drawdown_pct', 'canary_count']) {
+      expect(q.sql).toContain(col);
+    }
+  });
+
+  it('applies from-date filter and custom limit', () => {
+    const q = buildFragilityQuery({ from: '2026-01-01', limit: 60 });
+    expect(q.sql).toMatch(/AND scan_date >= \?/);
+    expect(q.params).toEqual(['2026-01-01', 60]);
+  });
+});

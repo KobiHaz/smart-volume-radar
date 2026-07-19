@@ -55,6 +55,7 @@ let sortKey = 'score';
 let sortDir = -1; // -1 = descending
 /** @type {Chart|null} */
 let chart = null;
+let fragChart = null;
 /** Calendar view state: which month/year the popover is currently showing */
 let calViewYear  = 0;
 let calViewMonth = 0; // 0-11
@@ -468,6 +469,108 @@ function renderChart() {
           beginAtZero: true,
           ticks: { color: '#8b95a5', font: { size: 10 }, stepSize: 1 },
           grid:  { color: '#242c3a' },
+        },
+      },
+    },
+  });
+}
+
+/* ─── Purple Fragility chart ──────────────────────────────────────────────── */
+
+/**
+ * Load the Purple List fragility series (written daily by the Smart pipeline)
+ * and render it as a line chart with the 1.0 warning threshold. The series is
+ * global (not per selected day) — loaded once at boot. Hidden when empty.
+ */
+async function loadFragility() {
+  let rows = [];
+  try {
+    const resp = await fetch('/api/fragility');
+    if (resp.ok) rows = await resp.json();
+  } catch { /* keep panel hidden */ }
+  if (!Array.isArray(rows) || rows.length === 0) return;
+  $('#fragility-wrap').hidden = false;
+  renderFragilityChart(rows);
+}
+
+function renderFragilityChart(rows) {
+  if (fragChart) { fragChart.destroy(); fragChart = null; }
+  const labels = rows.map((r) => r.scan_date.slice(5)); // MM-DD
+  const scores = rows.map((r) => r.score);
+  const threshold = rows.map(() => 1.0);
+
+  const ctx = $('#fragility-chart').getContext('2d');
+  fragChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Fragility',
+          data: scores,
+          borderColor: 'rgba(163,113,247,0.95)',
+          backgroundColor: 'rgba(163,113,247,0.12)',
+          borderWidth: 1.6,
+          pointRadius: 0,
+          pointHitRadius: 6,
+          tension: 0.25,
+          fill: false,
+        },
+        {
+          label: 'סף 1.0',
+          data: threshold,
+          borderColor: 'rgba(248,81,73,0.7)',
+          borderWidth: 1,
+          borderDash: [5, 4],
+          pointRadius: 0,
+          pointHitRadius: 0,
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      animation: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1b2130',
+          borderColor: '#242c3a',
+          borderWidth: 1,
+          titleColor: '#e6edf3',
+          bodyColor: '#8b95a5',
+          filter: (item) => item.datasetIndex === 0,
+          callbacks: {
+            title: (items) => (items[0] ? rows[items[0].dataIndex].scan_date : ''),
+            label: (item) => {
+              const r = rows[item.dataIndex];
+              const z = (v) => (v == null ? '—' : v.toFixed(1));
+              return [
+                `ציון: ${r.score.toFixed(2)}`,
+                `DD: ${r.drawdown_pct == null ? '—' : r.drawdown_pct.toFixed(1) + '%'}` +
+                  (r.canary_count != null ? ` | Canary: ${r.canary_count}` : ''),
+                `wick ${z(r.wick10_z)} | %>50 ${z(r.pct_above50_z)} | dist ${z(r.dist20_z)}`,
+                `ext ${z(r.ext50_z)} | corr ${z(r.corr20_z)} | disp ${z(r.disp10_z)}`,
+              ];
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#8b95a5',
+            font: { size: 9, family: 'ui-monospace, monospace' },
+            maxTicksLimit: 12,
+            maxRotation: 0,
+          },
+          grid: { color: '#242c3a' },
+        },
+        y: {
+          ticks: { color: '#8b95a5', font: { size: 10 } },
+          grid: { color: '#242c3a' },
         },
       },
     },
@@ -1003,6 +1106,9 @@ async function boot() {
 
   // Select most recent day (index 0 = newest first per API contract)
   await selectDay(latestDate);
+
+  // Fragility series is global (not per-day) — load once, after the main view.
+  loadFragility();
 }
 
 boot();

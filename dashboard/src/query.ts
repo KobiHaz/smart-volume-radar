@@ -92,3 +92,25 @@ export function buildSummaryQuery(_p: SignalParams): Query {
     params: [],
   };
 }
+
+/**
+ * Fragility time series written daily by the Smart pipeline into its OWN
+ * table (fragility_daily) — a per-day scalar series, not per-ticker rows, so
+ * it never goes through mergeSetup. The table may not exist until the first
+ * Smart ingest runs: callers must treat a query error as "no rows".
+ */
+export interface FragilityParams { from?: string; limit?: number; }
+
+export function buildFragilityQuery(p: FragilityParams = {}): Query {
+  const SEL =
+    'SELECT scan_date,score,wick10_z,pct_above50_z,dist20_z,ext50_z,corr20_z,disp10_z,' +
+    'index_value,drawdown_pct,canary_count FROM fragility_daily WHERE score IS NOT NULL';
+  const limit = p.limit ?? 250;
+  if (p.from) {
+    return {
+      sql: `${SEL} AND scan_date >= ? ORDER BY scan_date ASC LIMIT ?`,
+      params: [p.from, limit],
+    };
+  }
+  return { sql: `${SEL} ORDER BY scan_date ASC LIMIT ?`, params: [limit] };
+}

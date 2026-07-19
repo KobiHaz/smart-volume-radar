@@ -387,6 +387,22 @@ main {
   font-family: var(--mono);
 }
 
+.chart-wrap--fragility {
+  grid-column: 1 / -1;   /* full-width row under cards + score chart */
+  border-color: rgba(163, 113, 247, 0.35);
+}
+
+/* Chart.js with maintainAspectRatio:false needs an explicitly sized box. */
+.chart-wrap--fragility .chart-box {
+  position: relative;
+  height: 200px;
+}
+
+.chart-subtitle {
+  font-weight: 400;
+  opacity: 0.75;
+}
+
 /* ═══════════════════════════════════════════════
    CONTROLS
 ═══════════════════════════════════════════════ */
