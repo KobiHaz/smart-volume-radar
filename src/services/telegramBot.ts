@@ -15,6 +15,7 @@ import { isGoldTierAlert } from '../utils/championScore.js';
 // `classifyTickersWithGroq` (the ticker-type utility) is still imported separately in index.ts.
 import type { MonitorUpdateSummary } from './monitorTracker.js';
 import type { MarketHealth } from './marketData.js';
+import { FRAGILITY_THRESHOLD, type FragilityResult } from './purpleFragility.js';
 
 const TELEGRAM_MAX_LENGTH = 4096;
 /** Delay between sends to avoid Telegram rate limit (429) when sending many chunks */
@@ -96,7 +97,8 @@ function formatReportHeader(
     actionCounts: { buy: number; watch: number; caution: number },
     topSectors?: Array<{ sector: string; rank: number; median63d: number }>,
     marketHealth?: MarketHealth | null,
-    goldCount = 0
+    goldCount = 0,
+    fragility?: FragilityResult | null
 ): string {
     const regimeBadge =
         regime === 'bear' ? ' | 🐻 Bear (SPY<SMA200)' : regime === 'bull' ? ' | 🐂 Bull' : '';
@@ -136,10 +138,26 @@ function formatReportHeader(
             `(${marketHealth.score}/3) <i>(${bits})</i>\n`;
     }
 
+    // Purple List fragility gauge — display-only, gates nothing (like healthLine).
+    // All values are numbers formatted here; no user strings → no escapeHtml needed.
+    let fragilityLine = '';
+    if (fragility?.latest.score != null) {
+        const s = fragility.latest.score;
+        const emoji = s >= FRAGILITY_THRESHOLD ? '🔴' : s >= 0.5 ? '🟡' : '🟢';
+        const dd = fragility.latest.drawdownPct;
+        const canaryBit = fragility.indexNearHigh
+            ? ` | Canary ${fragility.canaryCount}/${fragility.tickersUsed.length}`
+            : '';
+        fragilityLine =
+            `🟣 <b>Purple Fragility:</b> ${emoji} ${s.toFixed(2)} ` +
+            `<i>(סף ${FRAGILITY_THRESHOLD.toFixed(1)})</i> | DD ${dd.toFixed(1)}%${canaryBit}\n`;
+    }
+
     return (
         `🛰 <b>SMART VOLUME RADAR</b>\n` +
         `📅 <code>${date}</code>${regimeBadge}\n` +
         healthLine +
+        fragilityLine +
         actionLine +
         goldLine +
         sectorLine +
@@ -489,7 +507,8 @@ export function formatDailyReport(
     _failedTickers: string[] = [],
     graduations?: GraduationInfo[],
     monitorMetaByTicker?: Map<string, MonitorMeta>,
-    marketHealth?: MarketHealth | null
+    marketHealth?: MarketHealth | null,
+    fragility?: FragilityResult | null
 ): string {
     const gradSection = formatGraduationSection(graduations);
     if (topSignals.length === 0) {
@@ -549,7 +568,7 @@ export function formatDailyReport(
 
     const goldCount = topSignals.filter(isGoldTierAlert).length;
     let message = formatReportHeader(
-        date, bullish, bearish, regime, actionCounts, topSectors, marketHealth, goldCount);
+        date, bullish, bearish, regime, actionCounts, topSectors, marketHealth, goldCount, fragility);
     if (gradSection) {
         message = gradSection + message;
     }
@@ -727,6 +746,8 @@ export interface ReportScope {
     monitorMetaByTicker?: Map<string, MonitorMeta>;
     /** SPY-derived market-health banner (display-only). Omitted when fetch failed. */
     marketHealth?: MarketHealth | null;
+    /** Purple List fragility gauge (display-only). Omitted when compute failed. */
+    fragility?: FragilityResult | null;
 }
 
 /**
@@ -756,6 +777,44 @@ function formatGraduationSection(graduations: GraduationInfo[] | undefined): str
     );
     lines.push('━━━━━━━━━━━━━━━━━━━━━━\n');
     return lines.join('\n');
+}
+
+/**
+ * Standalone ⚠️ alert sent only on the day the fragility score crosses the
+ * threshold upward (anti-spam: crossedUp is false while it stays above).
+ * Display-only — never gates any scan signal.
+ */
+export function formatFragilityAlert(f: FragilityResult): string {
+    const s = f.latest.score ?? 0;
+    const prev = f.prevScore;
+    const componentLabels: Array<[keyof typeof f.latest.z, string]> = [
+        ['wick10', 'wick10'],
+        ['pctAbove50', '%>MA50'],
+        ['dist20', 'dist20'],
+        ['ext50', 'ext50'],
+        ['corr20', 'corr20'],
+        ['disp10', 'disp10'],
+    ];
+    const components = componentLabels
+        .map(([key, label]) => ({ label, z: f.latest.z[key] }))
+        .filter((c): c is { label: string; z: number } => c.z != null)
+        .sort((a, b) => b.z - a.z)
+        .map((c) => `${c.label} ${c.z >= 0 ? '+' : ''}${c.z.toFixed(1)}`)
+        .join(' | ');
+    const canaryBit = f.indexNearHigh
+        ? ` | Canary: ${f.canaryCount}/${f.tickersUsed.length}`
+        : '';
+    return (
+        `⚠️ <b>PURPLE FRAGILITY — חציית סף</b>\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `🟣 ציון שבירוּת: <b>${s.toFixed(2)}</b>` +
+        (prev != null ? ` (אתמול ${prev.toFixed(2)} → חצה את ${FRAGILITY_THRESHOLD.toFixed(1)})` : '') +
+        `\n` +
+        `📉 Index: DD ${f.latest.drawdownPct.toFixed(1)}% מהשיא${canaryBit}\n` +
+        `רכיבים (z): ${components}\n\n` +
+        `<i>מחקר: ציון מעל ${FRAGILITY_THRESHOLD.toFixed(1)} היסטורית הקדים חולשה בסל ה-Purple ` +
+        `(75% מהנפילות של &gt;7% תוך 15 ימי מסחר, In-Sample). תצוגה בלבד — לא משנה שום התראת סריקה.</i>`
+    );
 }
 
 /** Format watchlist summary: total in sheet, analyzed, not analyzed with reasons */
@@ -820,7 +879,8 @@ export async function sendDailyReport(
         failedTickers,
         scope?.graduations,
         scope?.monitorMetaByTicker,
-        scope?.marketHealth
+        scope?.marketHealth,
+        scope?.fragility
     );
     const chunks = chunkMessage(report);
 

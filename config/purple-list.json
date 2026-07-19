@@ -1,0 +1,16 @@
+{
+  "lastUpdated": "2026-07-19",
+  "description": "Purple List — fixed semi/AI fragility basket. `yahooSymbol` overrides the fetch symbol when Yahoo needs a different code (data is reported under the canonical `ticker`).",
+  "tickers": [
+    { "ticker": "SMTC" },
+    { "ticker": "AMKR" },
+    { "ticker": "CRDO" },
+    { "ticker": "IFX", "yahooSymbol": "IFNNY" },
+    { "ticker": "MRVL" },
+    { "ticker": "MU" },
+    { "ticker": "ONTO" },
+    { "ticker": "SEDG" },
+    { "ticker": "SNDK" },
+    { "ticker": "TSM" }
+  ]
+}

@@ -35,6 +35,16 @@ export interface SnapshotMeta {
         failed: string[];
     };
     topSectors?: Array<{ sector: string; rank: number; median63d: number; count: number }>;
+    /** Purple List fragility gauge scalars (display-only; D1 holds the full series). */
+    fragility?: {
+        score: number | null;
+        prevScore: number | null;
+        crossedUp: boolean;
+        canaryCount: number;
+        indexNearHigh: boolean;
+        indexValue: number;
+        drawdownPct: number;
+    };
 }
 
 /** Radar-specific snapshot (main scanner). */

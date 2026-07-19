@@ -7,6 +7,8 @@
  * Stocks must have `action` set; otherwise they're invisible.
  */
 
+// Mock p-limit to avoid ESM import issues in Jest (telegramBot → purpleFragility → p-limit)
+jest.mock('p-limit', () => () => (fn: () => Promise<unknown>) => fn());
 // Mock config and llmSummary before importing telegramBot (avoids p-limit ESM in Jest)
 jest.mock('../src/config/index.js', () => ({
     config: {

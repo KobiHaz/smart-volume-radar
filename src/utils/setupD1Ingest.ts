@@ -111,12 +111,13 @@ export interface D1Config {
     apiToken: string;
 }
 
-interface Batch {
+export interface Batch {
     sql: string;
     params: unknown[];
 }
 
-async function runBatch(batch: Batch, cfg: D1Config): Promise<void> {
+/** Shared D1 HTTP helper — also used by fragilityD1Ingest. */
+export async function runBatch(batch: Batch, cfg: D1Config): Promise<void> {
     const url = `https://api.cloudflare.com/client/v4/accounts/${cfg.accountId}/d1/database/${cfg.databaseId}/query`;
     const res = await fetch(url, {
         method: 'POST',

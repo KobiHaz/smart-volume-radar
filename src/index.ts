@@ -15,7 +15,9 @@ import { enrichWithFundamentals } from './services/finnhubFundamentals.js';
 import { calculateRVOL } from './services/rvolCalculator.js';
 // News enrichment removed 2026-05-22 (Finnhub news feature deprecated).
 // `enrichWithFundamentals` (separate concern — earnings + EPS) still imported above.
-import { sendDailyReport, sendTelegramMessage, formatMonitorTelegramMessage, GraduationInfo, MonitorMeta } from './services/telegramBot.js';
+import { sendDailyReport, sendTelegramMessage, formatMonitorTelegramMessage, formatFragilityAlert, GraduationInfo, MonitorMeta } from './services/telegramBot.js';
+import { computePurpleFragility } from './services/purpleFragility.js';
+import { ingestFragilityToD1 } from './utils/fragilityD1Ingest.js';
 import { loadMonitorState, saveMonitorState } from './utils/monitorStore.js';
 import { updateMonitorState } from './services/monitorTracker.js';
 import { RVOLResult, MarketStatus, StockData } from './types/index.js';
@@ -126,6 +128,15 @@ async function main(): Promise<void> {
         const marketHealth = await fetchMarketHealth(scanDate);
         if (marketHealth) {
             logger.info(`🩺 Market health: ${marketHealth.label} (${marketHealth.score}/3)`);
+        }
+        // Purple List fragility score (display + separate crossing alert; gates nothing).
+        const fragility = await computePurpleFragility(scanDate);
+        if (fragility?.latest.score != null) {
+            logger.info(
+                `🟣 Fragility score: ${fragility.latest.score.toFixed(2)} ` +
+                `(prev ${fragility.prevScore?.toFixed(2) ?? '—'})` +
+                (fragility.crossedUp ? ' ⚠️ CROSSED 1.0' : '')
+            );
         }
         const { stocks, failedTickers } = await fetchAllStocksAsOfDate(tickers, scanDate);
 
@@ -382,7 +393,18 @@ async function main(): Promise<void> {
             graduations,
             monitorMetaByTicker,
             marketHealth,
+            fragility,
         });
+
+        // Fragility threshold-crossing alert — separate message, never fails the scan.
+        if (fragility?.crossedUp) {
+            try {
+                await sendTelegramMessage(formatFragilityAlert(fragility));
+                logger.info('⚠️ Fragility crossing alert sent to Telegram');
+            } catch (fragErr) {
+                logger.warn('Fragility alert send failed (non-fatal): ' + (fragErr as Error).message);
+            }
+        }
 
         // JSON history keeps the legacy 3-path + silent set so backtest scripts still see them.
         // sector is already populated on stocks (see line ~130 — assigned before applySectorRanks).
@@ -402,6 +424,9 @@ async function main(): Promise<void> {
         // percentiles to D1 (own tables — read-merged by the dashboard API).
         // Soft-fail by design: a D1/network hiccup must not fail the scan.
         await ingestSetupToD1(stocks, scanDate);
+
+        // 8.06 Fragility series → D1 (own table, soft-fail; no-op when compute failed).
+        await ingestFragilityToD1(fragility, scanDate);
 
         // 8.1 Write TradingView watchlist files (BUY + WATCH) for nightly TV sync.
         // Files land in results/ alongside scan-*.json so the daily-scan GHA
@@ -439,6 +464,17 @@ async function main(): Promise<void> {
                             median63d: info.median63d,
                             count: info.count,
                         })),
+                    fragility: fragility
+                        ? {
+                              score: fragility.latest.score,
+                              prevScore: fragility.prevScore,
+                              crossedUp: fragility.crossedUp,
+                              canaryCount: fragility.canaryCount,
+                              indexNearHigh: fragility.indexNearHigh,
+                              indexValue: fragility.latest.indexValue,
+                              drawdownPct: fragility.latest.drawdownPct,
+                          }
+                        : undefined,
                     actionDistribution: computeActionDistribution(stocks),
                     telegramSentCount: finalSignals.length,
                     stocks,
