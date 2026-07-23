@@ -1,6 +1,9 @@
 # Plan: Capitulation Score (מד המיצוי) — second dashboard gauge
 
-**Overall Progress:** `~65%` (Phases 0-2 + engine tests complete; Phase 3 dashboard is a separate PR on `stable`)
+**Overall Progress:** `100%` — shipped. Engine PR [#83](https://github.com/22syn/smart-volume-radar/pull/83) merged to `main`,
+dashboard PR [#84](https://github.com/22syn/smart-volume-radar/pull/84) merged to `stable`, dashboard deployed to
+production, D1 `capitulation` column backfilled via a live scan run (2026-07-23,
+capitulation=0.86 that day) — verified end-to-end.
 
 ## Context
 
@@ -100,23 +103,22 @@ resolved by T0 (the backtest), not by a persona.
 - [x] **2.2** 🟩 Included in batch insert params, positioned right after `climax`.
   - **Verify:** ✅ `fragilityD1Ingest.test.ts` extended (8/8 passing, incl. the param-order test).
 
-### Phase 3: Dashboard (stable branch, separate PR)
-- [ ] **3.1** 🟥 Add the new field(s) to the API response in
+### Phase 3: Dashboard (stable branch, separate PR) — ✅ COMPLETE (PR #84)
+- [x] **3.1** 🟩 Added `capitulation` to the API response in `dashboard/src/query.ts` +
   `dashboard/functions/api/fragility.ts`.
-  - **Verify:** `curl` against a local/preview deploy shows the new field(s) in the JSON.
-- [ ] **3.2** 🟥 Add a second Chart.js line/graph in `dashboard/public/app.js`, explicitly
-  labeled descriptive-only (no color-coding as a buy/action signal, per FR5/Non-Goals).
-  - **Verify:** manual check in browser — second line renders, legend/label matches the
-    "descriptive only" framing.
-- [ ] **3.3** 🟥 Update the dashboard explainer tab (same pattern as PR #79's fragility
-  explainer) to describe the Capitulation Score's 4 components and state plainly: this is
-  descriptive only, our own validation found ~35% recall / ~29% precision against real
-  troughs and an edge that weakens in more recent data — not the friend's "+1.5% vs +8.6%"
-  number, which ran on a different basket.
-  - **Verify:** explainer text present, matches PRD §11's actual numbers, not a generic
-    "no trigger" disclaimer and not the friend's numbers.
+  - **Verify:** ✅ dashboard test suite extended (`query.test.ts`), 35/35 passing.
+- [x] **3.2** 🟩 Added a second Chart.js line in `dashboard/public/app.js` — distinct teal
+  color, legend enabled (previously hidden, now needed to distinguish two real lines),
+  tooltip explicitly labeled "תיאורי בלבד, לא טריגר" (descriptive only, not a trigger). No
+  dashed threshold line for it (unlike Fragility's 1.0) — we found no reliable action level.
+  - **Verify:** ✅ visually confirmed via `wrangler pages dev` against a seeded local D1 —
+    both lines render, legend/tooltip work correctly (screenshotted).
+- [x] **3.3** 🟩 New 🩵 explainer-tab section in `dashboard/public/index.html` describing the
+  4 components and stating our own validation numbers (35%/29% recall/precision, edge
+  weakens in the more recent half) — not the friend's "+1.5% vs +8.6%" number.
+  - **Verify:** ✅ visually confirmed — explainer text renders correctly, matches PRD §11.
 
-### Phase 4: Tests
+### Phase 4: Tests — ✅ COMPLETE
 - [x] **4.1** 🟩 Engine unit tests for the 4 components + combined score, mirroring
   `tests/purpleFragility.test.ts` conventions — 5 new tests: min-3-of-4 gate, panicVolume's
   down-day gating (near/far comparison, same pattern as the `climax` near-high test),
@@ -124,18 +126,26 @@ resolved by T0 (the backtest), not by a persona.
   - **Verify:** ✅ 26/26 in `purpleFragility.test.ts` (was 21).
 - [x] **4.2** 🟩 D1 ingest tests extended for the `capitulation` column.
   - **Verify:** ✅ 8/8 in `fragilityD1Ingest.test.ts`.
-- [ ] **4.3** 🟥 Dashboard tests extended for the new field(s) — **Phase 3 scope, not this PR.**
+- [x] **4.3** 🟩 Dashboard `query.test.ts` extended for the new column.
+  - **Verify:** ✅ 35/35 dashboard tests passing.
 
-### Phase X: Final verification (engine half — this PR) — ✅ COMPLETE
-- [x] `npx tsc --noEmit` clean
-- [x] `npm run lint` clean
-- [x] `npm test` — 370/370 passing (was 362 at the start of this plan)
+### Phase X: Final verification — ✅ COMPLETE END TO END
+- [x] `npx tsc --noEmit` clean (engine + dashboard)
+- [x] `npm run lint` clean (engine)
+- [x] `npm test` — 370/370 engine, 35/35 dashboard
 - [x] Manual preview: `scripts/preview-fragility.ts` — capitulation score renders correctly
-  in the per-day table, latest summary, and header line (today: capitulation=0.86, DD=-21.2%)
-- [ ] Dashboard build/typecheck clean — **Phase 3, separate PR on `stable`**
-- [ ] Cabinet PRD status updated from `analyzed` → `shipped` once BOTH PRs merge (engine +
-  dashboard) — not yet, engine PR still needs to be opened/merged first
-- [ ] [[radar-purple-fragility]] memory entry updated with the outcome — after merge
+  in the per-day table, latest summary, and header line
+- [x] Dashboard visually verified locally (Chart.js render, legend, tooltip, explainer)
+- [x] Engine PR #83 merged to `main`; dashboard PR #84 merged to `stable`
+- [x] `deploy-dashboard.yml` triggered and completed successfully — dashboard live in production
+- [x] `daily-scan.yml` triggered to backfill D1 — confirmed live: `capitulation: 0.86`,
+  "🟣 D1 fragility ingest: 250 rows through 2026-07-22"
+- [x] Cabinet PRD status updated `analyzed` → `shipped`
+- [x] [[radar-purple-fragility]] memory entry updated with the outcome
+- **Not independently verified:** the live production dashboard's rendered output — the site
+  sits behind Cloudflare Access SSO, which blocks headless verification. The deployed code is
+  byte-identical to what was visually verified locally against seeded data; Kobi should do a
+  quick spot-check next time he opens the dashboard.
 
 ---
 
