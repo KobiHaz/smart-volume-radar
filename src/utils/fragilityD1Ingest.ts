@@ -21,12 +21,14 @@ import { logger } from './logger.js';
 const BACKFILL_DAYS = 250;
 
 const FRAGILITY_COLS =
-    '(scan_date,score,core3,climax,wick10_z,pct_above50_z,dist20_z,ext50_z,corr20_z,disp10_z,' +
+    '(scan_date,score,core3,climax,capitulation,wick10_z,pct_above50_z,dist20_z,ext50_z,corr20_z,disp10_z,' +
     'index_value,drawdown_pct,canary_count,ingested_at)';
-/** D1 caps at 100 bound params/query: 14 cols × 7 rows = 98. Adding a column
- *  requires lowering ROWS_PER_INSERT — the unit test asserts the arithmetic. */
-export const FRAGILITY_COL_COUNT = 14;
-export const ROWS_PER_INSERT = 7;
+/** D1 caps at 100 bound params/query: 15 cols × 6 rows = 90. Adding a column
+ *  requires lowering ROWS_PER_INSERT — the unit test asserts the arithmetic.
+ *  Only the combined `capitulation` score is stored (not its 4 sub-components)
+ *  — the dashboard only plots the one line (FR5, PRD-capitulation-score.md). */
+export const FRAGILITY_COL_COUNT = 15;
+export const ROWS_PER_INSERT = 6;
 
 const round = (x: number | null, digits: number): number | null =>
     x == null ? null : Math.round(x * 10 ** digits) / 10 ** digits;
@@ -37,7 +39,7 @@ export function buildFragilityBatches(days: FragilityDay[], stamp: string): Batc
         {
             sql: `CREATE TABLE IF NOT EXISTS fragility_daily (
                 scan_date TEXT PRIMARY KEY,
-                score REAL, core3 REAL, climax REAL, wick10_z REAL, pct_above50_z REAL, dist20_z REAL,
+                score REAL, core3 REAL, climax REAL, capitulation REAL, wick10_z REAL, pct_above50_z REAL, dist20_z REAL,
                 ext50_z REAL, corr20_z REAL, disp10_z REAL,
                 index_value REAL, drawdown_pct REAL, canary_count INTEGER, ingested_at TEXT)`,
             params: [],
@@ -51,7 +53,7 @@ export function buildFragilityBatches(days: FragilityDay[], stamp: string): Batc
     });
     for (let i = 0; i < rows.length; i += ROWS_PER_INSERT) {
         const slice = rows.slice(i, i + ROWS_PER_INSERT);
-        const placeholders = slice.map(() => '(?,?,?,?,?,?,?,?,?,?,?,?,?,?)').join(',');
+        const placeholders = slice.map(() => '(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').join(',');
         const params: unknown[] = [];
         for (const d of slice) {
             params.push(
@@ -59,6 +61,7 @@ export function buildFragilityBatches(days: FragilityDay[], stamp: string): Batc
                 round(d.score, 4),
                 round(d.core3, 4),
                 round(d.climax, 4),
+                round(d.capitulation, 4),
                 round(d.z.wick10, 4), round(d.z.pctAbove50, 4), round(d.z.dist20, 4),
                 round(d.z.ext50, 4), round(d.z.corr20, 4), round(d.z.disp10, 4),
                 round(d.indexValue, 4), round(d.drawdownPct, 2),
@@ -104,6 +107,11 @@ export async function ingestFragilityToD1(
         }
         try {
             await runBatch({ sql: 'ALTER TABLE fragility_daily ADD COLUMN climax REAL', params: [] }, config);
+        } catch {
+            // column already present (or table missing — CREATE below handles it)
+        }
+        try {
+            await runBatch({ sql: 'ALTER TABLE fragility_daily ADD COLUMN capitulation REAL', params: [] }, config);
         } catch {
             // column already present (or table missing — CREATE below handles it)
         }

@@ -1,4 +1,4 @@
-import { mean, stdDev, pearson, rollingMean, expandingZ } from '../src/utils/statistics.js';
+import { mean, stdDev, pearson, rollingMean, rollingMax, expandingZ } from '../src/utils/statistics.js';
 
 describe('mean', () => {
     it('returns null on empty input', () => {
@@ -42,6 +42,19 @@ describe('rollingMean', () => {
     });
     it('returns all nulls when the series is shorter than the window', () => {
         expect(rollingMean([1, 2], 3)).toEqual([null, null]);
+    });
+});
+
+describe('rollingMax', () => {
+    it('is null until the window fills, then takes the max of the window', () => {
+        expect(rollingMax([3, 1, 4, 1, 5], 3)).toEqual([null, null, 4, 4, 5]);
+    });
+    it('returns all nulls when the series is shorter than the window', () => {
+        expect(rollingMax([1, 2], 3)).toEqual([null, null]);
+    });
+    it('propagates null when any value in the window is null', () => {
+        expect(rollingMax([1, null, 3], 2)).toEqual([null, null, null]);
+        expect(rollingMax([1, 2, 3], 2)).toEqual([null, 2, 3]);
     });
 });
 

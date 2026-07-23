@@ -141,13 +141,18 @@ function formatReportHeader(
     // Purple List fragility gauge — display-only, gates nothing (like healthLine).
     // Two-tier emoji mirrors the model v2 alert rules: 🔴 when mean6 is over
     // threshold AND the basket is near its high; 🟡 when core3 is elevated, or
-    // climax is elevated while near the high; 🟢 otherwise.
+    // climax is elevated while near the high; 🟢 otherwise. `capitulation` (the
+    // bottom-detection companion gauge) is shown for context only — it never
+    // affects the emoji, and has no alert/threshold of its own (see
+    // PRD-capitulation-score.md: our own validation found it isn't precise
+    // enough to act on).
     // All values are numbers formatted here; no user strings → no escapeHtml needed.
     let fragilityLine = '';
     if (fragility?.latest.score != null) {
         const s = fragility.latest.score;
         const c3 = fragility.latest.core3;
         const climax = fragility.latest.climax;
+        const capitulation = fragility.latest.capitulation;
         const nearHigh = fragility.indexNearHigh;
         const emoji =
             s >= FRAGILITY_THRESHOLD && nearHigh ? '🔴'
@@ -157,9 +162,10 @@ function formatReportHeader(
         const canaryBit = nearHigh ? ` | Canary ${fragility.canaryCount}/${fragility.tickersUsed.length}` : '';
         const core3Bit = c3 != null ? ` | core3 ${c3.toFixed(2)}` : '';
         const climaxBit = climax != null ? ` | climax ${climax.toFixed(2)}` : '';
+        const capitulationBit = capitulation != null ? ` | capitulation ${capitulation.toFixed(2)}` : '';
         fragilityLine =
             `🟣 <b>Purple Fragility:</b> ${emoji} ${s.toFixed(2)} ` +
-            `<i>(סף ${FRAGILITY_THRESHOLD.toFixed(1)})</i>${core3Bit}${climaxBit} | DD ${dd.toFixed(1)}%${canaryBit}\n`;
+            `<i>(סף ${FRAGILITY_THRESHOLD.toFixed(1)})</i>${core3Bit}${climaxBit}${capitulationBit} | DD ${dd.toFixed(1)}%${canaryBit}\n`;
     }
 
     return (

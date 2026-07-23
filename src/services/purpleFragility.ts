@@ -40,7 +40,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import pLimit from 'p-limit';
 import { normalizePriceUnitJumps } from './marketData.js';
-import { mean, stdDev, pearson, rollingMean, rollingStd, expandingZ } from '../utils/statistics.js';
+import { mean, stdDev, pearson, rollingMean, rollingStd, rollingMax, expandingZ } from '../utils/statistics.js';
 import logger from '../utils/logger.js';
 
 // process.cwd() is the project root in every run mode (npm start, tsx scripts,
@@ -104,6 +104,14 @@ export interface FragilityComponents {
     disp10: number | null;
 }
 
+/** Sub-components of the Capitulation Score (מד המיצוי) — see FragilityDay.capitulation. */
+export interface CapitulationComponents {
+    depth: number | null;
+    panicVolume: number | null;
+    washout: number | null;
+    negMom: number | null;
+}
+
 export interface FragilityDay {
     date: string;
     /** Mean of the non-null component z's; null during burn-in or when <5 of 6 are available. */
@@ -116,6 +124,14 @@ export interface FragilityDay {
      *  tickers within CLIMAX_NEAR_HIGH_PCT of their own trailing 20d closing
      *  high. Null until every ticker's volume-z baseline is warmed up. */
     climax: number | null;
+    /** Capitulation Score (מד המיצוי) — bottom-detection companion to the
+     *  euphoria score above ("has selling exhausted itself?"). Mean of the 4
+     *  z's in capitulationZ, null unless at least 3 of 4 are available.
+     *  DISPLAY ONLY — no threshold/alert wired to this anywhere; see
+     *  PRD-capitulation-score.md for why (our own validation found ~35%/29%
+     *  recall/precision against real troughs, edge doesn't hold up split-half). */
+    capitulation: number | null;
+    capitulationZ: CapitulationComponents;
     z: FragilityComponents;
     raw: FragilityComponents;
     /** Equal-weight basket index, growth of $1 from the first aligned day. */
@@ -361,6 +377,8 @@ export function buildFragilityDays(
         ma50.push(rollingMean(s.close, 50));
         vol50.push(rollingMean(s.volume, 50));
     }
+    // Per-ticker 20d MA, used by the Capitulation Score's `washout` component.
+    const ma20 = series.map((s) => rollingMean(s.close, 20));
     // Per-ticker contextual volume climax: 60d volume z-score, only counted
     // while the ticker trades within CLIMAX_NEAR_HIGH_PCT of its own trailing
     // 20d closing high ("volume only predicts in context").
@@ -450,6 +468,40 @@ export function buildFragilityDays(
         if (vals.every((x): x is number => x != null)) climaxRaw[t] = mean(vals as number[]);
     }
 
+    // Capitulation Score (מד המיצוי) — DISPLAY ONLY, no threshold/alert logic
+    // anywhere (see PRD-capitulation-score.md: our own validation found ~35%/
+    // 29% recall/precision against real troughs and an edge that doesn't hold
+    // up in split-half testing). Bottom-detection companion to the euphoria
+    // score above — "has the selling exhausted itself?" instead of "is the
+    // market ripe for a top?". `panicVolume` reuses the same per-ticker 60d
+    // volume-z baseline as climax but gates on down->1% days instead of
+    // near-high days, then takes the rolling max of the trailing 10 days
+    // (hunting for one capitulation day, not a same-day average).
+    const panicDaily: Array<number | null> = new Array(T).fill(null);
+    for (let t = 0; t < T; t++) {
+        const vals: number[] = [];
+        let allDefined = true;
+        for (let i = 0; i < N; i++) {
+            const m = volMean60[i]![t];
+            const sd = volStd60[i]![t];
+            if (m == null || sd == null || sd < 1e-9) { allDefined = false; break; }
+            const volZ = (series[i]!.volume[t]! - m) / sd;
+            const r = ret[i]![t];
+            vals.push(r != null && r < -0.01 ? Math.max(volZ, 0) : 0);
+        }
+        if (allDefined) panicDaily[t] = mean(vals);
+    }
+    const panicVolumeRaw = rollingMax(panicDaily, 10);
+
+    // washout: fraction of tickers below their own 20d MA (inverse-sense
+    // sibling of pctAbove50, which uses a 50d MA).
+    const washoutRaw: Array<number | null> = new Array(T).fill(null);
+    for (let t = 0; t < T; t++) {
+        if (ma20.every((m) => m[t] != null)) {
+            washoutRaw[t] = series.filter((s, i) => s.close[t]! < (ma20[i]![t] as number)).length / N;
+        }
+    }
+
     // ---- expanding z-scores (one-day lag) + composite score ----
     const zSeries = {
         wick10: expandingZ(wick10, Z_MIN_PRIOR),
@@ -469,6 +521,22 @@ export function buildFragilityDays(
         indexValue[t] = indexValue[t - 1]! * (1 + (mean(rets) ?? 0));
     }
 
+    // depth + negMom (Capitulation Score) derive from indexValue, so they're
+    // computed here rather than alongside panicVolume/washout above.
+    const runningPeakArr: number[] = new Array(T);
+    runningPeakArr[0] = indexValue[0]!;
+    for (let t = 1; t < T; t++) runningPeakArr[t] = Math.max(runningPeakArr[t - 1]!, indexValue[t]!);
+    const depthRaw: number[] = indexValue.map((v, t) => -(v / runningPeakArr[t]! - 1));
+    const negMomRaw: Array<number | null> = new Array(T).fill(null);
+    for (let t = 20; t < T; t++) negMomRaw[t] = -(indexValue[t]! / indexValue[t - 20]! - 1);
+
+    const capitulationZ = {
+        depth: expandingZ(depthRaw, Z_MIN_PRIOR),
+        panicVolume: expandingZ(panicVolumeRaw, Z_MIN_PRIOR),
+        washout: expandingZ(washoutRaw, Z_MIN_PRIOR),
+        negMom: expandingZ(negMomRaw, Z_MIN_PRIOR),
+    };
+
     const days: FragilityDay[] = [];
     let runningPeak = -Infinity;
     for (let t = 0; t < T; t++) {
@@ -482,6 +550,13 @@ export function buildFragilityDays(
         const score = zVals.length >= 5 ? mean(zVals) : null;
         const core3Parts = [z.wick10, z.dist20, z.disp10].filter((x): x is number => x != null);
         const core3 = core3Parts.length === 3 ? mean(core3Parts) : null;
+
+        const capZ: CapitulationComponents = {
+            depth: capitulationZ.depth[t]!, panicVolume: capitulationZ.panicVolume[t]!,
+            washout: capitulationZ.washout[t]!, negMom: capitulationZ.negMom[t]!,
+        };
+        const capVals = Object.values(capZ).filter((x): x is number => x != null);
+        const capitulation = capVals.length >= 3 ? mean(capVals) : null;
 
         // Trailing-250d index high for "near high"; per-ticker high age for the canary.
         const lb = Math.max(0, t - (HIGH_LOOKBACK_DAYS - 1));
@@ -506,6 +581,8 @@ export function buildFragilityDays(
             score,
             core3,
             climax: climaxZ[t]!,
+            capitulation,
+            capitulationZ: capZ,
             z,
             raw: {
                 wick10: wick10[t]!, pctAbove50: pctAbove50[t]!, dist20: dist20[t]!,

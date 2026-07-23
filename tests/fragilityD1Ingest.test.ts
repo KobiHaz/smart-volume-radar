@@ -12,6 +12,8 @@ function day(date: string, score: number | null): FragilityDay {
         score,
         core3: 0.7,
         climax: 0.9,
+        capitulation: 0.4,
+        capitulationZ: { depth: 0.1, panicVolume: 0.2, washout: 0.3, negMom: 0.4 },
         z: { wick10: 0.1, pctAbove50: 0.2, dist20: 0.3, ext50: 0.4, corr20: 0.5, disp10: 0.6 },
         raw: { wick10: 0.25, pctAbove50: 0.8, dist20: 3, ext50: 0.15, corr20: 0.4, disp10: 0.02 },
         indexValue: 2.5,
@@ -44,7 +46,7 @@ describe('buildFragilityBatches', () => {
         expect(insert.params[0]).toBe('2026-07-01');
     });
 
-    it('chunks inserts at ROWS_PER_INSERT rows (8 rows → 2 insert batches)', () => {
+    it('chunks inserts at ROWS_PER_INSERT rows (ROWS_PER_INSERT+1 rows → 2 insert batches)', () => {
         const days = Array.from({ length: ROWS_PER_INSERT + 1 }, (_, i) =>
             day(`2026-07-${String(i + 1).padStart(2, '0')}`, 0.5)
         );
@@ -55,12 +57,12 @@ describe('buildFragilityBatches', () => {
         expect(inserts[1]!.params.length).toBe(1 * FRAGILITY_COL_COUNT);
     });
 
-    it('orders row params to match the column list (incl. core3, climax)', () => {
+    it('orders row params to match the column list (incl. core3, climax, capitulation)', () => {
         const batches = buildFragilityBatches([day('2026-07-01', 0.5)], 'the-stamp');
         const p = batches[2]!.params;
         expect(p).toEqual([
-            '2026-07-01', 0.5, 0.7, 0.9,     // score, core3, climax
-            0.1, 0.2, 0.3, 0.4, 0.5, 0.6,   // z components
+            '2026-07-01', 0.5, 0.7, 0.9, 0.4,  // score, core3, climax, capitulation
+            0.1, 0.2, 0.3, 0.4, 0.5, 0.6,      // z components
             2.5, -1.23, 2, 'the-stamp',
         ]);
     });

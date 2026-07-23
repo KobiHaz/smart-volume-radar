@@ -136,7 +136,8 @@ async function main(): Promise<void> {
                 `🟣 Fragility score: ${fragility.latest.score.toFixed(2)} ` +
                 `(prev ${fragility.prevScore?.toFixed(2) ?? '—'}) | ` +
                 `core3: ${fragility.latest.core3?.toFixed(2) ?? '—'} | ` +
-                `climax: ${fragility.latest.climax?.toFixed(2) ?? '—'}` +
+                `climax: ${fragility.latest.climax?.toFixed(2) ?? '—'} | ` +
+                `capitulation: ${fragility.latest.capitulation?.toFixed(2) ?? '—'}` +
                 (fragility.crossedUp ? ' ⚠️ CROSSED (mean6+nearHigh)' : fragility.core3CrossedUp ? ` 🟡 Watch crossed (${fragility.watchTrigger})` : '')
             );
         }
@@ -484,6 +485,7 @@ async function main(): Promise<void> {
                               core3CrossedUp: fragility.core3CrossedUp,
                               climax: fragility.latest.climax,
                               watchTrigger: fragility.watchTrigger,
+                              capitulation: fragility.latest.capitulation,
                               canaryCount: fragility.canaryCount,
                               indexNearHigh: fragility.indexNearHigh,
                               indexValue: fragility.latest.indexValue,

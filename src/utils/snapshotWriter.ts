@@ -47,6 +47,8 @@ export interface SnapshotMeta {
         climax?: number | null;
         /** Which Watch-tier condition fired: core3, climax, both, or none. */
         watchTrigger?: 'core3' | 'climax' | 'both' | null;
+        /** Capitulation Score (מד המיצוי) — descriptive only, no alert wired to it. */
+        capitulation?: number | null;
         canaryCount: number;
         indexNearHigh: boolean;
         indexValue: number;

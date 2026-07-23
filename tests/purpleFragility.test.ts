@@ -413,3 +413,103 @@ describe('dual-tier crossing (model v2)', () => {
         expect(result.watchTrigger).toBe('both');
     });
 });
+
+describe('capitulation score (מד המיצוי) — display-only, no threshold/alert wired to it', () => {
+    const T = 140;
+    const last = T - 1;
+
+    it('is defined once at least 3 of 4 components are available, and equals their mean', () => {
+        const mk = (name: string, phase: number) => makeSeries(name, T, (t) => quietBar(t, phase));
+        const built = buildFragilityDays([mk('A', 0), mk('B', 1), mk('C', 2)])!;
+        const d = built.days[built.days.length - 1]!;
+        expect(d.capitulation).not.toBeNull();
+        const vals = Object.values(d.capitulationZ).filter((x): x is number => x != null);
+        expect(vals.length).toBeGreaterThanOrEqual(3);
+        expect(d.capitulation!).toBeCloseTo(vals.reduce((a, b) => a + b, 0) / vals.length, 12);
+    });
+
+    it('panicVolume registers a volume spike only on a day the ticker actually fell >1%', () => {
+        // quietBar alone never has a >1% single-day move, so the panic-volume raw
+        // series would be a constant zero (degenerate variance, z stays null
+        // forever — see expandingZ's documented guard). Give the background a
+        // periodic, modest down-day + volume bump so the series has genuine
+        // variance to z-score against, then compare a real spike day to it.
+        const noisyBar = (t: number, phase: number, prevClose: number): Bar => {
+            const dip = t % 7 === 3;
+            const c = dip ? prevClose * 0.988 : prevClose * (1 + 0.001 * Math.sin(t * 0.7 + phase));
+            const v = dip ? 1500 + Math.round(200 * Math.sin(t * 0.9 + phase)) : 1000 + Math.round(100 * Math.sin(t * 1.3 + phase));
+            return { o: prevClose, h: prevClose + 0.3, l: c - 0.3, c, v };
+        };
+        const mkFalling = (name: string, phase: number): OhlcvSeries => {
+            let prevClose = 100;
+            return makeSeries(name, T, (t) => {
+                if (t !== last) { const b = noisyBar(t, phase, prevClose); prevClose = b.c; return b; }
+                const c = prevClose * 0.98; // -2% day-over-day — clears the >1% down gate
+                return { o: prevClose, h: prevClose + 0.2, l: c - 0.2, c, v: 8000 };
+            });
+        };
+        const mkFlat = (name: string, phase: number): OhlcvSeries => {
+            let prevClose = 100;
+            return makeSeries(name, T, (t) => {
+                const b = noisyBar(t, phase, prevClose);
+                prevClose = b.c;
+                return t === last ? { ...b, v: 8000 } : b; // same huge volume, no down day
+            });
+        };
+        const fallingDay = buildFragilityDays([mkFalling('A', 0), mkFalling('B', 1), mkFalling('C', 2)])!
+            .days.at(-1)!;
+        const flatDay = buildFragilityDays([mkFlat('A', 0), mkFlat('B', 1), mkFlat('C', 2)])!
+            .days.at(-1)!;
+        expect(fallingDay.capitulationZ.panicVolume).not.toBeNull();
+        expect(flatDay.capitulationZ.panicVolume).not.toBeNull();
+        expect(fallingDay.capitulationZ.panicVolume!).toBeGreaterThan(flatDay.capitulationZ.panicVolume!);
+    });
+
+    it('washout is elevated when the whole basket trades below its own 20d MA', () => {
+        const mk = (name: string, phase: number): OhlcvSeries => {
+            let prevClose = 0;
+            return makeSeries(name, T, (t) => {
+                if (t < last - 5) { const b = quietBar(t, phase); prevClose = b.c; return b; }
+                const c = prevClose * 0.97; // crash the last 6 days well below the trailing MA20
+                const b = { o: prevClose, h: prevClose + 0.2, l: c - 0.2, c, v: 1000 };
+                prevClose = c;
+                return b;
+            });
+        };
+        const d = buildFragilityDays([mk('A', 0), mk('B', 1), mk('C', 2)])!.days.at(-1)!;
+        expect(d.capitulationZ.washout).not.toBeNull();
+        expect(d.capitulationZ.washout!).toBeGreaterThan(0);
+    });
+
+    it('negMom is positive after a sustained trailing-20d index decline', () => {
+        const mk = (name: string, phase: number): OhlcvSeries => {
+            let prevClose = 0;
+            return makeSeries(name, T, (t) => {
+                if (t < T - 20) { const b = quietBar(t, phase); prevClose = b.c; return b; }
+                const c = prevClose * 0.99; // ~-1%/day compounding decline over the trailing 20d
+                const b = { o: prevClose, h: prevClose + 0.2, l: c - 0.2, c, v: 1000 };
+                prevClose = c;
+                return b;
+            });
+        };
+        const d = buildFragilityDays([mk('A', 0), mk('B', 1), mk('C', 2)])!.days.at(-1)!;
+        expect(d.capitulationZ.negMom).not.toBeNull();
+        expect(d.capitulationZ.negMom!).toBeGreaterThan(0);
+    });
+
+    it('depth is positive when the index sits well below its running peak', () => {
+        const mk = (name: string, phase: number): OhlcvSeries => {
+            let prevClose = 0;
+            return makeSeries(name, T, (t) => {
+                if (t < 80) { const b = quietBar(t, phase); prevClose = b.c; return b; } // establish a peak
+                const c = prevClose * 0.995; // steady decline from t=80 to the end
+                const b = { o: prevClose, h: prevClose + 0.2, l: c - 0.2, c, v: 1000 };
+                prevClose = c;
+                return b;
+            });
+        };
+        const d = buildFragilityDays([mk('A', 0), mk('B', 1), mk('C', 2)])!.days.at(-1)!;
+        expect(d.capitulationZ.depth).not.toBeNull();
+        expect(d.capitulationZ.depth!).toBeGreaterThan(0);
+    });
+});

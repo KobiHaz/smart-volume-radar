@@ -72,6 +72,22 @@ export function rollingStd(xs: number[], window: number): Array<number | null> {
 }
 
 /**
+ * Rolling max over a fixed trailing window (including the current day).
+ * Result[i] is null until the window is full (i < window−1) or any value in
+ * the window is null (matches rollingMean/rollingStd's require-the-whole-
+ * window convention). Length-preserving.
+ */
+export function rollingMax(xs: Array<number | null>, window: number): Array<number | null> {
+    const out: Array<number | null> = new Array(xs.length).fill(null);
+    if (window < 1) return out;
+    for (let i = window - 1; i < xs.length; i++) {
+        const slice = xs.slice(i - window + 1, i + 1);
+        if (slice.every((x): x is number => x != null)) out[i] = Math.max(...slice);
+    }
+    return out;
+}
+
+/**
  * Expanding-window z-scores with a one-day lag (no lookahead):
  *
  *   z[t] = (x[t] − mean(x[0..t−1])) / std(x[0..t−1])
