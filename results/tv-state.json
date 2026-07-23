@@ -11,10 +11,6 @@
         "signalDate": "2026-07-23"
       },
       {
-        "ticker": "ARF",
-        "signalDate": "2026-07-23"
-      },
-      {
         "ticker": "XBI",
         "signalDate": "2026-07-23"
       },
@@ -48,8 +44,7 @@
       },
       {
         "ticker": "BLND",
-        "signalDate": "2026-07-23",
-        "exchange": "LSE"
+        "signalDate": "2026-07-23"
       }
     ],
     "Smart Radar - WATCH": [
@@ -119,8 +114,7 @@
       },
       {
         "ticker": "HARL",
-        "signalDate": "2026-07-23",
-        "exchange": "TASE"
+        "signalDate": "2026-07-23"
       },
       {
         "ticker": "PANW",
@@ -155,95 +149,7 @@
         "signalDate": "2026-07-23"
       },
       {
-        "ticker": "JPM",
-        "signalDate": "2026-07-23"
-      },
-      {
         "ticker": "CL",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "KBE",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "VLY",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "REG",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "AEP",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "KO",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "YUM",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "EWP",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "EIRL",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "EWL",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "CAPL",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "EQR",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "SPY",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "TMHC",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "DKSH",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "IYR",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "EWU",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "VNQ",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "XLU",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "VGK",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "XLP",
-        "signalDate": "2026-07-23"
-      },
-      {
-        "ticker": "EWI",
         "signalDate": "2026-07-23"
       }
     ]
