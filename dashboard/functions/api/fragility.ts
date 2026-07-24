@@ -11,6 +11,13 @@ interface Env { DB: D1Database; }
 interface FragilityRow {
   scan_date: string;
   score: number;
+  /** Watch-tier score (wick10+dist20+disp10 z-mean) — model v2, PR #82. Part of the
+   *  real 🟡 alert rule (core3>=1.0 OR climax>=1.5+nearHigh); not drawn as its own
+   *  line (would clutter the chart) — surfaced in the tooltip instead. */
+  core3: number | null;
+  /** Contextual volume climax (euphoria-context, near a high) — model v2, PR #82.
+   *  Same tooltip-only treatment as core3. */
+  climax: number | null;
   /** Capitulation Score (מד המיצוי) — bottom-detection companion gauge, descriptive
    *  only (no threshold/alert tied to it). See explainer tab for our own validation. */
   capitulation: number | null;
