@@ -70,9 +70,9 @@ describe('buildFragilityQuery', () => {
     expect(q.params).toEqual([250]);
   });
 
-  it('selects the score, capitulation score, six z components, index, drawdown and canary', () => {
+  it('selects the score, core3, climax, capitulation score, six z components, index, drawdown and canary', () => {
     const q = buildFragilityQuery({});
-    for (const col of ['score', 'capitulation', 'wick10_z', 'pct_above50_z', 'dist20_z', 'ext50_z', 'corr20_z', 'disp10_z', 'index_value', 'drawdown_pct', 'canary_count']) {
+    for (const col of ['score', 'core3', 'climax', 'capitulation', 'wick10_z', 'pct_above50_z', 'dist20_z', 'ext50_z', 'corr20_z', 'disp10_z', 'index_value', 'drawdown_pct', 'canary_count']) {
       expect(q.sql).toContain(col);
     }
   });

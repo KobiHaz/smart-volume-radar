@@ -434,19 +434,38 @@
           </div>
         </div>
         <p class="explainer-prose">
-          <strong>איך קוראים את הגרף:</strong> ציון סביב 0 = התנהגות רגילה. מעל
-          <strong>1.0</strong> (הקו האדום המקווקו) = פרופיל אופוריה קיצוני. במחקר הכיול
-          (שנה אחורה, 8 אירועי נפילה): ציון מעל 1.0 קדם ל-<strong>75% מהנפילות של יותר מ-7%
-          תוך 15 ימי מסחר</strong> — לעומת 35% ביום אקראי — כולל התרעה של ~3 שבועות לפני ראש
-          השוק של יוני 2026. ה-tooltip מציג לכל יום גם את ה-drawdown של הסל ואת
-          <strong>ספירת הקנריות</strong> — כמה מניות כבר עשו את השיא שלהן לפני יותר מ-10 ימים
-          בזמן שהמדד עוד ליד שיא (ביוני: SEDG, IFX ו-MRVL נשברו שבועיים-שלושה לפני כולם).
+          <strong>Model v2 (2026-07-22):</strong> נוסף רכיב שביעי, <strong>climax</strong> —
+          Z של מחזור 60 יום לכל מניה, נספר <em>רק</em> כשהיא בתוך 5% מהשיא שלה ב-20 הימים
+          האחרונים ("מחזור מנבא רק בהקשר"). לצדו נגזר <strong>core3</strong> — ממוצע ה-Z של
+          wick10+dist20+disp10 בלבד, שכבת "Watch" רכה יותר. שני הרכיבים האלה לא מצוירים כקווים
+          נפרדים בגרף (כדי לא לעמוס) — אבל מוצגים בכל <strong>tooltip</strong> לצד הציון הראשי.
+        </p>
+        <p class="explainer-prose">
+          <strong>איך קוראים את הגרף:</strong> ציון סביב 0 = התנהגות רגילה. הקו האדום המקווקו
+          על <strong>1.0</strong> הוא <em>ייחוס בלבד</em> — הכלל האמיתי שרץ במנוע מורכב יותר:
+        </p>
+        <div class="explainer-score-grid">
+          <div class="explainer-score-item explainer-score-item--neg">
+            <span class="explainer-score-label">🔴 Alert</span>
+            <span class="explainer-score-detail">mean6 ≥ 1.0 <strong>וגם</strong> הסל קרוב לשיא הרץ שלו (indexNearHigh) — לא מספיק לחצות 1.0 לבד</span>
+          </div>
+          <div class="explainer-score-item explainer-score-item--neg">
+            <span class="explainer-score-label">🟡 Watch</span>
+            <span class="explainer-score-detail">core3 ≥ 1.0 <strong>או</strong> (climax ≥ 1.5 וגם קרוב לשיא) — השכבה שתופסת הכי הרבה</span>
+          </div>
+        </div>
+        <p class="explainer-prose">
+          <strong>הכיול (בדיקת יציבות Split-Half, 2023-24 מול 2025-26 — לא In-Sample על שנה
+          אחת):</strong> חוק ה-Watch המשולב תפס <strong>94%/92% מהשיאים</strong> (סף >7%/≥10%)
+          בדיוק <strong>~39%</strong> — יציב בשתי התקופות בנפרד. ה-tooltip מציג לכל יום גם את
+          ה-drawdown של הסל ואת <strong>ספירת הקנריות</strong> — כמה מניות כבר עשו את השיא שלהן
+          לפני יותר מ-10 ימים בזמן שהמדד עוד ליד שיא (ביוני 2026: SEDG, IFX ו-MRVL נשברו
+          שבועיים-שלושה לפני כולם).
         </p>
         <p class="explainer-prose">
           <strong>מה זה לא:</strong> תצוגה בלבד — הציון לא חוסם ולא משנה שום סיגנל ברדאר.
-          הסף 1.0 נבחר בדיעבד (In-Sample) על שנת ראלי אחת; המבחן האמיתי הוא מהיום והלאה,
-          וזו בדיוק הסיבה שהוא מחושב ונשמר כאן כל יום. מחזור גבוה לבדו, אגב, נפסל במחקר
-          (IC אפס) — הוא מנבא רק בהקשר, ולכן ימי חלוקה בפנים ו-Volume גולמי בחוץ.
+          מחזור גבוה לבדו, אגב, לא מספיק — הוא מנבא רק בהקשר (קרוב לשיא), ולכן ימי חלוקה
+          וה-climax החדש בפנים, אבל Volume גולמי נשאר בחוץ.
         </p>
       </section>
 

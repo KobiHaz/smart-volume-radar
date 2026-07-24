@@ -103,7 +103,7 @@ export interface FragilityParams { from?: string; limit?: number; }
 
 export function buildFragilityQuery(p: FragilityParams = {}): Query {
   const SEL =
-    'SELECT scan_date,score,capitulation,wick10_z,pct_above50_z,dist20_z,ext50_z,corr20_z,disp10_z,' +
+    'SELECT scan_date,score,core3,climax,capitulation,wick10_z,pct_above50_z,dist20_z,ext50_z,corr20_z,disp10_z,' +
     'index_value,drawdown_pct,canary_count FROM fragility_daily WHERE score IS NOT NULL';
   const limit = p.limit ?? 250;
   if (p.from) {

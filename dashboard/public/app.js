@@ -533,8 +533,12 @@ function renderFragilityChart(rows) {
           fill: false,
           hidden: !hasCapitulation,
         },
+        // Reference line only — the real 🔴 alert also requires the basket to be
+        // near its own running high (indexNearHigh, not persisted per-day here),
+        // so a score crossing 1.0 on this chart isn't identical to a real alert
+        // having fired. See the tooltip / explainer tab for the full rule.
         {
-          label: 'סף 1.0 (Fragility בלבד)',
+          label: 'סף 1.0 (ייחוס — לא הכלל המלא)',
           data: threshold,
           borderColor: 'rgba(248,81,73,0.7)',
           borderWidth: 1,
@@ -557,7 +561,7 @@ function renderFragilityChart(rows) {
             color: '#8b95a5',
             font: { size: 10 },
             boxWidth: 12,
-            filter: (item) => item.text !== 'סף 1.0 (Fragility בלבד)',
+            filter: (item) => item.text !== 'סף 1.0 (ייחוס — לא הכלל המלא)',
           },
         },
         tooltip: {
@@ -578,7 +582,7 @@ function renderFragilityChart(rows) {
                   : `Capitulation: ${r.capitulation.toFixed(2)} (תיאורי בלבד, לא טריגר)`;
               }
               return [
-                `ציון: ${r.score.toFixed(2)}`,
+                `ציון: ${r.score.toFixed(2)}  |  core3: ${z(r.core3)}  |  climax: ${z(r.climax)}`,
                 `DD: ${r.drawdown_pct == null ? '—' : r.drawdown_pct.toFixed(1) + '%'}` +
                   (r.canary_count != null ? ` | Canary: ${r.canary_count}` : ''),
                 `wick ${z(r.wick10_z)} | %>50 ${z(r.pct_above50_z)} | dist ${z(r.dist20_z)}`,
